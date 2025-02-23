@@ -1,4 +1,9 @@
-# NotesMaster
+<div align="center">
+   <img src="repo_imgs/repo_app_icon.svg" alt="" width="150px">
+</div>
+<h1 align="center">
+ NotesMaster
+</h1>
 
 <div align="center">
  <a href="https://github.com/PranshulGG/NotesMaster/releases"><img alt="GitHub" src="https://censorship.no/img/github-badge.png" height="80"/></a>
