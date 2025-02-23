@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" Theme="blue_material">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <script src="../module/android.js"></script>
+    <link rel="stylesheet" href="../ui-files/font-usage.css">
+    <link rel="stylesheet" href="../ui-files/ui.css">
+    <link rel="stylesheet" href="../ui-files/variables.css">
+    <link rel="stylesheet" href="../components/components.css">
+    <link rel="stylesheet" href="../components/modal-ver.css">
+
+    <style>
+        md-list-item{
+            background-color: var(--Surface-Container-Lowest);
+            margin-bottom: 6px;
+            border-radius: 10px;
+        }
+
+        md-list{
+            padding: 8px;
+        }
+
+        md-list md-list-item:first-child{
+            border-radius: 18px 18px 10px 10px;
+        }
+
+        md-list md-list-item:last-child{
+            border-radius: 10px 10px 18px 18px ;
+        }
+
+        .custom_theme .color-item{
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--clr);
+            border-radius: 50px;
+            flex-shrink: 0;
+        }
+
+        .custom_theme .color-item::before{
+            content: 'check';
+            font-family: 'Material symbols';
+            font-weight: normal !important;
+            font-style: normal !important;
+            line-height: 1;
+            font-size: 24px;
+            color: var(--clr-check);
+            display: var(--display-style, none);
+        }
+
+        .custom_theme{
+            display: flex;
+            overflow: auto;
+            gap: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+
+        .custom_theme_items.hidden{
+            height: 0px;
+            padding: 0;
+            margin: 0;
+            opacity: 0;
+        }
+
+        .custom_theme_items{
+            opacity: 1;
+            height: 79px;
+            overflow: hidden;
+        }
+    </style>
+
+</head>
+<body>
+    <div id="app">
+    <div class="activity-large open">
+        <div class="header-activity-large" id="head-1">
+          <md-icon-button onclick="ActivityBack();">
+            <md-icon icon-outlined>arrow_back</md-icon>
+        </md-icon-button>
+          <p class="label-hidden-large" style="white-space: nowrap;">Settings</p>
+        </div>
+        <div class="activity-large-content" id="headUser-1">
+          <p class="label-large-main">Settings</p>
+          <div class="content-parent-large" style="padding-bottom: 32px;">
+            <p class="title" style="margin-top: 5px;">App looks</p>
+
+            <md-list>
+                <md-list-item>
+                    <md-icon icon-filled slot="start">dark_mode</md-icon>
+                    <div slot="headline">Dark theme</div>
+                    <div slot="supporting-text">Use dark theme colors</div>
+                    <md-switch slot="end" id="darkThemeSwitch"></md-switch>
+                  </md-list-item>
+
+                  <md-list-item class="custom_theme_items">
+                    <div class="custom_theme_wrap" slot="headline">
+                      <div class="custom_theme">
+                        <div class="color-item" style="--clr:  #2196f3; --clr-check: rgb(255, 255, 255);" theme-value="blue_material"></div>
+                        <div class="color-item" style="--clr: #673ab7; --clr-check: rgb(255, 255, 255);" theme-value="purple_material"></div>
+                        <div class="color-item" style="--clr: #ffeb3b; --clr-check: rgb(0, 0, 0);" theme-value="yellow_material"></div>
+                        <div class="color-item" style="--clr:  #4caf50; --clr-check: rgb(255, 255, 255);" theme-value="green_material"></div>
+                        <div class="color-item" style="--clr: #e92315; --clr-check: rgb(255, 255, 255);"  theme-value="red_material"></div>
+                        <div class="color-item" style="--clr: #e91e63; --clr-check: rgb(255, 255, 255);"  theme-value="pink_material"></div>
+                        <div class="color-item" style="--clr:  #da7e07; --clr-check: rgb(255, 255, 255);"theme-value="orange_material"></div>
+                        <div class="color-item" style="--clr:  #414141; --clr-check: rgb(255, 255, 255);" theme-value="mono_material"></div>
+          
+                      </div>
+                    </div>
+                  </md-list-item>
+
+            </md-list>
+            
+        </div>
+    </div>
+</div>
+</div>
+    <script>
+        if(localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') === 'true'){
+        document.documentElement.setAttribute('colorTheme', 'dark');
+        if(localStorage.getItem('Materialtheme')){
+            document.documentElement.setAttribute(
+        "Theme",
+        localStorage.getItem('Materialtheme')
+      );
+        }
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '0')
+    } else{
+        document.documentElement.setAttribute('colorTheme', 'light');
+        if(localStorage.getItem('Materialtheme')){
+            document.documentElement.setAttribute(
+        "Theme",
+        localStorage.getItem('Materialtheme')
+      );
+        }
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '1')
+    }
+    </script>
+
+    <script type="module" src="../index.js"></script>
+    <script src="../bundle.js"></script>
+    <script src="../components-script.js/components.js"></script>
+    <script src="../module/settingsModule.js"></script>
+    <script src="../module/render.js"></script>
+</body>
+</html>

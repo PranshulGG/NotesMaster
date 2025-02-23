@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" Theme="blue_material">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note</title>
+    <script src="../module/android.js"></script>
+    <link rel="stylesheet" href="../ui-files/font-usage.css">
+    <link rel="stylesheet" href="../ui-files/ui.css">
+    <link rel="stylesheet" href="../ui-files/variables.css">
+    <link rel="stylesheet" href="../ui-files/editorUi.css">
+    <link rel="stylesheet" href="../components/components.css">
+    <link rel="stylesheet" href="../components/modal-ver.css">
+</head>
+<body>
+    <div id="app">
+    <div class="full-activity open">
+        <div class="full-activity-header round" id="head-2">
+            <md-icon-button onclick="ActivityBack();">
+                <md-icon icon-outlined>arrow_back</md-icon>
+            </md-icon-button>
+            <p>Note</p>
+            <flex></flex>
+            <md-icon-button onclick="toggleView()" toggle class="view-btn" >
+                <md-icon icon-outlined slot="selected">edit</md-icon>
+                <md-icon icon-outlined>visibility</md-icon>
+            </md-icon-button>
+        </div>
+        <div class="full-activity-content" id="Content" style="height: calc(100% - 65px - 65px - 20px); top: 65px; width: calc(100% - 32px); padding: 0 16px 0 16px; padding-bottom: 20px;">
+    
+            <div class="editor">
+                           
+        <div class="input-section">
+            <input type="text" id="noteTitle" placeholder="Title" autocomplete="off">
+        </div>
+
+        <div class="editable" id="editor" contenteditable="true" placeholder="Note" oninput="if(this.innerHTML.trim()==='<br>')this.innerHTML=''"></div>
+
+    </div>
+    
+        </div>
+        <id hidden></id>
+
+
+        <div class="bottom_tool_bar">
+            <!-- <button type="button" onclick="execCmd('bold')">Bold</button>
+            <button type="button" onclick="execCmd('italic')">Italic</button>
+            <button type="button" onclick="execCmd('insertUnorderedList')">Unordered List</button>
+            <button type="button" onclick="execCmd('insertOrderedList')">Ordered List</button>
+            <button type="button" onclick="execCmd('formatBlock', 'h1')">Heading 1</button>
+            <button type="button" onclick="execCmd('formatBlock', 'p')">Paragraph</button>
+            <button type="button" onclick="setTextColor('#ff0000')" style="background-color: #ff0000;"></button> 
+            <button type="button" onclick="setTextColor('#00ff00')" style="background-color: #00ff00;"></button> 
+            <button type="button" onclick="setTextColor('#0000ff')" style="background-color: #0000ff;"></button> 
+            <button type="button" onclick="undo()">Undo</button>
+            <button type="button" onclick="redo()">Redo</button> -->
+
+            <div class="format_item">
+                <input type="checkbox" id="bold_checkbox" onchange="toggleFormat('bold')">
+                <label for="bold_checkbox"><md-icon icon-outlined>format_bold</md-icon></label>
+            </div>
+
+            <div class="format_item">
+                <input type="checkbox" id="italic_checkbox" onchange="toggleFormat('italic')">
+                <label for="italic_checkbox"><md-icon icon-outlined>format_italic</md-icon></label>
+            </div>
+
+            <div class="format_item">
+                <input type="checkbox" id="insertOrderedList_checkbox" onchange="toggleFormat('insertOrderedList')">
+                <label for="insertOrderedList_checkbox"><md-icon icon-outlined>format_list_numbered</md-icon></label>
+            </div>
+
+            <div class="format_item">
+                <input type="checkbox" id="insertUnorderedList_checkbox" onchange="toggleFormat('insertUnorderedList')">
+                <label for="insertUnorderedList_checkbox"><md-icon icon-outlined>format_list_bulleted</md-icon></label>
+            </div>
+
+            <div class="format_item">
+                <label for="heading_checkboxToggle"  id="Headingusage-popover-anchor"><md-icon icon-outlined>format_h1</md-icon></label>
+                <md-menu positioning="popover" id="Headingusage-popover" anchor="Headingusage-popover-anchor" style="min-width: 40px;">
+                    <md-menu-item onclick="execCmd('formatBlock', 'h1')">
+                        <div slot="headline">H1</div>
+                    </md-menu-item onclick="execCmd('formatBlock', 'h2')">
+                    <md-menu-item>
+                        <div slot="headline">H2</div>
+                    </md-menu-item>
+                    <md-menu-item onclick="execCmd('formatBlock', 'h3')">
+                        <div slot="headline">H3</div>
+                    </md-menu-item>
+                    <md-menu-item onclick="execCmd('formatBlock', 'h4')">
+                        <div slot="headline">H4</div>
+                      </md-menu-item>
+                      <md-menu-item onclick="execCmd('formatBlock', 'p')">
+                        <div slot="headline">Body</div>
+                      </md-menu-item>
+                  </md-menu>
+                  <script type="module">
+                    const anchorEl = document.body.querySelector('#Headingusage-popover-anchor');
+                    const menuEl = document.body.querySelector('#Headingusage-popover');
+                    anchorEl.addEventListener('click', () => { menuEl.open = !menuEl.open; });
+                  </script>
+            </div>
+            <div class="format_item" id="openInsertLinkDialog">
+                <label ><md-icon icon-outlined>link</md-icon></label>
+            </div>
+
+            <div class="format_item">
+                <input type="checkbox" id="formatBlockPre_checkbox" onchange="toggleFormatPre('formatBlock', 'pre')">
+                <label for="formatBlockPre_checkbox" style="background-color: var(--Surface-Container-Low) !important; color: var(--On-Surface) !important;"><md-icon icon-outlined>code</md-icon></label>
+            </div>
+
+            <div class="format_item">
+                <label for="Color_checkboxToggle"  id="Colorusage-popover-anchor"><md-icon icon-outlined>format_color_text</md-icon></label>
+                <md-menu positioning="popover" id="Colorusage-popover" anchor="Colorusage-popover-anchor" style="min-width: 50px;" x-offset="-7">
+                    <md-menu-item onclick="setTextColor(getComputedStyle(document.documentElement).getPropertyValue('--On-Surface'))">
+                        <md-icon slot="headline" icon-outlined style="color: var(--On-Surface);">format_color_text</md-icon>
+                    </md-menu-item>
+                    <md-menu-item onclick="setTextColor(getComputedStyle(document.documentElement).getPropertyValue('--On-Surface-Variant'))">
+                        <md-icon slot="headline" icon-outlined style="color: var(--On-Surface-Variant);">format_color_text</md-icon>
+                    </md-menu-item>
+                    <md-menu-item  onclick="setTextColor('#fcdf03')">
+                        <md-icon slot="headline" icon-outlined style="color: #fcdf03;">format_color_text</md-icon>
+                    </md-menu-item>
+                    <md-menu-item onclick="setTextColor('#fc0303')">
+                        <md-icon slot="headline" icon-outlined style="color: #fc0303;">format_color_text</md-icon>
+                    </md-menu-item>
+                    <md-menu-item onclick="setTextColor('#03fc17')">
+                        <md-icon slot="headline" icon-outlined style="color: #03fc17;">format_color_text</md-icon>
+                      </md-menu-item>
+                      <md-menu-item onclick="setTextColor('#fc03ec')">
+                        <md-icon slot="headline" icon-outlined style="color: #fc03ec;">format_color_text</md-icon>
+                      </md-menu-item>
+                  </md-menu>
+                  <script type="module">
+                    const anchorElColor = document.body.querySelector('#Colorusage-popover-anchor');
+                    const menuElColor = document.body.querySelector('#Colorusage-popover');
+                    anchorElColor.addEventListener('click', () => { menuElColor.open = !menuElColor.open; });
+                  </script>
+            </div>
+
+        </div>
+
+        <md-dialog id="insertLinkDialog" quick>
+            <div slot="headline">Insert link</div>
+
+            <div slot="content">
+                <md-outlined-text-field style="width: 100%; margin-bottom: 10px;" placeholder="Link title" id="linkTitleInput"></md-outlined-text-field>
+                <md-outlined-text-field style="width: 100%;" placeholder="URL" id="linkURLInput"></md-outlined-text-field>
+            </div>
+
+            <div slot="actions">
+                <md-text-button onclick="window.history.back()">Cancel</md-text-button>
+                <md-text-button onclick="insertLink()">Add</md-text-button>
+            </div>
+        </md-dialog>
+    </div>
+
+
+</div>
+  
+    <script>
+        if(localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') === 'true'){
+        document.documentElement.setAttribute('colorTheme', 'dark');
+        if(localStorage.getItem('Materialtheme')){
+            document.documentElement.setAttribute(
+        "Theme",
+        localStorage.getItem('Materialtheme')
+      );
+        }
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), '0')
+    } else{
+        document.documentElement.setAttribute('colorTheme', 'light');
+        if(localStorage.getItem('Materialtheme')){
+            document.documentElement.setAttribute(
+        "Theme",
+        localStorage.getItem('Materialtheme')
+      );
+        }
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), '1')
+    }
+    </script>
+
+    <script type="module" src="../index.js"></script>
+    <script src="../bundle.js"></script>
+    <script src="../app/editor.js"></script>
+    <script src="../module/render.js"></script>
+</body>
+</html>

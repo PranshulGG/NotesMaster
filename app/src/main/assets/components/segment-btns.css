@@ -1,0 +1,181 @@
+segment-btn {
+  display: flex;
+  align-items: center;
+}
+
+segment-btn segment-item-regular input, segment-btn segment-item-icon-selected input, segment-btn segment-item-icons input {
+  display: none;
+}
+
+
+segment-btn segment-item-regular label {
+  color: var(--On-Surface);
+  background-color: rgba(0, 0, 255, 0);
+  border: 1.4px solid var(--Outline);
+  display: flex;
+  height: 38px;
+  font-family: var(--google-mid);
+  font-size: 14px;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  width: max-content;
+  padding-left: 15px;
+  padding-right: 15px;
+  transition: background-color 0.1s;
+  border-right: 0;
+  cursor: pointer;
+}
+
+segment-btn[full] segment-item-regular label{
+  width: auto;
+  padding: 0;
+}
+
+segment-btn[full] segment-item-regular {
+  width: 100%;
+  padding: 0;
+} 
+
+segment-btn segment-item-regular:first-child label{
+  border-radius: 50px 0 0px 50px;
+  border-right: 1.4px solid transparent;
+}
+
+segment-btn segment-item-regular:last-child label{
+  border-radius: 0px 50px 50px 0px;
+  border-right: 1.4px solid var(--Outline);
+}
+
+segment-btn segment-item-regular input:checked + label{
+  background-color: var(--Secondary-Container);
+  color: var(--On-Secondary-Container);
+}
+
+
+
+/* selected icon */
+
+
+
+segment-btn segment-item-icon-selected label{
+  color: var(--On-Surface);
+  background-color: rgba(0, 0, 255, 0);
+  border: 1.4px solid var(--Outline);
+  display: flex;
+  height: 38px;
+  font-family: var(--google-mid);
+  font-size: 14px;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  width: max-content;
+  padding-left: 15px;
+  padding-right: 15px;
+  transition: background-color 0.2s;
+  border-right: 0;
+  cursor: pointer;
+  gap: 3px;
+}
+
+segment-btn segment-item-icon-selected label::before{
+  content: 'check';
+  font-family: 'Material symbols';
+  font-weight: normal !important;
+  font-style: normal !important;
+  font-variation-settings: 'FILL' 1;
+  line-height: 1;
+  font-size: 23px;
+  display: none;
+}
+
+segment-btn segment-item-icon-selected:first-child label{
+  border-radius: 50px 0 0px 50px;
+  border-right: 1.4px solid transparent;
+}
+
+segment-btn segment-item-icon-selected:last-child label{
+  border-radius: 0px 50px 50px 0px;
+  border-right: 1.4px solid var(--Outline);
+}
+
+segment-btn segment-item-icon-selected input:checked + label{
+  background-color: var(--Secondary-Container);
+  color: var(--On-Secondary-Container);
+}
+
+segment-btn segment-item-icon-selected input:checked + label::before{
+  display: block;
+  color: var(--On-Secondary-Container);
+}
+
+
+segment-btn segment-item-icon-selected:last-child input:checked + label{
+  padding-left: 5px;
+}
+
+segment-btn segment-item-icon-selected input:checked + label{
+  padding-left: 8px;
+}
+
+segment-btn segment-item-icon-selected:first-child input:checked + label{
+  padding-left: 13px;
+}
+
+/* with icons */
+
+segment-btn segment-item-icons label{
+  color: var(--On-Surface);
+  background-color: rgba(0, 0, 255, 0);
+  border: 1.4px solid var(--Outline);
+  display: flex;
+  height: 38px;
+  font-family: var(--google-mid);
+  font-size: 14px;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  width: max-content;
+  padding-left: 12px;
+  padding-right: 12px;
+  transition: background-color 0.2s;
+  border-right: 0;
+  cursor: pointer;
+  gap: 5px;
+}
+
+
+segment-btn segment-item-icons:first-child label{
+  border-radius: 50px 0 0px 50px;
+  border-right: 1.4px solid transparent;
+}
+
+segment-btn segment-item-icons:last-child label{
+  border-radius: 0px 50px 50px 0px;
+  border-right: 1.4px solid var(--Outline);
+}
+
+segment-btn segment-item-icons input:checked + label{
+  background-color: var(--Secondary-Container);
+  color: var(--On-Secondary-Container);
+}
+
+segment-btn segment-item-icons label::before{
+  content: attr(data-icon);
+  font-family: 'Material symbols';
+  font-weight: normal !important;
+  font-style: normal !important;
+  font-variation-settings: 'FILL' 1;
+  line-height: 1;
+  font-size: 22px;
+}
+
+segment-btn segment-item-icons input:checked + label::before{
+  content: 'check';
+  font-family: 'Material symbols';
+  font-weight: normal !important;
+  font-style: normal !important;
+  font-variation-settings: 'FILL' 1;
+  line-height: 1;
+  font-size: 23px;
+}

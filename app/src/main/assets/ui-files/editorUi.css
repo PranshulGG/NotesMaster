@@ -1,0 +1,95 @@
+
+.bottom_tool_bar {
+    height: 65px;    
+    position: absolute;
+    bottom: 0;
+    background-color: var(--Surface-Container);
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    overflow: auto;
+}
+
+
+.bottom_tool_bar .format_item input{
+    display: none;    
+}
+
+.bottom_tool_bar .format_item label{
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    background-color: var(--Surface-Container-Low);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50px;
+    color: var(--On-Surface);
+}
+
+.bottom_tool_bar .format_item:first-child{
+    margin-left: 16px;
+}
+
+.bottom_tool_bar .format_item:last-child{
+    margin-right: 16px;
+}
+
+.bottom_tool_bar .format_item input:checked + label{
+    background-color: var(--Primary);
+    color: var(--On-Primary);
+}
+
+
+#editor{
+    font-size: 18px;
+    font-family: var(--google-normal);
+    color: var(--On-Surface);
+    caret-color: var(--Primary);
+    padding-top: 10px;
+
+}
+
+#noteTitle{
+    width: 100%;
+    border: none;
+    background-color: transparent;
+    font-family: var(--google-normal);
+    font-size: 30px;
+    padding: 10px;
+    margin-top: 10px;
+    padding-left: 0;
+    padding-right: 0;
+    caret-color: var(--Primary);
+    
+}
+
+[contenteditable][placeholder]:empty:before {
+    content: attr(placeholder);
+    position: absolute;
+    color: var(--On-Surface-Variant);
+    opacity: 0.6;
+    background-color: transparent;
+  }
+
+ .editable pre {
+    font-family: 'MonoSpace';
+    background-color: var(--Surface-Container-High);
+    padding: 5px;
+    margin: 0;
+    padding-bottom: 5px;
+    padding-top: 5px;
+  }
+
+  ol, ul{
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 20px;
+  }
+
+
+
+  a{
+    color: var(--Tertiary);
+  }

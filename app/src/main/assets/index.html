@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" Theme="blue_material" >
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+    <title>NotesMaster</title>
+    <script src="module/android.js"></script>
+    <link rel="stylesheet" href="ui-files/ui.css">
+    <link rel="stylesheet" href="ui-files/font-usage.css">
+    <link rel="stylesheet" href="ui-files/variables.css">
+</head>
+<body>
+    <div id="app">
+    <div class="header_search">
+        <div class="search_container" id="Search_notes_input_wrapper">
+            <md-icon-button style="pointer-events: none;" id="backSearchBtnIconSearch">
+                <md-icon icon-outlined>search</md-icon>
+            </md-icon-button>
+            <md-icon-button onclick="window.history.back(); event.stopPropagation();" id="backSearchBtn" hidden>
+                <md-icon icon-outlined>arrow_back</md-icon>
+            </md-icon-button>
+            <input type="search" name="Search notes" placeholder="Search..." id="Search_notes_input">
+            <md-icon-button onclick="deleteSelectedNotes();  event.stopPropagation();" hidden id="deleteNoteBtn">
+                <md-icon icon-outlined>delete</md-icon>
+            </md-icon-button>
+            <md-icon-button onclick="navigateActivity('SettingsActivity');  event.stopPropagation();">
+                <md-icon icon-outlined>settings</md-icon>
+            </md-icon-button>
+        </div> 
+    </div>
+
+    <div class="floatfab_div">
+        <md-fab variant="primary" onclick="navigateActivity('NotesViewActivity')">
+            <md-icon icon-outlined slot="icon">add</md-icon>
+        </md-fab>
+    </div>
+
+        <div class="saved-notes">
+            <div id="savedNotesList"></div>
+        </div>
+
+    <div class="water_mark" hidden>
+        <i icon-outlined>notes</i>
+        <p>No notes</p>
+    </div>
+
+    <div class="search_container_screen" hidden>
+
+    </div>
+</div>
+
+
+
+
+
+    <script>
+        if(localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') === 'true'){
+        document.documentElement.setAttribute('colorTheme', 'dark');
+        if(localStorage.getItem('Materialtheme')){
+            document.documentElement.setAttribute(
+        "Theme",
+        localStorage.getItem('Materialtheme')
+      );
+        }
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '0')
+    } else{
+        document.documentElement.setAttribute('colorTheme', 'light');
+        if(localStorage.getItem('Materialtheme')){
+            document.documentElement.setAttribute(
+        "Theme",
+        localStorage.getItem('Materialtheme')
+      );
+        }
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '1')
+    }
+    </script>
+    <script type="module" src="./index.js"></script>
+    <script src="./bundle.js"></script>
+    <script src="app/app.js"></script>
+    <script src="module/render.js"></script>
+    <script src="app/events.js"></script>
+</body>
+</html>

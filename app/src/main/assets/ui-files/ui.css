@@ -1,0 +1,221 @@
+*{
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    outline: none;
+    touch-action: manipulation;  
+}
+
+#app{
+    opacity: 0;
+    transition: opacity 0.2s ease-out;
+}
+
+body{
+    padding: 0;
+    margin: 0;
+    background-color: var(--Surface);
+    overflow: hidden;
+}
+
+
+::selection{
+    background-color: var(--Inverse-Primary);
+    color: var(--On-Surface);
+}
+
+::placeholder{
+    color: var(--On-Surface-Variant);
+    opacity: 0.6;
+}
+
+md-icon-button, md-icon{
+    flex-shrink: 0;
+}
+
+[hidden]{
+    display: none !important;
+}
+
+
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+  -webkit-appearance:none;
+}
+  
+.floatfab_div{
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+}
+
+.header_search{
+    padding: 12px 15px;
+    height: calc(75px - 22px - 1.5px);
+    z-index: 3;
+    position: relative;
+    display: flex;
+    align-items: center;
+    border-bottom: 1.5px solid transparent;
+    transition: padding 0.15s ease-out;
+}
+
+.header_search.enabled{
+    border-bottom: 1.5px solid var(--Outline);
+    padding: 10px 0px;
+}
+
+
+.header_search .search_container{
+    background-color: var(--Surface-Container-High);
+    height: 56px;
+    display: flex;
+    align-items: center;
+    padding-left: 11px;
+    padding-right: 11px;
+    border-radius: 50px;
+    gap: 10px;
+    position: relative;
+    width: 100%;
+}
+
+.header_search .search_container input{
+    background-color: transparent;
+    caret-color: var(--Primary);
+    border: none;
+    font-family: var(--google-normal);
+    font-size: 17px;
+    width: 100%;
+    
+}
+
+.water_mark{
+    position: fixed;
+    width: 100%;
+    height: 50px;
+    top: 200px;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    opacity: 0.6;
+    color: var(--On-Surface-Variant);
+}
+
+.water_mark p{
+    margin: 0;
+    font-family: var(--google-normal);
+    font-size: 30px;
+}
+
+.water_mark i{
+    font-size: 40px;
+}
+
+.search_container_screen{
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    left: 0;
+    top: 0;
+    background-color: var(--Surface-Container-High);
+    z-index: 2;
+    animation: search_container_screen 0.15s ease-in;
+}
+
+@keyframes search_container_screen{
+    0%{
+        opacity: 0;
+    }
+    100%{
+        opacity: 1;
+    }
+}
+
+
+flex{
+    flex: 1;
+}
+
+.saved-notes{
+    padding: 20px;
+    padding-top: 0;
+    z-index: 2;
+}
+
+.saved-notes #savedNotesList {
+    column-count: 2;
+    gap: 10px;
+}
+
+.saved-notes #savedNotesList noteTileWrap {
+    display: inline-block;
+    width: calc(100% - 8px - 10px);
+    background-color: var(--Surface-Container-Low);
+    border-radius: 10px;
+    margin-bottom: 6px;
+    padding: 10px;
+    max-height: 120px;
+    overflow: hidden;
+    position: relative;
+    padding-bottom: 40px;
+
+}
+
+.saved-notes #savedNotesList noteTileWrap p{
+    margin: 0;
+    margin-bottom: 10px;
+    font-family: var(--google-normal);
+    color: var(--On-Surface);
+    font-size: 18px;
+}
+
+.saved-notes #savedNotesList noteTileWrap span{
+    opacity: 0.5;
+    font-family: var(--google-normal);
+    overflow: hidden;
+    position: relative;
+    max-height: 60px;
+    display: block;
+}
+
+.saved-notes #savedNotesList noteTileWrap span::before {
+    position: absolute;
+    bottom: 0;
+    content: '';
+    width: 100%;
+    background: linear-gradient(0deg, var(--Surface-Container-Low) 10%, rgba(255, 0, 0, 0));
+    height: 10px;
+    z-index: 1;
+}
+.noteCheckboxWrap{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+
+}
+
+.noteCheckboxWrap check_label{
+    position: absolute;
+    right: 10px;
+    bottom: 10px !important;
+    height: 18px;
+    overflow: hidden;
+    width: 18px;
+}
+.saved-notes #savedNotesList noteTileWrap time{
+    position: absolute;
+    bottom: 10px;
+    z-index: 1;
+    font-family: var(--google-mid);
+    font-size: 13px;
+    left: 10px;
+    color: var(--On-Surface-Variant);
+}
+
