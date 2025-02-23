@@ -57,7 +57,7 @@
     --md-sys-color-on-surface-variant: var(--On-Surface-Variant);
     --md-sys-color-on-background-variant: var(--On-Surface-Variant);
     --md-focus-ring-color: transparent;
-    --md-ripple-pressed-opacity: 0.12;
+    --md-ripple-pressed-opacity: 0.08;
     --md-ripple-hover-opacity: 0;
     --md-ripple-focus-opacity: 1;
 

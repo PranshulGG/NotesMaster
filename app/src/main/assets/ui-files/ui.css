@@ -172,7 +172,7 @@ flex{
     font-size: 18px;
 }
 
-.saved-notes #savedNotesList noteTileWrap span{
+.saved-notes #savedNotesList noteTileWrap span, p_content{
     opacity: 0.5;
     font-family: var(--google-normal);
     overflow: hidden;
@@ -181,7 +181,7 @@ flex{
     display: block;
 }
 
-.saved-notes #savedNotesList noteTileWrap span::before {
+.saved-notes #savedNotesList noteTileWrap span::before, p_content::before {
     position: absolute;
     bottom: 0;
     content: '';
@@ -219,3 +219,35 @@ flex{
     color: var(--On-Surface-Variant);
 }
 
+#notesContainerSearched{
+    position: fixed;
+    top: 80px;
+    width: calc(100% - 20px);
+    padding: 10px;
+}
+
+#notesContainerSearched searchednote{
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    background-color: var(--Surface-Container);
+    padding: 10px;
+    flex-direction: column;
+    gap: 10px;
+     position: relative;
+    max-height: 100px;
+
+}
+
+#notesContainerSearched searchednote p{
+    font-family: var(--google-normal);
+    color: var(--On-Surface);
+    margin: 0;
+    font-size: 18px;
+}
+
+#notesContainerSearched searchednote span{
+    font-family: var(--google-normal);
+    color: var(--On-Surface-Variant);
+}
