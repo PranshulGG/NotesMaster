@@ -21,6 +21,8 @@ window.addEventListener("popstate", function (event) {
         document.querySelector('.header_search').classList.remove('enabled');
         sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag)
         document.getElementById('backSearchBtn').hidden = true;
+        document.getElementById('notesContainerSearched').innerHTML = '';
+        document.getElementById('Search_notes_input').value = ''
     }
 
        const deleteCheckboxes = document.querySelectorAll('.noteCheckboxWrap');
@@ -126,12 +128,64 @@ noteTile.addEventListener('touchend', () =>{
 });
 }
 function displayWaterMark(){
-    if (JSON.parse(localStorage.getItem('notes')).length === 0) {
-        document.querySelector('.water_mark').hidden = false;
-    } else{
+    if (JSON.parse(localStorage.getItem('notes')) && JSON.parse(localStorage.getItem('notes')).length > 0 ) {
         document.querySelector('.water_mark').hidden = true;
+    } else{
+        document.querySelector('.water_mark').hidden = false;
     }
 
 }
 
 displayWaterMark()
+
+// search......
+
+
+
+function searchNotes() {
+    let notes = JSON.parse(localStorage.getItem('notes')) || [];
+
+    const query = document.getElementById('Search_notes_input').value.toLowerCase();
+    const container = document.getElementById('notesContainerSearched');
+    container.innerHTML = "";
+
+    if (query === "") return;
+
+    const filtered = notes
+        .map((note, originalIndex) => ({ ...note, originalIndex })) // Keep track of original index
+        .filter(note => note.title.toLowerCase().includes(query));
+
+    if (filtered.length === 0) {
+        container.innerHTML = "<error style='color: var(--On-Surface);'>No matching notes found.</error>";
+        return;
+    }
+
+    filtered.forEach(note => {
+        const searchedItem = document.createElement('SearchedNote');
+
+        const timestamp = parseInt(note.noteID.split('_')[0]);
+        const date = new Date(timestamp);
+        const formattedDate = `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}`;
+
+        searchedItem.innerHTML = `
+        <p>${note.title}</p>
+        <p_content>${note.content}</p_content>
+        <span>${formattedDate}</span>
+        <md-ripple></md-ripple>
+        `;
+
+        searchedItem.addEventListener('click', () => {
+            localStorage.setItem('clickedNote', note.originalIndex); // Use the original index
+            navigateActivity('NotesViewActivity');
+            setTimeout(() => {
+                window.history.back();
+            }, 200);
+        });
+
+        container.appendChild(searchedItem);
+    });
+}
+
+
+
+document.getElementById('Search_notes_input').addEventListener('input', searchNotes)
