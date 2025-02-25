@@ -20,6 +20,7 @@
 
         md-list{
             padding: 8px;
+            padding-top: 0;
         }
 
         md-list md-list-item:first-child{
@@ -72,6 +73,19 @@
             height: 79px;
             overflow: hidden;
         }
+        .main_provider_item {
+            font-size: 16px;
+            font-family: var(--google-mid);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-top: 13px;
+            padding-bottom: 13px;
+        }
+
+        .main_provider_item:first-child {
+            padding-top: 5px;
+        }
     </style>
 
 </head>
@@ -87,9 +101,10 @@
         <div class="activity-large-content" id="headUser-1">
           <p class="label-large-main">Settings</p>
           <div class="content-parent-large" style="padding-bottom: 32px;">
-            <p class="title" style="margin-top: 5px;">App looks</p>
 
+              <p class="title" style="margin-top: 5px;">App looks</p>
             <md-list>
+
                 <md-list-item>
                     <md-icon icon-filled slot="start">dark_mode</md-icon>
                     <div slot="headline">Dark theme</div>
@@ -113,9 +128,70 @@
                     </div>
                   </md-list-item>
 
+                <md-list-item onclick="openAppFontDialog()" type="button">
+                    <md-icon icon-filled slot="start">font_download</md-icon>
+                    <div slot="headline" data-translate="font">Font</div>
+                    <div slot="supporting-text" data-translate="change_apps_font">Change app's font</div>
+                </md-list-item>
+
             </md-list>
-            
-        </div>
+
+              <p class="title" style="margin-top: 5px;">Additional</p>
+              <md-list>
+
+                  <md-list-item type="button" id="exportAppData">
+                      <div slot="headline">Export data</div>
+                      <div slot="supporting-text">Export a backup file</div>
+                  </md-list-item>
+
+
+                  <md-list-item type="button" id="importAppData">
+                      <div slot="headline">Import data</div>
+                      <div slot="supporting-text">import a backup file</div>
+                      <input type="file" id="ImportFile" style="display:none;" accept="application/json">
+                  </md-list-item>
+
+                  <md-list-item type="button">
+                      <div slot="headline">About NotesMaster</div>
+                      <div slot="supporting-text">Learn about the app</div>
+                      <md-icon icon-outlined slot="end">chevron_right</md-icon>
+                  </md-list-item>
+              </md-list>
+
+
+
+              <br>
+              <br>
+              <br>
+              <br>
+              <br>
+              <br>
+
+          <!-- dialogs -->
+
+          <md-dialog id="chooseAPPFontDialog" style="min-width: 85%;" quick>
+              <div slot="headline" data-translate="app_font">App font</div>
+
+              <div slot="content">
+                  <label class="main_provider_item">
+                      <md-radio slot="start" value="product_sans" name="app_font_radio"></md-radio>
+                      Product sans
+                  </label>
+                  <label class="main_provider_item">
+                      <md-radio slot="start" value="roboto" name="app_font_radio"></md-radio>
+                      Roboto
+                  </label>
+              </div>
+
+              <div slot="actions">
+                  <md-text-button onclick="window.history.back()" data-translate="cancel">Cancel</md-text-button>
+                  <md-text-button id="saveSelectedFont" data-translate="ok">OK</md-text-button>
+              </div>
+          </md-dialog>
+
+          <load_theme hidden></load_theme>
+
+          </div>
     </div>
 </div>
 </div>
@@ -139,6 +215,58 @@
         }
         sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '1')
     }
+
+        const user1 = document.getElementById("headUser-1");
+
+        function changeColorOnScroll1() {
+        var container = document.getElementById("headUser-1");
+        var scrollY = container.scrollTop;
+
+        if (scrollY >= 50) {
+            document.getElementById("head-1").style.backgroundColor =
+            "var(--Surface-Container)";
+            document.getElementById("head-1").style.transition = "";
+
+            document.getElementById("headUser-1").style.scrollSnapType = "unset";
+            container.removeEventListener("scroll", changeColorOnScroll1);
+            sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '220')
+
+        } else {
+        }
+        }
+
+        if (user1) {
+        document
+            .getElementById("headUser-1")
+            .addEventListener("scroll", changeColorOnScroll1);
+        }
+
+        function changeColorOnScroll1A() {
+        var container = document.getElementById("headUser-1");
+        var scrollY = container.scrollTop;
+
+        if (scrollY <= 1) {
+            document.getElementById("head-1").style.backgroundColor = "";
+            document.getElementById("head-1").style.transition =
+            "background-color 0.2s ease-in";
+
+            sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '220')
+
+
+            container.addEventListener("scroll", changeColorOnScroll1);
+            if (scrollY <= 20);
+            {
+            document.getElementById("headUser-1").style.scrollSnapType = "";
+            }
+        } else {
+        }
+        }
+
+        if (user1) {
+        document
+            .getElementById("headUser-1")
+            .addEventListener("scroll", changeColorOnScroll1A);
+        }
     </script>
 
     <script type="module" src="../index.js"></script>

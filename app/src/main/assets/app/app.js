@@ -28,24 +28,44 @@ window.addEventListener("popstate", function (event) {
        const deleteCheckboxes = document.querySelectorAll('.noteCheckboxWrap');
 
        deleteCheckboxes.forEach((checkbox) =>{
+       if(sessionStorage.getItem('DeleteAlertDialogOpen') === "false" || !sessionStorage.getItem('DeleteAlertDialogOpen')){
         if(!checkbox.hidden){
             checkbox.hidden = true;
             document.getElementById('backSearchBtn').hidden = true;
             document.getElementById('backSearchBtnIconSearch').hidden = false;
             document.getElementById('deleteNoteBtn').hidden = true;
+            document.getElementById('deleteNoteBtn').disabled = true;
+            document.querySelector('#textheadingNotes').innerHTML = `Notes`;
+
+        }
         }
        });
+
+       const notes_ripple_elems = document.querySelectorAll('.notes_ripple_elem');
+
+          notes_ripple_elems.forEach((notes_ripple_elem) =>{
+           notes_ripple_elem.hidden = false;
+       })
 })
 
 function createNoteTile(){
     setTimeout(() =>{
         loadCheckboxListeners()
-    }, 300);
+        disableEnableDeleteBtn()
+    }, 200);
         const savedNotesList = document.getElementById('savedNotesList');
+        const pinnedNotesList = document.getElementById('pinnedNotesList');
         savedNotesList.innerHTML = '';
+        pinnedNotesList.innerHTML = '';
 
         let notes = JSON.parse(localStorage.getItem('notes')) || [];
-        notes = notes.filter(note => note.title !== "" || note.content !== "");
+        notes = notes.filter(note => {
+            if (note.title.trim() === "" && note.content.trim() === "") {
+                return false;
+            }
+            return true;
+        });
+        localStorage.setItem('notes', JSON.stringify(notes));
         displayWaterMark()
 
         notes.forEach((note, index) => {
@@ -65,15 +85,27 @@ function createNoteTile(){
                 <p>${note.title}</p>
                 <span>${note.content}</span>
                 <time>${formattedDate}</time>
+                <md-ripple class="notes_ripple_elem"></md-ripple>
             `
 
             noteTile.addEventListener('click', function() {
                 localStorage.setItem('clickedNote', index)
+                localStorage.setItem('clickedNoteId', note.noteID)
 
                 navigateActivity('NotesViewActivity')
             });
 
-            savedNotesList.appendChild(noteTile);
+                if(notes.filter(note => note.pinned).length < 1){
+                    document.querySelector('.saved-notesPinned').hidden = true;
+                } else{
+                    document.querySelector('.saved-notesPinned').hidden = false;
+                }
+
+            if (note.pinned) {
+                pinnedNotesList.appendChild(noteTile);
+            } else {
+                savedNotesList.appendChild(noteTile);
+            }
         });
 }
 
@@ -92,8 +124,9 @@ function deleteSelectedNotes() {
         document.getElementById('backSearchBtn').hidden = true;
         document.getElementById('backSearchBtnIconSearch').hidden = false;
         document.getElementById('deleteNoteBtn').hidden = true;
+        document.getElementById('deleteNoteBtn').disabled = true;
     });
-
+    document.querySelector('#textheadingNotes').innerHTML = `Notes`;
     localStorage.setItem('notes', JSON.stringify(updatedNotes));
     createNoteTile();
      displayWaterMark()
@@ -105,23 +138,38 @@ function loadCheckboxListeners(){
 
 const deleteCheckboxes = document.querySelectorAll('.noteCheckboxWrap');
 const noteTilesAll = document.querySelectorAll('noteTileWrap');
+const notes_ripple_elems = document.querySelectorAll('.notes_ripple_elem');
+const Checkboxes = document.querySelectorAll('.noteCheckbox');
 
 noteTilesAll.forEach((noteTile) =>{
 noteTile.addEventListener('touchstart', () =>{
-    holdTimer = setTimeout(() =>{
-        deleteCheckboxes.forEach((checkbox) =>{
-            checkbox.hidden = false;
             clearTimeout(holdTimer)
+
+    holdTimer = setTimeout(() =>{
+        notes_ripple_elems.forEach((notes_ripple_elem) =>{
+            notes_ripple_elem.hidden = true;
+        })
+        Checkboxes.forEach((Checkbox) =>{
+            Checkbox.checked = false;
+        })
+        deleteCheckboxes.forEach((checkbox) =>{
+            checkbox.addEventListener('touchstart', (event) =>{
+                event.stopPropagation()
+            })
+            checkbox.hidden = false;
             document.getElementById('backSearchBtn').hidden = false;
             document.getElementById('backSearchBtnIconSearch').hidden = true;
             document.getElementById('deleteNoteBtn').hidden = false;
-            window.history.pushState({ SelectionOpen: true }, "");
-
         });
+            window.history.pushState({ SelectionOpen: true }, "");
+            document.querySelector('#textheadingNotes').innerHTML = `Selected 0`
     }, 1000)
 })
 
 noteTile.addEventListener('touchend', () =>{
+    clearTimeout(holdTimer)
+});
+noteTile.addEventListener('touchmove', () =>{
     clearTimeout(holdTimer)
 });
 
@@ -156,7 +204,7 @@ function searchNotes() {
         .filter(note => note.title.toLowerCase().includes(query));
 
     if (filtered.length === 0) {
-        container.innerHTML = "<error style='color: var(--On-Surface);'>No matching notes found.</error>";
+        container.innerHTML = "<error style='color: var(--On-Surface); margin-left: 15px;'>No matching notes found.</error>";
         return;
     }
 
@@ -175,7 +223,8 @@ function searchNotes() {
         `;
 
         searchedItem.addEventListener('click', () => {
-            localStorage.setItem('clickedNote', note.originalIndex); // Use the original index
+            localStorage.setItem('clickedNote', note.originalIndex);
+            localStorage.setItem('clickedNoteId', note.noteID)
             navigateActivity('NotesViewActivity');
             setTimeout(() => {
                 window.history.back();
@@ -189,3 +238,55 @@ function searchNotes() {
 
 
 document.getElementById('Search_notes_input').addEventListener('input', searchNotes)
+
+// check delete btn
+
+function disableEnableDeleteBtn() {
+    const checkboxes = document.querySelectorAll('.noteCheckbox');
+
+    checkboxes.forEach((checkbox) => {
+        checkbox.addEventListener('change', () => {
+            const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+
+            if (checkedCount < 1) {
+                document.getElementById('deleteNoteBtn').disabled = true;
+            } else {
+                document.getElementById('deleteNoteBtn').disabled = false;
+            }
+            document.querySelector('#textheadingNotes').innerHTML = `Selected ${checkedCount}`
+        });
+    });
+}
+
+// --------
+
+
+function showDeleteAlertDialog(){
+    document.getElementById('deleteNoteAlert').show();
+    sendThemeToAndroid(colorsDialogsOpenSurface[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface[GetDialogOverlayContainerColor()], '0', '40');
+
+    window.history.pushState({ DeleteAlertDialogOpen: true }, "");
+    sessionStorage.setItem('DeleteAlertDialogOpen', "true");
+
+}
+
+
+window.addEventListener("popstate", function (event) {
+    if(document.getElementById('deleteNoteAlert').open){
+        document.getElementById('deleteNoteAlert').close();
+    }
+});
+
+document.getElementById('deleteNoteAlert').addEventListener('cancel', () =>{
+    document.getElementById('deleteNoteAlert').addEventListener('closed', () =>{
+        window.history.back()
+    })
+})
+
+
+document.getElementById('deleteNoteAlert').addEventListener('close', () =>{
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '40')
+        setTimeout(() =>{
+            sessionStorage.setItem('DeleteAlertDialogOpen', "false");
+        }, 200);
+})

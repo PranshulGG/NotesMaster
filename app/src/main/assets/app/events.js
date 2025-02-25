@@ -29,6 +29,8 @@ function handleStorageChange(event) {
             break;
             case 'notes':
                 createNoteTile()
+            case 'SelectedAPPfont':
+                applyAppFont()
             default:
                 console.log('Untracked key changed:', event.key);
       }

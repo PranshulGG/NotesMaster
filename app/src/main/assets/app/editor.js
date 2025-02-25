@@ -1,3 +1,5 @@
+let openedNoteId = null;
+
 function execCmd(command, value = null) {
     if (command === 'createLink') {
         const url = prompt('Enter the URL:');
@@ -39,9 +41,16 @@ document.getElementById('noteTitle').addEventListener('input', () =>{
 });
 
 function saveNote() {
-    const title = document.getElementById('noteTitle').value.trim() || 'Your title';
-    const content = document.getElementById('editor').innerHTML.trim() || 'Empty note';
+    const title = document.getElementById('noteTitle').value.trim();
+    const content = document.getElementById('editor').innerHTML.trim();
     const noteID = document.querySelector('id').getAttribute('id')
+
+
+    if(title === "" && content === ""){
+        document.getElementById('pinThisNoteBtn').disabled = true;
+    } else{
+        document.getElementById('pinThisNoteBtn').disabled = false;
+    }
 
     let notes = JSON.parse(localStorage.getItem('notes')) || [];
 
@@ -64,15 +73,27 @@ function displaySavedNotes(note) {
         document.getElementById('editor').innerHTML = note.content;
      document.querySelector('id').setAttribute('id', note.noteID)
 
+      if(note.pinned){
+         document.getElementById('pinThisNoteBtnText').innerHTML = 'Unpin';
+         document.getElementById('pinThisNoteBtnIcon').innerHTML = 'bookmark_remove';
+     }
+
 }
 
 if(localStorage.getItem('clickedNote')){
     displaySavedNotes(JSON.parse(localStorage.getItem('notes'))[localStorage.getItem('clickedNote')])
         document.querySelector('.view-btn').selected = true;
         toggleView()
+        openedNoteId = localStorage.getItem('clickedNoteId')
         localStorage.removeItem('clickedNote')
+        localStorage.removeItem('clickedNoteId')
 } else{
     document.querySelector('id').setAttribute('id', Date.now() + '_note')
+    openedNoteId = document.querySelector('id').getAttribute('id');
+
+        if(document.getElementById('noteTitle').value.trim() === "" && document.getElementById('editor').innerHTML.trim() === ""){
+            document.getElementById('pinThisNoteBtn').disabled = true;
+        }
 }
 
 
@@ -170,10 +191,7 @@ function insertLink() {
 document.getElementById('openInsertLinkDialog').addEventListener('click', () =>{
     document.getElementById('insertLinkDialog').show();
     window.history.pushState({ InsertLinkDialogOpen: true }, "");
-
-    sendThemeToAndroid(colorsDialogsOpenContainer[GetDialogColorOverlay], colorsDialogsOpenContainer[GetDialogColorOverlay], '0', '40');
-
-
+    sendThemeToAndroid(colorsDialogsOpenContainer[GetDialogOverlayContainerColor()], colorsDialogsOpenContainer[GetDialogOverlayContainerColor()], '0', '40');
 });
 
 document.getElementById('linkURLInput').addEventListener('input', () =>{
@@ -201,9 +219,7 @@ document.getElementById('insertLinkDialog').addEventListener('cancel', () =>{
 })
 
 document.getElementById('insertLinkDialog').addEventListener('close', () =>{
-    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), Themeflag, '40')
-
-
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), Themeflag, '40');
 })
 
 
@@ -214,8 +230,12 @@ function toggleView() {
 
     if(viewButton.selected){
         editor.contentEditable = 'false';
+        document.getElementById('noteTitle').style.pointerEvents = 'none';
+
     } else{
         editor.contentEditable = 'true';
+        document.getElementById('noteTitle').style.pointerEvents = '';
+
     }
 
 }
@@ -229,3 +249,5 @@ function toggleFormatPre(cmd, value){
         execCmd('formatBlock', '<div>');
     }
 }
+
+document.getElementById('editor').focus()

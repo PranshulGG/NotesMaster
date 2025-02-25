@@ -20,13 +20,24 @@
                 <md-icon icon-outlined>arrow_back</md-icon>
             </md-icon-button>
             <input type="search" name="Search notes" placeholder="Search..." id="Search_notes_input">
-            <md-icon-button onclick="deleteSelectedNotes();  event.stopPropagation();" hidden id="deleteNoteBtn">
+            <md-icon-button onclick="showDeleteAlertDialog(); event.stopPropagation();" hidden id="deleteNoteBtn" disabled>
                 <md-icon icon-outlined>delete</md-icon>
             </md-icon-button>
             <md-icon-button onclick="navigateActivity('SettingsActivity');  event.stopPropagation();">
                 <md-icon icon-outlined>settings</md-icon>
             </md-icon-button>
-        </div> 
+        </div>
+
+        <md-dialog id="deleteNoteAlert" quick style="min-width: 85%;">
+            <div slot="headline">Delete Note?</div>
+            <div slot="content">
+                This action cannot be undone.
+            </div>
+            <div slot="actions">
+                <md-text-button onclick="window.history.back();">Cancel</md-text-button>
+                <md-filled-button onclick="deleteSelectedNotes(); window.history.back()">Delete</md-filled-button>
+            </div>
+        </md-dialog>
     </div>
 
     <div class="floatfab_div">
@@ -34,9 +45,17 @@
             <md-icon icon-outlined slot="icon">add</md-icon>
         </md-fab>
     </div>
+        <div class="main_app_wrap" style="padding-top: 10px;">
+
+        <div class="saved-notesPinned">
+            <p style="color: var(--Primary); font-family: var(--google-mid); margin-top: 0; font-size: 18px; margin-bottom: 10px;">Pinned</p>
+            <div id="pinnedNotesList"></div>
+        </div>
 
         <div class="saved-notes">
+            <p style="color: var(--Primary); font-family: var(--google-mid); margin-top: 0; font-size: 18px; margin-bottom: 10px;" id="textheadingNotes">Notes</p>
             <div id="savedNotesList"></div>
+        </div>
         </div>
 
     <div class="water_mark" hidden>
@@ -80,5 +99,7 @@
     <script src="app/app.js"></script>
     <script src="module/render.js"></script>
     <script src="app/events.js"></script>
+    <script src="app/scroll.js"></script>
+
 </body>
 </html>

@@ -48,12 +48,14 @@ input[type="search"]::-webkit-search-results-decoration {
     position: fixed;
     bottom: 16px;
     right: 16px;
+    z-index: 3;
+
 }
 
 .header_search{
     padding: 12px 15px;
     height: calc(75px - 22px - 1.5px);
-    z-index: 3;
+    z-index: 5;
     position: relative;
     display: flex;
     align-items: center;
@@ -87,7 +89,7 @@ input[type="search"]::-webkit-search-results-decoration {
     font-family: var(--google-normal);
     font-size: 17px;
     width: 100%;
-    
+    color: var(--On-Surface);
 }
 
 .water_mark{
@@ -121,7 +123,7 @@ input[type="search"]::-webkit-search-results-decoration {
     left: 0;
     top: 0;
     background-color: var(--Surface-Container-High);
-    z-index: 2;
+    z-index: 4;
     animation: search_container_screen 0.15s ease-in;
 }
 
@@ -139,21 +141,21 @@ flex{
     flex: 1;
 }
 
-.saved-notes{
+.saved-notes, .saved-notesPinned{
     padding: 20px;
     padding-top: 0;
     z-index: 2;
 }
 
-.saved-notes #savedNotesList {
+.saved-notes #savedNotesList, .saved-notesPinned #pinnedNotesList {
     column-count: 2;
     gap: 10px;
 }
 
-.saved-notes #savedNotesList noteTileWrap {
+.saved-notes #savedNotesList noteTileWrap, .saved-notesPinned #pinnedNotesList noteTileWrap {
     display: inline-block;
-    width: calc(100% - 8px - 10px);
-    background-color: var(--Surface-Container-Low);
+    width: calc(100% - 10px - 10px);
+    background-color: var(--Surface-Container);
     border-radius: 10px;
     margin-bottom: 6px;
     padding: 10px;
@@ -164,15 +166,15 @@ flex{
 
 }
 
-.saved-notes #savedNotesList noteTileWrap p{
+.saved-notes #savedNotesList noteTileWrap p, .saved-notesPinned #pinnedNotesList noteTileWrap p{
     margin: 0;
     margin-bottom: 10px;
-    font-family: var(--google-normal);
+    font-family: var(--google-mid);
     color: var(--On-Surface);
     font-size: 18px;
 }
 
-.saved-notes #savedNotesList noteTileWrap span, p_content{
+.saved-notes #savedNotesList noteTileWrap span, p_content, .saved-notesPinned #pinnedNotesList noteTileWrap span{
     opacity: 0.5;
     font-family: var(--google-normal);
     overflow: hidden;
@@ -181,12 +183,12 @@ flex{
     display: block;
 }
 
-.saved-notes #savedNotesList noteTileWrap span::before, p_content::before {
+.saved-notes #savedNotesList noteTileWrap span::before, p_content::before, .saved-notesPinned #pinnedNotesList noteTileWrap span::before {
     position: absolute;
     bottom: 0;
     content: '';
     width: 100%;
-    background: linear-gradient(0deg, var(--Surface-Container-Low) 10%, rgba(255, 0, 0, 0));
+    background: linear-gradient(0deg, var(--Surface-Container) 10%, rgba(255, 0, 0, 0));
     height: 10px;
     z-index: 1;
 }
@@ -209,7 +211,7 @@ flex{
     overflow: hidden;
     width: 18px;
 }
-.saved-notes #savedNotesList noteTileWrap time{
+.saved-notes #savedNotesList noteTileWrap time, .saved-notesPinned #pinnedNotesList noteTileWrap time{
     position: absolute;
     bottom: 10px;
     z-index: 1;
@@ -222,32 +224,90 @@ flex{
 #notesContainerSearched{
     position: fixed;
     top: 80px;
-    width: calc(100% - 20px);
+    width: calc(100% - 0px);
     padding: 10px;
+    padding-top: 15px;
+    padding-left: 0;
+    padding-right: 0;
 }
 
 #notesContainerSearched searchednote{
     display: flex;
     align-items: flex-start;
-    margin-bottom: 8px;
-    border-radius: 10px;
-    background-color: var(--Surface-Container);
+    margin-bottom: 15px;
     padding: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
     flex-direction: column;
-    gap: 10px;
-     position: relative;
+    gap: 5px;
+    position: relative;
     max-height: 100px;
+    padding-top: 0;
+    border-bottom: 1.2px solid var(--Outline-Variant);
 
 }
 
+p_content::before{
+    background: linear-gradient(0deg, var(--Surface-Container-High) 10%, rgba(255, 0, 0, 0)) !important;
+
+}
+
+p_content{
+    max-height: 80px !important;
+}
+
+
 #notesContainerSearched searchednote p{
-    font-family: var(--google-normal);
-    color: var(--On-Surface);
+    font-family: var(--google-mid);
+    color: var(--Primary);
     margin: 0;
-    font-size: 18px;
+    font-size: 17px;
 }
 
 #notesContainerSearched searchednote span{
     font-family: var(--google-normal);
     color: var(--On-Surface-Variant);
+}
+
+textheading{
+    font-family: var(--google-mid);
+    color: var(--Secondary);
+    font-size: 30px;
+    padding: 20px;
+    display: block;
+    padding-top: 0px;
+}
+
+.main_app_wrap{
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 76px - 80px);
+    padding-bottom: 80px;
+}
+
+.main_app_wrap::before{
+    position: fixed;
+    top: 76px;
+    content: '';
+    width: 100%;
+    background: linear-gradient(180deg, var(--Surface) 10%, rgba(255, 0, 0, 0));
+    height: 30px;
+    z-index: 3;
+    opacity: 0;
+    transition: 0.2s ease-in;
+}
+
+.main_app_wrap.scrolled::before{
+    opacity: 1;
+}
+
+load_theme{
+    z-index: 99;
+    width: 100%;
+    height: 100%;
+    background-color: var(--Surface);
+    position: fixed;
+    left: 0;
+    top: 0;
 }

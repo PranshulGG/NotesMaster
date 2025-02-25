@@ -21,10 +21,41 @@
             </md-icon-button>
             <p>Note</p>
             <flex></flex>
+            <md-icon-button onclick="undo()">
+                <md-icon icon-outlined>undo</md-icon>
+            </md-icon-button>
+            <md-icon-button onclick="redo()">
+                <md-icon icon-outlined>redo</md-icon>
+            </md-icon-button>
             <md-icon-button onclick="toggleView()" toggle class="view-btn" >
                 <md-icon icon-outlined slot="selected">edit</md-icon>
                 <md-icon icon-outlined>visibility</md-icon>
             </md-icon-button>
+            <md-icon-button id="usage-popover-anchorNoteOptions">
+                <md-icon icon-outlined>more_vert</md-icon>
+            </md-icon-button>
+
+            <md-menu positioning="popover" id="usage-popoverNoteOptions" anchor="usage-popover-anchorNoteOptions" anchor-corner="start-start">
+                <md-menu-item menu-type id="pinThisNoteBtn">
+                    <md-icon slot="start" id="pinThisNoteBtnIcon" icon-outlined>bookmark</md-icon>
+                    <div slot="headline" id="pinThisNoteBtnText">Pin</div>
+                </md-menu-item>
+                <md-menu-item menu-type id="deleteThisNoteBtn">
+                    <md-icon slot="start" icon-outlined>delete</md-icon>
+                    <div slot="headline">Delete<span style="opacity: 0;">33</span></div>
+                </md-menu-item>
+                <md-menu-item menu-type>
+                    <md-icon slot="start" icon-outlined>share</md-icon>
+                    <div slot="headline">Share</div>
+                </md-menu-item>
+            </md-menu>
+
+            <script type="module">
+                const anchorElNoteOptions = document.body.querySelector('#usage-popover-anchorNoteOptions');
+                const menuElNoteOptions = document.body.querySelector('#usage-popoverNoteOptions');
+
+                anchorElNoteOptions.addEventListener('click', () => { menuElNoteOptions.open = !menuElNoteOptions.open; });
+              </script>
         </div>
         <div class="full-activity-content" id="Content" style="height: calc(100% - 65px - 65px - 20px); top: 65px; width: calc(100% - 32px); padding: 0 16px 0 16px; padding-bottom: 20px;">
     
@@ -184,5 +215,6 @@
     <script src="../bundle.js"></script>
     <script src="../app/editor.js"></script>
     <script src="../module/render.js"></script>
+    <script src="../app/note.js"></script>
 </body>
 </html>

@@ -45,7 +45,7 @@ const colorsDialogsOpenSurface = {
     green_materialDialog_dark: "#070806",
     yellow_materialDialog: "#66645f",
     yellow_materialDialog_dark: "#080804",
-    mono_materialDialog: "",
+    mono_materialDialog: "#656363",
     mono_materialDialog_dark: "#080808"
 }
 
@@ -64,7 +64,7 @@ const colorsDialogsOpenContainer = {
     green_materialDialog_dark: "#0c0d0a",
     yellow_materialDialog: "#625f59",
     yellow_materialDialog_dark: "#0e0d09",
-    mono_materialDialog: "",
+    mono_materialDialog: "#605f5e",
     mono_materialDialog_dark: "#0d0c0c"
 }
 
@@ -82,5 +82,16 @@ function GetDialogOverlayContainerColor() {
     }
 }
 
-const GetDialogColorOverlay = GetDialogOverlayContainerColor();
+//font
+
+function applyAppFont(){
+    if(localStorage.getItem('SelectedAPPfont') === 'roboto'){
+        document.documentElement.setAttribute('sys-font', 'roboto');
+    } else{
+        document.documentElement.setAttribute('sys-font', ' ');
+    }
+}
+
+applyAppFont();
+
 
