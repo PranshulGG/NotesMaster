@@ -2,7 +2,7 @@
 <html lang="en" Theme="blue_material">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
     <title>Note</title>
     <script src="../module/android.js"></script>
     <link rel="stylesheet" href="../ui-files/font-usage.css">
@@ -27,7 +27,7 @@
             <md-icon-button onclick="redo()">
                 <md-icon icon-outlined>redo</md-icon>
             </md-icon-button>
-            <md-icon-button onclick="toggleView()" toggle class="view-btn" >
+            <md-icon-button onclick="toggleView(); changeNavStatusConfig()" toggle class="view-btn" >
                 <md-icon icon-outlined slot="selected">edit</md-icon>
                 <md-icon icon-outlined>visibility</md-icon>
             </md-icon-button>
@@ -40,9 +40,13 @@
                     <md-icon slot="start" id="pinThisNoteBtnIcon" icon-outlined>bookmark</md-icon>
                     <div slot="headline" id="pinThisNoteBtnText">Pin</div>
                 </md-menu-item>
-                <md-menu-item menu-type id="deleteThisNoteBtn">
+                <md-menu-item menu-type id="deleteThisNoteBtnAlert">
                     <md-icon slot="start" icon-outlined>delete</md-icon>
                     <div slot="headline">Delete<span style="opacity: 0;">33</span></div>
+                </md-menu-item>
+                <md-menu-item menu-type id="addLabelToThisNoteDialog">
+                    <md-icon slot="start" icon-outlined>new_label</md-icon>
+                    <div slot="headline">Label</div>
                 </md-menu-item>
                 <md-menu-item menu-type>
                     <md-icon slot="start" icon-outlined>share</md-icon>
@@ -60,8 +64,9 @@
         <div class="full-activity-content" id="Content" style="height: calc(100% - 65px - 65px - 20px); top: 65px; width: calc(100% - 32px); padding: 0 16px 0 16px; padding-bottom: 20px;">
     
             <div class="editor">
-                           
-        <div class="input-section">
+                <div id="added_note_labels" hidden>
+                </div>
+                <div class="input-section">
             <input type="text" id="noteTitle" placeholder="Title" autocomplete="off">
         </div>
 
@@ -149,14 +154,14 @@
                     <md-menu-item onclick="setTextColor(getComputedStyle(document.documentElement).getPropertyValue('--On-Surface-Variant'))">
                         <md-icon slot="headline" icon-outlined style="color: var(--On-Surface-Variant);">format_color_text</md-icon>
                     </md-menu-item>
-                    <md-menu-item  onclick="setTextColor('#fcdf03')">
-                        <md-icon slot="headline" icon-outlined style="color: #fcdf03;">format_color_text</md-icon>
+                    <md-menu-item  onclick="setTextColor('#d6a718')">
+                        <md-icon slot="headline" icon-outlined style="color: #d6a718;">format_color_text</md-icon>
                     </md-menu-item>
-                    <md-menu-item onclick="setTextColor('#fc0303')">
-                        <md-icon slot="headline" icon-outlined style="color: #fc0303;">format_color_text</md-icon>
+                    <md-menu-item onclick="setTextColor('#e92315')">
+                        <md-icon slot="headline" icon-outlined style="color: #e92315;">format_color_text</md-icon>
                     </md-menu-item>
-                    <md-menu-item onclick="setTextColor('#03fc17')">
-                        <md-icon slot="headline" icon-outlined style="color: #03fc17;">format_color_text</md-icon>
+                    <md-menu-item onclick="setTextColor('#4caf50')">
+                        <md-icon slot="headline" icon-outlined style="color: #4caf50;">format_color_text</md-icon>
                       </md-menu-item>
                       <md-menu-item onclick="setTextColor('#fc03ec')">
                         <md-icon slot="headline" icon-outlined style="color: #fc03ec;">format_color_text</md-icon>
@@ -184,6 +189,30 @@
                 <md-text-button onclick="insertLink()">Add</md-text-button>
             </div>
         </md-dialog>
+
+        <md-dialog id="deleteNoteAlert" quick style="min-width: 85%;">
+            <div slot="headline">Delete Note?</div>
+            <div slot="content">
+                This action cannot be undone.
+            </div>
+            <div slot="actions">
+                <md-text-button onclick="window.history.back();">Cancel</md-text-button>
+                <md-filled-button id="deleteThisNoteBtn">Delete</md-filled-button>
+            </div>
+        </md-dialog>
+
+        <md-dialog id="NoteLabelDialog" quick style="min-width: 85%;">
+            <div slot="headline">Select labels</div>
+            <div slot="content" style="padding-left: 0; padding-right: 0;">
+                <div id="label_selection_list">
+
+                </div>
+            </div>
+            <div slot="actions">
+                <md-text-button onclick="window.history.back();">Cancel</md-text-button>
+                <md-text-button id="addNoteLabel">Add</md-text-button>
+            </div>
+        </md-dialog>
     </div>
 
 
@@ -198,7 +227,11 @@
         localStorage.getItem('Materialtheme')
       );
         }
+        if(localStorage.getItem('clickedNote')){
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '0')
+        } else{
         sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), '0')
+        }
     } else{
         document.documentElement.setAttribute('colorTheme', 'light');
         if(localStorage.getItem('Materialtheme')){
@@ -207,14 +240,18 @@
         localStorage.getItem('Materialtheme')
       );
         }
+        if(localStorage.getItem('clickedNote')){
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '1')
+        } else{
         sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), '1')
+        }
     }
     </script>
 
     <script type="module" src="../index.js"></script>
     <script src="../bundle.js"></script>
+    <script src="../app/note.js"></script>
     <script src="../app/editor.js"></script>
     <script src="../module/render.js"></script>
-    <script src="../app/note.js"></script>
 </body>
 </html>

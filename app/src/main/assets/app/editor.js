@@ -48,8 +48,12 @@ function saveNote() {
 
     if(title === "" && content === ""){
         document.getElementById('pinThisNoteBtn').disabled = true;
+        document.getElementById('addLabelToThisNoteDialog').disabled = true;
+
     } else{
         document.getElementById('pinThisNoteBtn').disabled = false;
+        document.getElementById('addLabelToThisNoteDialog').disabled = false;
+
     }
 
     let notes = JSON.parse(localStorage.getItem('notes')) || [];
@@ -78,6 +82,10 @@ function displaySavedNotes(note) {
          document.getElementById('pinThisNoteBtnIcon').innerHTML = 'bookmark_remove';
      }
 
+          setTimeout(()=>{
+             loadNoteLabels(note.noteID)
+          }, 100)
+
 }
 
 if(localStorage.getItem('clickedNote')){
@@ -93,6 +101,7 @@ if(localStorage.getItem('clickedNote')){
 
         if(document.getElementById('noteTitle').value.trim() === "" && document.getElementById('editor').innerHTML.trim() === ""){
             document.getElementById('pinThisNoteBtn').disabled = true;
+            document.getElementById('addLabelToThisNoteDialog').disabled = true;
         }
 }
 
@@ -133,6 +142,7 @@ function updateCheckboxes() {
     document.getElementById('bold_checkbox').checked = document.queryCommandState('bold');
     document.getElementById('italic_checkbox').checked = document.queryCommandState('italic');
     document.getElementById('insertOrderedList_checkbox').checked = document.queryCommandState('insertOrderedList');
+    document.getElementById('insertUnorderedList_checkbox').checked = document.queryCommandState('insertUnorderedList');
 
 }
 
@@ -230,15 +240,40 @@ function toggleView() {
 
     if(viewButton.selected){
         editor.contentEditable = 'false';
-        document.getElementById('noteTitle').style.pointerEvents = 'none';
+        document.getElementById('noteTitle').setAttribute('readonly', '')
+        document.querySelector('.bottom_tool_bar').hidden = true
+        document.querySelector('.full-activity-content').style.height = 'calc(100% - 65px - 0px - 20px)'
 
     } else{
         editor.contentEditable = 'true';
-        document.getElementById('noteTitle').style.pointerEvents = '';
+        document.getElementById('noteTitle').removeAttribute('readonly')
+        document.querySelector('.bottom_tool_bar').hidden = false
+        document.querySelector('.full-activity-content').style.height = 'calc(100% - 65px - 65px - 20px)'
 
     }
 
 }
+
+function changeNavStatusConfig(){
+    const viewButton = document.querySelector('.view-btn');
+
+    if(viewButton.selected){
+        if(localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') === 'true'){
+            sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '0')
+        } else{
+            sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '1')
+        }
+
+    } else{
+        if(localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') === 'true'){
+            sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), '0')
+        } else{
+            sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), '1')
+        }
+
+    }
+}
+
 
 function toggleFormatPre(cmd, value){
     const isChecked = document.getElementById('formatBlockPre_checkbox').checked;

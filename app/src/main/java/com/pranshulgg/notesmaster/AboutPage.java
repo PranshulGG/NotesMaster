@@ -36,7 +36,7 @@ import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 
-public class NoteView extends AppCompatActivity {
+public class AboutPage extends AppCompatActivity {
     private WebView webview;
 
     @Override
@@ -81,33 +81,9 @@ public class NoteView extends AppCompatActivity {
         webview.addJavascriptInterface(new ShowSnackInterface(this), "ShowSnackMessage");
 
 
-        webview.loadUrl("file:///android_asset/pages/note-editor.html");
+        webview.loadUrl("file:///android_asset/pages/aboutPage.html");
 
 
-    }
-
-    public class NavigateActivityInterface {
-        private final Context mContext;
-
-        public NavigateActivityInterface(Context context) {
-            this.mContext = context;
-        }
-
-        @JavascriptInterface
-        public void OpenActivity(final String activityName) {
-            Intent intent = null;
-
-            switch (activityName) {
-                case "--":
-                    break;
-                default:
-                    Toast.makeText(mContext, "Activity not found", Toast.LENGTH_SHORT).show();
-                    return;
-            }
-
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            mContext.startActivity(intent);
-        }
     }
 
     public class ShowSnackInterface {
@@ -153,6 +129,30 @@ public class NoteView extends AppCompatActivity {
         }
     }
 
+    public class NavigateActivityInterface {
+        private final Context mContext;
+
+        public NavigateActivityInterface(Context context) {
+            this.mContext = context;
+        }
+
+        @JavascriptInterface
+        public void OpenActivity(final String activityName) {
+            Intent intent = null;
+
+            switch (activityName) {
+                case "--":
+                    break;
+                default:
+                    Toast.makeText(mContext, "Activity not found", Toast.LENGTH_SHORT).show();
+                    return;
+            }
+
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            mContext.startActivity(intent);
+        }
+    }
+
     public class BackActivityInterface {
         private final Activity gActivity;
 
@@ -170,9 +170,9 @@ public class NoteView extends AppCompatActivity {
     }
 
     public class AndroidInterface {
-        private NoteView mActivity;
+        private AboutPage mActivity;
 
-        AndroidInterface(NoteView activity) {
+        AndroidInterface(AboutPage activity) {
             mActivity = activity;
         }
 
@@ -273,7 +273,7 @@ public class NoteView extends AppCompatActivity {
         }
 
         private boolean isExcludedUrl(String url) {
-            return url.startsWith("file:///android_asset/pages/note-editor.html");
+            return url.startsWith("file:///android_asset/pages/aboutPage.html");
         }
     }
 

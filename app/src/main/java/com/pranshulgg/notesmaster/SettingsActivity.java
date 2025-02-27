@@ -1,8 +1,10 @@
 package com.pranshulgg.notesmaster;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
@@ -13,25 +15,47 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.snackbar.Snackbar;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class SettingsActivity extends AppCompatActivity {
     private WebView webview;
-
+    private boolean doubleBackToExitPressedOnce = false;
+    private ValueCallback<Uri[]> filePathCallback;
+    private static final int REQUEST_PERMISSION_CODE = 1;
+    private final static int FILECHOOSER_RESULTCODE = 1;
+    private final static int EXPORT_REQUEST_CODE = 2;
+    private static final int PERMISSION_REQUEST_CODE = 3;
+    private static final int SAVE_DOCUMENT_REQUEST_CODE = 2;
+    private static final int IMPORT_REQUEST_CODE = 3;
+    private String dataToSave;
     @Override
     public void onBackPressed() {
         if (webview.canGoBack()) {
@@ -69,7 +93,8 @@ public class SettingsActivity extends AppCompatActivity {
         webview.addJavascriptInterface(androidInterface, "AndroidInterface");
         webview.addJavascriptInterface(new NavigateActivityInterface(this), "OpenActivityInterface");
         webview.addJavascriptInterface(new BackActivityInterface(this), "BackActivityInterface");
-
+        webview.addJavascriptInterface(new ShowSnackInterface(this), "ShowSnackMessage");
+        webview.addJavascriptInterface(new WebAppInterface(), "Android");
 
         webview.loadUrl("file:///android_asset/pages/settings.html");
 
@@ -119,6 +144,162 @@ public class SettingsActivity extends AppCompatActivity {
 
         });
 
+
+
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == FILECHOOSER_RESULTCODE) {
+            if (filePathCallback != null) {
+                Uri[] results = null;
+                if (resultCode == RESULT_OK && data != null) {
+                    String dataString = data.getDataString();
+                    if (dataString != null) {
+                        results = new Uri[]{Uri.parse(dataString)};
+                    }
+                }
+                filePathCallback.onReceiveValue(results);
+                filePathCallback = null;
+            }
+        } else if (requestCode == SAVE_DOCUMENT_REQUEST_CODE) {
+            if (resultCode == RESULT_OK && data != null && data.getData() != null) {
+                saveToUri(data.getData());
+            } else {
+                Toast.makeText(this, "Error exporting", Toast.LENGTH_SHORT).show();
+            }
+        } else if (requestCode == IMPORT_REQUEST_CODE) {
+            if (resultCode == RESULT_OK && data != null && data.getData() != null) {
+                importFromUri(data.getData());
+            } else {
+                Toast.makeText(this, "Error importing file", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    public class WebAppInterface {
+        @JavascriptInterface
+        public void saveFile(String data) {
+            dataToSave = data;
+            openFilePickerExport();
+        }
+
+        @JavascriptInterface
+        public void importFile() {
+            openFilePickerImport();  // Open file picker for importing JSON data
+        }
+
+    }
+
+
+
+
+
+    private void openFilePickerExport() {
+        String currentDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        String fileName = "NotesMasterBackup_" + currentDate + ".json";
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("application/json");
+        intent.putExtra(Intent.EXTRA_TITLE, fileName);
+        startActivityForResult(intent, SAVE_DOCUMENT_REQUEST_CODE);
+    }
+    private void openFilePickerImport() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("application/json");
+        startActivityForResult(intent, IMPORT_REQUEST_CODE);
+    }
+
+    private void importFromUri(Uri uri) {
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(uri);
+            if (inputStream != null) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                StringBuilder stringBuilder = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    stringBuilder.append(line);
+                }
+                reader.close();
+                inputStream.close();
+
+                String importedData = stringBuilder.toString();
+
+                String escapedData = importedData.replace("'", "\\'").replace("\"", "\\\"");
+
+                runOnUiThread(() -> {
+                    String jsCode = "handleImportedData('" + escapedData + "');";
+                    webview.evaluateJavascript(jsCode, null);
+                });
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Error reading file", Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
+    }
+
+
+
+    private void saveToUri(Uri uri) {
+        try {
+            OutputStream outputStream = getContentResolver().openOutputStream(uri);
+            if (outputStream != null) {
+                outputStream.write(dataToSave.getBytes());
+                outputStream.close();
+                Toast.makeText(this, "Backup saved", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Error saving file", Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
+    }
+
+    public class ShowSnackInterface {
+        private final Context mContext;
+
+        public ShowSnackInterface(Context context) {
+            this.mContext = context;
+        }
+
+        @JavascriptInterface
+        public void ShowSnack(final String text, final String time) {
+            int duration = Snackbar.LENGTH_SHORT;
+            if ("long".equals(time)) {
+                duration = Snackbar.LENGTH_LONG;
+            } else if ("short".equals(time)){
+                duration = Snackbar.LENGTH_SHORT;
+            }
+
+
+            Snackbar snackbar = Snackbar.make(((Activity) mContext).findViewById(android.R.id.content), text, duration);
+
+            View snackbarView = snackbar.getView();
+
+
+
+            TextView textView = snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+            Typeface typeface = ResourcesCompat.getFont(mContext, R.font.roboto_medium);
+            textView.setTypeface(typeface);
+
+
+            ViewGroup.LayoutParams params = snackbar.getView().getLayoutParams();
+            if (params instanceof ViewGroup.MarginLayoutParams) {
+                ViewGroup.MarginLayoutParams marginParams = (ViewGroup.MarginLayoutParams) params;
+                marginParams.bottomMargin = 34;
+                marginParams.leftMargin = 26;
+                marginParams.rightMargin = 26;
+                snackbar.getView().setLayoutParams(marginParams);
+            }
+
+
+            snackbar.show();
+        }
     }
 
     public class NavigateActivityInterface {
@@ -133,7 +314,8 @@ public class SettingsActivity extends AppCompatActivity {
             Intent intent = null;
 
             switch (activityName) {
-                case "--":
+                case "AboutPage":
+                    intent = new Intent(mContext, AboutPage.class);
                     break;
                 default:
                     Toast.makeText(mContext, "Activity not found", Toast.LENGTH_SHORT).show();

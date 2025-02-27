@@ -49,7 +49,10 @@ input[type="search"]::-webkit-search-results-decoration {
     bottom: 16px;
     right: 16px;
     z-index: 3;
-
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
 }
 
 .header_search{
@@ -152,6 +155,16 @@ flex{
     gap: 10px;
 }
 
+.saved-notes #savedNotesList.listView, .saved-notesPinned #pinnedNotesList.listView{
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 5px !important;
+}
+
+.saved-notes #savedNotesList.listView noteTileWrap, .saved-notesPinned #pinnedNotesList.listView noteTileWrap{
+    border-radius: 15px;
+}
+
 .saved-notes #savedNotesList noteTileWrap, .saved-notesPinned #pinnedNotesList noteTileWrap {
     display: inline-block;
     width: calc(100% - 10px - 10px);
@@ -175,12 +188,34 @@ flex{
 }
 
 .saved-notes #savedNotesList noteTileWrap span, p_content, .saved-notesPinned #pinnedNotesList noteTileWrap span{
-    opacity: 0.5;
+    opacity: 0.4;
     font-family: var(--google-normal);
     overflow: hidden;
     position: relative;
     max-height: 60px;
     display: block;
+    pointer-events: none;
+    display: flex;
+    align-items: flex-start;
+    word-break: break-word;
+    text-overflow: ellipsis;
+    flex-direction: column;
+
+}
+
+.saved-notes #savedNotesList noteTileWrap span pre, p_content pre, .saved-notesPinned #pinnedNotesList noteTileWrap span pre{
+    margin: 0;
+    word-break: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.saved-notes #savedNotesList noteTileWrap span ul, p_content ul, .saved-notesPinned #pinnedNotesList noteTileWrap span ul{
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
 }
 
 .saved-notes #savedNotesList noteTileWrap span::before, p_content::before, .saved-notesPinned #pinnedNotesList noteTileWrap span::before {
@@ -282,8 +317,8 @@ textheading{
     overflow: auto;
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 76px - 80px);
-    padding-bottom: 80px;
+    height: calc(100vh - 76px - 120px);
+    padding-bottom: 120px;
 }
 
 .main_app_wrap::before{
@@ -310,4 +345,54 @@ load_theme{
     position: fixed;
     left: 0;
     top: 0;
+}
+
+ a{
+    color: var(--Tertiary);
+}
+
+note_label{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+    border-bottom: 1px solid var(--Outline-Variant);
+}
+
+
+note_label p{
+    color: var(--On-Primary);
+    font-family: var(--google-normal);
+    font-size: 15px;
+    background-color: var(--Primary);
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-radius: 50px;
+    margin: 0;
+
+}
+
+note_label div{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+note_label div md-icon{
+    color: var(--On-Surface);
+}
+
+#label_holder{
+    z-index: 3;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-bottom: 20px;
+    gap: 10px;
+    display: flex;
+    overflow: auto;
+    overflow-y: hidden;
 }

@@ -31,6 +31,11 @@ function handleStorageChange(event) {
                 createNoteTile()
             case 'SelectedAPPfont':
                 applyAppFont()
+            case 'notesLabels':
+            case 'dragAndDropState':
+                 createLabels()
+            case 'NotesView':
+            useListView()
             default:
                 console.log('Untracked key changed:', event.key);
       }

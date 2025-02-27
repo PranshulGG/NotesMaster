@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en" Theme="blue_material">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+    <title>Labels</title>
+    <script src="../module/android.js"></script>
+    <link rel="stylesheet" href="../ui-files/font-usage.css">
+    <link rel="stylesheet" href="../ui-files/ui.css">
+    <link rel="stylesheet" href="../ui-files/variables.css">
+    <link rel="stylesheet" href="../ui-files/editorUi.css">
+    <link rel="stylesheet" href="../components/components.css">
+    <link rel="stylesheet" href="../components/modal-ver.css">
+    <script src="../module/Sortable.min.js"></script>
+    <style>
+        .sortable-ghost{
+          opacity: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="full-activity open">
+        <div class="full-activity-header transparent round" id="head-1">
+            <md-icon-button onclick="ActivityBack();">
+                <md-icon icon-outlined>arrow_back</md-icon>
+            </md-icon-button>
+            <p>Labels</p>
+        </div>
+        <div class="full-activity-content" id="headUser-1">
+
+            <div class="label_list" id="label_list" style="padding-bottom: 100px;">
+
+            </div>
+
+
+            <div class="floatfab_div" style="z-index: 1;">
+                <md-fab variant="primary" onclick="openCreateLabelDialog()">
+                    <md-icon icon-outlined slot="icon">add</md-icon>
+                </md-fab>
+            </div>
+
+            <div class="water_mark" hidden>
+                <i icon-outlined>label</i>
+                <p>No labels</p>
+            </div>
+
+            <md-dialog quick style="min-width: 85%;" id="createLabelDialog">
+                <div slot="headline">New label</div>
+
+                <div slot="content">
+                    <md-outlined-text-field style="width: 100%;" id="NewLabel_input" maxlength="15">
+
+                    </md-outlined-text-field>
+                </div>
+
+                <div slot="actions">
+                    <md-text-button onclick="window.history.back();">Cancel</md-text-button>
+                    <md-text-button onclick="createNewLabel();">Create</md-text-button>
+                </div>
+            </md-dialog>
+
+
+            <md-dialog quick style="min-width: 85%;" id="editLabelDialog">
+                <div slot="headline">Edit label</div>
+
+                <div slot="content">
+                    <md-outlined-text-field style="width: 100%;" id="editLabel_input" maxlength="15">
+
+                    </md-outlined-text-field>
+                </div>
+
+                <div slot="actions">
+                    <md-text-button onclick="window.history.back();">Cancel</md-text-button>
+                    <md-text-button onclick="updateLabel();">Update</md-text-button>
+                </div>
+            </md-dialog>
+        </div>
+
+        <script>
+
+    let sortableInstance;
+
+
+        if(localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') === 'true'){
+        document.documentElement.setAttribute('colorTheme', 'dark');
+        if(localStorage.getItem('Materialtheme')){
+            document.documentElement.setAttribute(
+        "Theme",
+        localStorage.getItem('Materialtheme')
+      );
+        }
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '0')
+    } else{
+        document.documentElement.setAttribute('colorTheme', 'light');
+        if(localStorage.getItem('Materialtheme')){
+            document.documentElement.setAttribute(
+        "Theme",
+        localStorage.getItem('Materialtheme')
+      );
+        }
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '1')
+    }
+
+        const user1 = document.getElementById("headUser-1");
+
+    function changeColorOnScroll1() {
+    var container = document.getElementById("headUser-1");
+    var scrollY = container.scrollTop;
+
+    if (scrollY >= 5) {
+        document.getElementById("head-1").style.backgroundColor =
+        "var(--Surface-Container)";
+        document.getElementById("head-1").style.transition = "";
+
+        container.removeEventListener("scroll", changeColorOnScroll1);
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '220')
+
+    } else {
+    }
+    }
+
+    if (user1) {
+    document
+        .getElementById("headUser-1")
+        .addEventListener("scroll", changeColorOnScroll1);
+    }
+
+    function changeColorOnScroll1A() {
+    var container = document.getElementById("headUser-1");
+    var scrollY = container.scrollTop;
+
+    if (scrollY <= 1) {
+        document.getElementById("head-1").style.backgroundColor = "";
+        document.getElementById("head-1").style.transition =
+        "background-color 0.2s ease-in";
+
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '220')
+
+
+        container.addEventListener("scroll", changeColorOnScroll1);
+    } else {
+    }
+    }
+
+    if (user1) {
+    document
+        .getElementById("headUser-1")
+        .addEventListener("scroll", changeColorOnScroll1A);
+    }
+
+
+        async function initializeDragAndDrop() {
+        const draggableContainer = document.getElementById('label_list');
+        const storageKey = 'dragAndDropState';
+
+        async function saveOrder() {
+            const itemsOrder = Array.from(draggableContainer.children).map(element => element.dataset.id);
+             localStorage.setItem(storageKey, JSON.stringify(itemsOrder));
+        }
+
+        async function loadOrder() {
+            const storedState = localStorage.getItem(storageKey);
+            if (storedState) {
+                const itemsOrder = JSON.parse(storedState);
+                const elements = Array.from(draggableContainer.children);
+
+                itemsOrder.forEach(id => {
+                    const element = elements.find(el => el.dataset.id === id);
+                    if (element) {
+                        draggableContainer.appendChild(element);
+                    }
+                });
+            }
+        }
+        if (sortableInstance) {
+            sortableInstance.destroy();
+  }
+     sortableInstance = new Sortable(draggableContainer, {
+            animation: 250,
+            ghostClass: 'sortable-ghost',
+            delay: 500,
+            onStart(evt) {
+
+                evt.item.classList.add('noSwipe');
+            },
+            onEnd(evt) {
+                saveOrder();
+
+            },
+        });
+
+        await loadOrder();
+        }
+
+    </script>
+
+        <script type="module" src="../index.js"></script>
+        <script src="../bundle.js"></script>
+        <script src="../module/render.js"></script>
+        <script src="../module/labels.js"></script>
+
+</body>
+</html>

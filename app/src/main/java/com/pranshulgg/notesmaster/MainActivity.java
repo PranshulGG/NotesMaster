@@ -2,24 +2,32 @@ package com.pranshulgg.notesmaster;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.snackbar.Snackbar;
 
 public class MainActivity extends AppCompatActivity {
     private WebView webview;
@@ -61,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
         AndroidInterface androidInterface = new AndroidInterface(this);
         webview.addJavascriptInterface(androidInterface, "AndroidInterface");
         webview.addJavascriptInterface(new NavigateActivityInterface(this), "OpenActivityInterface");
+        webview.addJavascriptInterface(new ShowSnackInterface(this), "ShowSnackMessage");
 
 
 
@@ -86,6 +95,9 @@ public class MainActivity extends AppCompatActivity {
                 case "NotesViewActivity":
                     intent = new Intent(mContext, NoteView.class);
                     break;
+                case "LabelsActivity":
+                    intent = new Intent(mContext, LabelsActivity.class);
+                    break;
                 case "GoBack":
                     back();
                     break;
@@ -96,6 +108,49 @@ public class MainActivity extends AppCompatActivity {
 
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             mContext.startActivity(intent);
+        }
+    }
+
+    public class ShowSnackInterface {
+        private final Context mContext;
+
+        public ShowSnackInterface(Context context) {
+            this.mContext = context;
+        }
+
+        @JavascriptInterface
+        public void ShowSnack(final String text, final String time) {
+            int duration = Snackbar.LENGTH_SHORT;
+            if ("long".equals(time)) {
+                duration = Snackbar.LENGTH_LONG;
+            } else if ("short".equals(time)){
+                duration = Snackbar.LENGTH_SHORT;
+            }
+
+
+            Snackbar snackbar = Snackbar.make(((Activity) mContext).findViewById(android.R.id.content), text, duration);
+
+            View snackbarView = snackbar.getView();
+
+
+
+            TextView textView = snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+            Typeface typeface = ResourcesCompat.getFont(mContext, R.font.roboto_medium);
+            textView.setTypeface(typeface);
+
+
+            ViewGroup.LayoutParams params = snackbar.getView().getLayoutParams();
+            if (params instanceof ViewGroup.MarginLayoutParams) {
+                ViewGroup.MarginLayoutParams marginParams = (ViewGroup.MarginLayoutParams) params;
+                marginParams.bottomMargin = 34;
+                marginParams.leftMargin = 26;
+                marginParams.rightMargin = 26;
+                snackbar.getView().setLayoutParams(marginParams);
+            }
+
+
+            snackbar.show();
         }
     }
 

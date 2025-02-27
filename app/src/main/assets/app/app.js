@@ -14,6 +14,18 @@ Search_notes_inputWrapper.addEventListener('click', () =>{
 })
 
 window.addEventListener("popstate", function (event) {
+    const deleteCheckboxes = document.querySelectorAll('.noteCheckboxWrap');
+
+    if(!document.querySelector('.search_container_screen').hidden){
+        deleteCheckboxes.forEach((checkbox) =>{
+            if(!checkbox.hidden){
+               setTimeout(() => {
+                    window.history.back();
+               }, 100);
+            }
+        })
+    }
+
     if(!document.querySelector('.search_container_screen').hidden){
         document.querySelector('.search_container_screen').hidden = true;
         Search_notes_input.blur();
@@ -24,8 +36,6 @@ window.addEventListener("popstate", function (event) {
         document.getElementById('notesContainerSearched').innerHTML = '';
         document.getElementById('Search_notes_input').value = ''
     }
-
-       const deleteCheckboxes = document.querySelectorAll('.noteCheckboxWrap');
 
        deleteCheckboxes.forEach((checkbox) =>{
        if(sessionStorage.getItem('DeleteAlertDialogOpen') === "false" || !sessionStorage.getItem('DeleteAlertDialogOpen')){
@@ -38,7 +48,8 @@ window.addEventListener("popstate", function (event) {
             document.querySelector('#textheadingNotes').innerHTML = `Notes`;
 
         }
-        }
+    }
+
        });
 
        const notes_ripple_elems = document.querySelectorAll('.notes_ripple_elem');
@@ -95,7 +106,7 @@ function createNoteTile(){
                 navigateActivity('NotesViewActivity')
             });
 
-                if(notes.filter(note => note.pinned).length < 1){
+                if(notes.filter(note => note.pinned).length < 1 ){
                     document.querySelector('.saved-notesPinned').hidden = true;
                 } else{
                     document.querySelector('.saved-notesPinned').hidden = false;
@@ -106,7 +117,25 @@ function createNoteTile(){
             } else {
                 savedNotesList.appendChild(noteTile);
             }
+
+            if(document.querySelectorAll('#savedNotesList noteTileWrap').length === 2){
+                document.getElementById('savedNotesList').style.display = 'flex';
+            } else{
+                document.getElementById('savedNotesList').style.display = '';
+            }
+
+            if(document.querySelectorAll('#pinnedNotesList noteTileWrap').length === 2){
+                document.getElementById('pinnedNotesList').style.display = 'flex';
+            } else{
+                document.getElementById('pinnedNotesList').style.display = '';
+            }
         });
+
+     document.querySelectorAll('md-filter-chip').forEach(chip => {
+            chip.removeAttribute('selected');
+        });
+        createLabels()
+
 }
 
 createNoteTile()
@@ -180,6 +209,8 @@ function displayWaterMark(){
         document.querySelector('.water_mark').hidden = true;
     } else{
         document.querySelector('.water_mark').hidden = false;
+        document.querySelector('.saved-notesPinned').hidden = true;
+
     }
 
 }
@@ -290,3 +321,105 @@ document.getElementById('deleteNoteAlert').addEventListener('close', () =>{
             sessionStorage.setItem('DeleteAlertDialogOpen', "false");
         }, 200);
 })
+
+// labels
+
+function createLabels(){
+if (JSON.parse(localStorage.getItem('notesLabels'))) {
+    const savedLabels = JSON.parse(localStorage.getItem('notesLabels')) || [];
+    const label_holder = document.getElementById('label_holder');
+    label_holder.innerHTML = ""
+
+    savedLabels.forEach((label, index) => {
+        const label_item = document.createElement('md-filter-chip');
+        label_item.setAttribute('label', label);
+        label_item.setAttribute("data-id", index + 1);
+
+        label_item.addEventListener('click', () => {
+            const isSelected = label_item.hasAttribute('selected');
+            label_holder.querySelectorAll('md-filter-chip').forEach(chip => {
+                chip.removeAttribute('selected');
+
+            });
+            if (!isSelected) {
+                label_item.setAttribute('selected', '');
+                filterNotesByLabel(label);
+            } else {
+                showAllNotes();
+            }
+        });
+
+        label_holder.appendChild(label_item);
+    });
+}
+
+    if(JSON.parse(localStorage.getItem('notesLabels')) && JSON.parse(localStorage.getItem('notesLabels')).length > 0){
+        document.getElementById('label_holder').hidden = false
+    } else{
+        document.getElementById('label_holder').hidden = true
+    }
+
+    async function initializeDragAndDropAllEL() {
+        const draggableContainer = document.getElementById('label_holder');
+        const storageKey = 'dragAndDropState';
+
+        async function saveOrder() {
+            const itemsOrder = Array.from(draggableContainer.children).map(element => element.dataset.id);
+            localStorage.setItem(storageKey, JSON.stringify(itemsOrder));
+        }
+
+        async function loadOrder() {
+            const storedState = localStorage.getItem(storageKey);
+            if (storedState) {
+                const itemsOrder = JSON.parse(storedState);
+                const elements = Array.from(draggableContainer.children);
+
+                itemsOrder.forEach(id => {
+                    const element = elements.find(el => el.dataset.id === id);
+                    if (element) {
+                        draggableContainer.appendChild(element);
+                    }
+                });
+            }
+        }
+        await loadOrder();
+      }
+      initializeDragAndDropAllEL()
+
+}
+
+function filterNotesByLabel(selectedLabel) {
+    let noteLabels = JSON.parse(localStorage.getItem('noteLabels')) || {};
+
+    document.querySelectorAll('#savedNotesList noteTileWrap, #pinnedNotesList noteTileWrap').forEach(noteTile => {
+        const noteID = noteTile.getAttribute('noteID');
+        const labels = noteLabels[noteID] || [];
+
+        if (labels.includes(selectedLabel)) {
+            noteTile.hidden = false;
+        } else {
+            noteTile.hidden = true;
+        }
+    });
+}
+
+function showAllNotes() {
+    document.querySelectorAll('#savedNotesList noteTileWrap, #pinnedNotesList noteTileWrap').forEach(noteTile => {
+        noteTile.hidden = false;
+    });
+}
+
+// toggle list or grid view
+
+function useListView(){
+    if(localStorage.getItem('NotesView') && localStorage.getItem('NotesView') === 'true'){
+    document.getElementById('savedNotesList').classList.add('listView')
+    document.getElementById('pinnedNotesList').classList.add('listView')
+
+    } else{
+    document.getElementById('savedNotesList').classList.remove('listView')
+    document.getElementById('pinnedNotesList').classList.remove('listView')
+}
+}
+
+useListView()
