@@ -54,6 +54,11 @@
     user-select: text !important;
 }
 
+#editor h1:first-child, #editor h2:first-child, #editor h3:first-child, #editor h4:first-child{
+    margin-top: 0;
+}
+
+
 #noteTitle{
     width: 100%;
     border: none;
@@ -65,7 +70,8 @@
     padding-left: 0;
     padding-right: 0;
     caret-color: var(--Primary);
-    
+    user-select: text !important;
+    min-height: 37px;
 }
 
 [contenteditable][placeholder]:empty:before {
@@ -141,3 +147,16 @@
 #label_selection_list notelabelitem{
     position: relative;
 }
+
+hr{
+    background-color: var(--On-Surface-Variant);
+    opacity: 0.4;
+}
+
+blockquote {
+    border-left: 4px solid var(--Outline-Variant);
+    padding-left: 10px;
+    color: var(--On-Surface-Variant);
+    margin: 0;
+    opacity: 0.7;
+  }

@@ -41,7 +41,7 @@ document.getElementById('noteTitle').addEventListener('input', () =>{
 });
 
 function saveNote() {
-    const title = document.getElementById('noteTitle').value.trim();
+    const title = document.getElementById('noteTitle').innerHTML.trim();
     const content = document.getElementById('editor').innerHTML.trim();
     const noteID = document.querySelector('id').getAttribute('id')
 
@@ -73,7 +73,7 @@ function saveNote() {
 }
 
 function displaySavedNotes(note) {
-        document.getElementById('noteTitle').value = note.title;
+        document.getElementById('noteTitle').innerHTML = note.title;
         document.getElementById('editor').innerHTML = note.content;
      document.querySelector('id').setAttribute('id', note.noteID)
 
@@ -99,7 +99,7 @@ if(localStorage.getItem('clickedNote')){
     document.querySelector('id').setAttribute('id', Date.now() + '_note')
     openedNoteId = document.querySelector('id').getAttribute('id');
 
-        if(document.getElementById('noteTitle').value.trim() === "" && document.getElementById('editor').innerHTML.trim() === ""){
+        if(document.getElementById('noteTitle').innerHTML.trim() === "" && document.getElementById('editor').innerHTML.trim() === ""){
             document.getElementById('pinThisNoteBtn').disabled = true;
             document.getElementById('addLabelToThisNoteDialog').disabled = true;
         }
@@ -126,6 +126,16 @@ function redo() {
     document.execCommand('redo');
 }
 
+function applyColorSurfaceVariant() {
+    document.execCommand('styleWithCSS', false, true);
+    document.execCommand('foreColor', false, 'var(--On-Surface-Variant)'); // Hack to apply class
+}
+
+function applyColorDefault() {
+    document.execCommand('styleWithCSS', false, true);
+    document.execCommand('foreColor', false, 'var(--On-Surface)'); // Hack to apply class
+}
+
 
 // checkboxes
 
@@ -143,6 +153,9 @@ function updateCheckboxes() {
     document.getElementById('italic_checkbox').checked = document.queryCommandState('italic');
     document.getElementById('insertOrderedList_checkbox').checked = document.queryCommandState('insertOrderedList');
     document.getElementById('insertUnorderedList_checkbox').checked = document.queryCommandState('insertUnorderedList');
+    document.getElementById('underline_checkbox').checked = document.queryCommandState('underline');
+    document.getElementById('strikethrough_checkbox').checked = document.queryCommandState('strikethrough');
+
 
 }
 
@@ -240,13 +253,13 @@ function toggleView() {
 
     if(viewButton.selected){
         editor.contentEditable = 'false';
-        document.getElementById('noteTitle').setAttribute('readonly', '')
+        document.getElementById('noteTitle').contentEditable = 'false';
         document.querySelector('.bottom_tool_bar').hidden = true
         document.querySelector('.full-activity-content').style.height = 'calc(100% - 65px - 0px - 20px)'
 
     } else{
         editor.contentEditable = 'true';
-        document.getElementById('noteTitle').removeAttribute('readonly')
+        document.getElementById('noteTitle').contentEditable = 'true';
         document.querySelector('.bottom_tool_bar').hidden = false
         document.querySelector('.full-activity-content').style.height = 'calc(100% - 65px - 65px - 20px)'
 
@@ -286,3 +299,12 @@ function toggleFormatPre(cmd, value){
 }
 
 document.getElementById('editor').focus()
+
+document.getElementById('blockquote_checkbox').addEventListener('input', () =>{
+    if(document.getElementById('blockquote_checkbox').checked){
+        execCmd('formatBlock', 'blockquote')
+    } else{
+        execCmd('formatBlock', 'div')
+
+    }
+});

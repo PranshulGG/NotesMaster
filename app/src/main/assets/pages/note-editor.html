@@ -67,7 +67,8 @@
                 <div id="added_note_labels" hidden>
                 </div>
                 <div class="input-section">
-            <input type="text" id="noteTitle" placeholder="Title" autocomplete="off">
+<!--            <input type="text" id="noteTitle" placeholder="Title" autocomplete="off">-->
+                    <div  id="noteTitle" placeholder="Title" oninput="if(this.innerHTML.trim()==='<br>')this.innerHTML=''" autocomplete="off"  contenteditable="true"></div>
         </div>
 
         <div class="editable" id="editor" contenteditable="true" placeholder="Note" oninput="if(this.innerHTML.trim()==='<br>')this.innerHTML=''"></div>
@@ -102,6 +103,17 @@
             </div>
 
             <div class="format_item">
+                <input type="checkbox" id="underline_checkbox" onchange="toggleFormat('underline')">
+                <label for="underline_checkbox"><md-icon icon-outlined>format_underlined</md-icon></label>
+            </div>
+
+            <div class="format_item">
+                <input type="checkbox" id="strikethrough_checkbox" onchange="toggleFormat('strikethrough')">
+                <label for="strikethrough_checkbox"><md-icon icon-outlined>format_strikethrough</md-icon></label>
+            </div>
+
+
+            <div class="format_item">
                 <input type="checkbox" id="insertOrderedList_checkbox" onchange="toggleFormat('insertOrderedList')">
                 <label for="insertOrderedList_checkbox"><md-icon icon-outlined>format_list_numbered</md-icon></label>
             </div>
@@ -111,23 +123,24 @@
                 <label for="insertUnorderedList_checkbox"><md-icon icon-outlined>format_list_bulleted</md-icon></label>
             </div>
 
+
             <div class="format_item">
                 <label for="heading_checkboxToggle"  id="Headingusage-popover-anchor"><md-icon icon-outlined>format_h1</md-icon></label>
                 <md-menu positioning="popover" id="Headingusage-popover" anchor="Headingusage-popover-anchor" style="min-width: 40px;">
                     <md-menu-item onclick="execCmd('formatBlock', 'h1')">
-                        <div slot="headline">H1</div>
-                    </md-menu-item onclick="execCmd('formatBlock', 'h2')">
-                    <md-menu-item>
-                        <div slot="headline">H2</div>
+                        <md-icon slot="headline" icon-outlined>format_h1</md-icon>
+                    </md-menu-item>
+                    <md-menu-item onclick="execCmd('formatBlock', 'h2')">
+                        <md-icon slot="headline" icon-outlined>format_h2</md-icon>
                     </md-menu-item>
                     <md-menu-item onclick="execCmd('formatBlock', 'h3')">
-                        <div slot="headline">H3</div>
+                        <md-icon slot="headline" icon-outlined>format_h3</md-icon>
                     </md-menu-item>
                     <md-menu-item onclick="execCmd('formatBlock', 'h4')">
-                        <div slot="headline">H4</div>
-                      </md-menu-item>
-                      <md-menu-item onclick="execCmd('formatBlock', 'p')">
-                        <div slot="headline">Body</div>
+                        <md-icon slot="headline" icon-outlined>format_h4</md-icon>
+                    </md-menu-item>
+                      <md-menu-item onclick="execCmd('formatBlock', 'div')">
+                          <md-icon slot="headline" icon-outlined>format_paragraph</md-icon>
                       </md-menu-item>
                   </md-menu>
                   <script type="module">
@@ -136,8 +149,19 @@
                     anchorEl.addEventListener('click', () => { menuEl.open = !menuEl.open; });
                   </script>
             </div>
+
+            <div class="format_item" onclick="execCmd('insertHorizontalRule')">
+                <label ><md-icon icon-outlined>horizontal_rule</md-icon></label>
+            </div>
+
             <div class="format_item" id="openInsertLinkDialog">
                 <label ><md-icon icon-outlined>link</md-icon></label>
+            </div>
+
+
+            <div class="format_item">
+                <input type="checkbox" id="blockquote_checkbox">
+                <label for="blockquote_checkbox"><md-icon icon-outlined>format_quote</md-icon></label>
             </div>
 
             <div class="format_item">
@@ -148,10 +172,10 @@
             <div class="format_item">
                 <label for="Color_checkboxToggle"  id="Colorusage-popover-anchor"><md-icon icon-outlined>format_color_text</md-icon></label>
                 <md-menu positioning="popover" id="Colorusage-popover" anchor="Colorusage-popover-anchor" style="min-width: 50px;" x-offset="-7">
-                    <md-menu-item onclick="setTextColor(getComputedStyle(document.documentElement).getPropertyValue('--On-Surface'))">
+                    <md-menu-item onclick="applyColorDefault()">
                         <md-icon slot="headline" icon-outlined style="color: var(--On-Surface);">format_color_text</md-icon>
                     </md-menu-item>
-                    <md-menu-item onclick="setTextColor(getComputedStyle(document.documentElement).getPropertyValue('--On-Surface-Variant'))">
+                    <md-menu-item onclick="applyColorSurfaceVariant()">
                         <md-icon slot="headline" icon-outlined style="color: var(--On-Surface-Variant);">format_color_text</md-icon>
                     </md-menu-item>
                     <md-menu-item  onclick="setTextColor('#d6a718')">

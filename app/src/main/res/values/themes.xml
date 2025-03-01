@@ -10,6 +10,7 @@
         <item name="android:statusBarColor">#fff</item>
         <item name="android:windowBackground">#fff</item>
         <item name="android:navigationBarColor">#fff</item>
+        <item name="colorAccent">#000000</item>
     </style>
 
 </resources>

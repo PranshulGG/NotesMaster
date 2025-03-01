@@ -2,6 +2,7 @@ const Search_notes_input = document.getElementById('Search_notes_input');
 const Search_notes_inputWrapper = document.getElementById('Search_notes_input_wrapper');
 
 Search_notes_inputWrapper.addEventListener('click', () =>{
+    if(document.querySelector('.search_container_screen').hidden){
     document.querySelector('.search_container_screen').hidden = false
     window.history.pushState({ SearchContainerOpen: true }, "");
     sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container-High'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container-High'), Themeflag, '200')
@@ -11,6 +12,7 @@ Search_notes_inputWrapper.addEventListener('click', () =>{
     setTimeout(() =>{
         Search_notes_input.focus();
     }, 100);
+  }
 })
 
 window.addEventListener("popstate", function (event) {
@@ -120,14 +122,27 @@ function createNoteTile(){
 
             if(document.querySelectorAll('#savedNotesList noteTileWrap').length === 2){
                 document.getElementById('savedNotesList').style.display = 'flex';
+                document.querySelectorAll('#savedNotesList notetilewrap').forEach(el => {
+                    el.style.height = 'max-content';
+                });
+
             } else{
                 document.getElementById('savedNotesList').style.display = '';
+                document.querySelectorAll('#savedNotesList notetilewrap').forEach(el => {
+                    el.style.height = '';
+                });
             }
 
             if(document.querySelectorAll('#pinnedNotesList noteTileWrap').length === 2){
                 document.getElementById('pinnedNotesList').style.display = 'flex';
+                document.querySelectorAll('#pinnedNotesList notetilewrap').forEach(el => {
+                    el.style.height = 'max-content';
+                });
             } else{
                 document.getElementById('pinnedNotesList').style.display = '';
+                document.querySelectorAll('#pinnedNotesList notetilewrap').forEach(el => {
+                    el.style.height = '';
+                });
             }
         });
 

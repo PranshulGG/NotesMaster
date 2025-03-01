@@ -88,3 +88,7 @@
 [icon-weight="100"]{
   font-weight: 100 !important;
 }
+
+[icon-weight="bold"]{
+  font-weight: 600 !important;
+}
