@@ -184,9 +184,10 @@ flex{
     margin-bottom: 10px;
     font-family: var(--google-mid);
     color: var(--On-Surface);
-    font-size: 18px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    font-size: 17px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
 }
 
@@ -257,7 +258,7 @@ p_content h1, p_content h2, p_content h3, p_content h4{
     position: absolute;
     width: 100%;
     height: 100%;
-    z-index: 1;
+    z-index: 2;
     top: 0;
     left: 0;
     overflow: hidden;
@@ -421,6 +422,7 @@ note_label div md-icon{
     display: flex;
     overflow: auto;
     overflow-y: hidden;
+    flex-shrink: 0;
 }
 
 blockquote{

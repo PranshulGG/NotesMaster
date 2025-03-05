@@ -11,8 +11,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ShortcutInfo;
+import android.content.pm.ShortcutManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.Icon;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -42,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("WrongThread")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         SharedPreferences prefs = getSharedPreferences("theme_prefs", MODE_PRIVATE);
@@ -76,6 +80,9 @@ public class MainActivity extends AppCompatActivity {
         webview.loadUrl("file:///android_asset/index.html");
 
     }
+
+
+
 
     public class NavigateActivityInterface {
         private final Context mContext;

@@ -146,6 +146,11 @@
     --ripple-unbounded: var(--On-Surface);
     --ripple-bounded: white;
     color-scheme: dark;
+    --bg-hi-1: #5c4b2f;
+    --bg-hi-2: #5b3b39;
+    --bg-hi-3: #31425c;
+    --bg-hi-4: #31524a;
+    --bg-hi-5: #4e3b57;
 }
 
 
@@ -153,6 +158,11 @@
     --ripple-unbounded: var(--On-Surface);
     --ripple-bounded: black;
     color-scheme: light;
+    --bg-hi-1: #fce3c4;
+    --bg-hi-2: #fad4d3;
+    --bg-hi-3: #c5ddf7;
+    --bg-hi-4: #c9f4ea;
+    --bg-hi-5: #e9d5f1;
 }
 
 

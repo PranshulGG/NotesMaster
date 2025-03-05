@@ -20,7 +20,17 @@ document.getElementById('editor').addEventListener('input', () =>{
     setTimeout(updateCheckboxes, 0);
     if (document.getElementById('editor').innerHTML.trim() === '') {
         document.getElementById('formatBlockPre_checkbox').checked = false;
+        document.getElementById('blockquote_checkbox').checked = false
     }
+
+       if (!document.getElementById('editor').textContent.trim()) {
+            document.getElementById('horizontal_rule_btn').style.opacity = '0.5';
+            document.getElementById('horizontal_rule_btn').style.pointerEvents = 'none';
+       } else{
+        document.getElementById('horizontal_rule_btn').style.opacity = '';
+        document.getElementById('horizontal_rule_btn').style.pointerEvents = '';
+       }
+
 
     clearTimeout(inputDebounce)
 
@@ -49,11 +59,16 @@ function saveNote() {
     if(title === "" && content === ""){
         document.getElementById('pinThisNoteBtn').disabled = true;
         document.getElementById('addLabelToThisNoteDialog').disabled = true;
+        document.getElementById('shareContentMenuOption').disabled = true
+        document.getElementById('ClearNoteContentMenuOption').disabled = true;
 
     } else{
         document.getElementById('pinThisNoteBtn').disabled = false;
         document.getElementById('addLabelToThisNoteDialog').disabled = false;
-
+        document.getElementById('shareContentMenuOption').disabled = false
+        if(!document.querySelector('.view-btn').selected){
+            document.getElementById('ClearNoteContentMenuOption').disabled = false;
+        }
     }
 
     let notes = JSON.parse(localStorage.getItem('notes')) || [];
@@ -102,6 +117,8 @@ if(localStorage.getItem('clickedNote')){
         if(document.getElementById('noteTitle').innerHTML.trim() === "" && document.getElementById('editor').innerHTML.trim() === ""){
             document.getElementById('pinThisNoteBtn').disabled = true;
             document.getElementById('addLabelToThisNoteDialog').disabled = true;
+            document.getElementById('shareContentMenuOption').disabled = true
+            document.getElementById('ClearNoteContentMenuOption').disabled = true;
         }
 }
 
@@ -115,6 +132,42 @@ function clearEditor() {
 
 function setTextColor(color) {
     execCmd('foreColor', color);
+    document.getElementById('editor').focus()
+}
+
+function setbgColor(color) {
+    try {
+    const selection = window.getSelection();
+    if (!selection.rangeCount) return;
+
+    const range = selection.getRangeAt(0);
+
+    const span = document.createElement('span');
+    span.style.backgroundColor = color;
+
+
+    if (!selection.isCollapsed) {
+        range.surroundContents(span);
+    } else {
+
+        span.innerHTML = '&#8203;';
+        range.insertNode(span);
+
+        const newRange = document.createRange();
+        newRange.setStart(span, 1);
+        newRange.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(newRange);
+    }    } catch (error) {
+        ShowSnackMessage.ShowSnack('Error', 'short');
+
+    }
+}
+
+
+function removeBgColor() {
+    document.execCommand('hiliteColor', false, 'initial');
+    document.getElementById('editor').focus()
 }
 
 
@@ -155,6 +208,7 @@ function updateCheckboxes() {
     document.getElementById('insertUnorderedList_checkbox').checked = document.queryCommandState('insertUnorderedList');
     document.getElementById('underline_checkbox').checked = document.queryCommandState('underline');
     document.getElementById('strikethrough_checkbox').checked = document.queryCommandState('strikethrough');
+    document.getElementById('blockquote_checkbox').checked = document.queryCommandState('formatBlock', '<blockquote>');
 
 
 }
@@ -256,12 +310,18 @@ function toggleView() {
         document.getElementById('noteTitle').contentEditable = 'false';
         document.querySelector('.bottom_tool_bar').hidden = true
         document.querySelector('.full-activity-content').style.height = 'calc(100% - 65px - 0px - 20px)'
+        document.getElementById('undo_btn_toggle').hidden = true;
+        document.getElementById('redo_btn_toggle').hidden = true;
+        document.getElementById('ClearNoteContentMenuOption').disabled = true;
 
     } else{
         editor.contentEditable = 'true';
         document.getElementById('noteTitle').contentEditable = 'true';
         document.querySelector('.bottom_tool_bar').hidden = false
         document.querySelector('.full-activity-content').style.height = 'calc(100% - 65px - 65px - 20px)'
+        document.getElementById('undo_btn_toggle').hidden = false;
+        document.getElementById('redo_btn_toggle').hidden = false;
+        document.getElementById('ClearNoteContentMenuOption').disabled = false;
 
     }
 
@@ -308,3 +368,14 @@ document.getElementById('blockquote_checkbox').addEventListener('input', () =>{
 
     }
 });
+
+function shareContent() {
+    window.Android.shareText(document.getElementById('noteTitle').textContent.trim(), document.getElementById('editor').textContent.trim());
+}
+
+function insertHR() {
+    document.execCommand("insertHorizontalRule", false, null);
+    document.execCommand("insertHTML", false, "<br>");
+}
+
+

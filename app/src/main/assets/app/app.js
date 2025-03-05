@@ -108,17 +108,17 @@ function createNoteTile(){
                 navigateActivity('NotesViewActivity')
             });
 
+                if (note.pinned) {
+                    pinnedNotesList.appendChild(noteTile);
+                } else {
+                    savedNotesList.appendChild(noteTile);
+                }
+
                 if(notes.filter(note => note.pinned).length < 1 ){
                     document.querySelector('.saved-notesPinned').hidden = true;
                 } else{
                     document.querySelector('.saved-notesPinned').hidden = false;
                 }
-
-            if (note.pinned) {
-                pinnedNotesList.appendChild(noteTile);
-            } else {
-                savedNotesList.appendChild(noteTile);
-            }
 
             if(document.querySelectorAll('#savedNotesList noteTileWrap').length === 2){
                 document.getElementById('savedNotesList').style.display = 'flex';
@@ -150,6 +150,9 @@ function createNoteTile(){
             chip.removeAttribute('selected');
         });
         createLabels()
+
+
+
 
 }
 

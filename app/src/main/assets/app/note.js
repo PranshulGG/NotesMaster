@@ -4,7 +4,11 @@ document.getElementById('deleteThisNoteBtnAlert').addEventListener('click', () =
     document.getElementById('deleteNoteAlert').show();
     window.history.pushState({ DeleteNoteDialogOpen: true }, "");
 
+    if(document.querySelector('.view-btn').selected){
+    sendThemeToAndroid(colorsDialogsOpenContainer[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface[GetDialogOverlayContainerColor()], '0', '40');
+    }else{
     sendThemeToAndroid(colorsDialogsOpenContainer[GetDialogOverlayContainerColor()], colorsDialogsOpenContainer[GetDialogOverlayContainerColor()], '0', '40');
+    }
 });
 
 window.addEventListener("popstate", function (event) {
@@ -20,8 +24,11 @@ document.getElementById('deleteNoteAlert').addEventListener('cancel', () =>{
 })
 
 document.getElementById('deleteNoteAlert').addEventListener('close', () =>{
+    if(document.querySelector('.view-btn').selected){
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '40')
+    } else{
     sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), Themeflag, '40')
-
+    }
 });
 
 
@@ -68,8 +75,11 @@ document.getElementById('addLabelToThisNoteDialog').addEventListener('click', ()
     document.getElementById('NoteLabelDialog').show();
 
     window.history.pushState({ NoteLabelDialogOpen: true }, "");
-
+    if(document.querySelector('.view-btn').selected){
+    sendThemeToAndroid(colorsDialogsOpenContainer[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface[GetDialogOverlayContainerColor()], '0', '40');
+    }else{
     sendThemeToAndroid(colorsDialogsOpenContainer[GetDialogOverlayContainerColor()], colorsDialogsOpenContainer[GetDialogOverlayContainerColor()], '0', '40');
+    }
 
 });
 
@@ -111,7 +121,11 @@ document.getElementById('NoteLabelDialog').addEventListener('cancel', () =>{
 })
 
 document.getElementById('NoteLabelDialog').addEventListener('close', () =>{
+    if(document.querySelector('.view-btn').selected){
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '40')
+    } else{
     sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), Themeflag, '40')
+    }
 });
 
 document.getElementById('addNoteLabel').addEventListener('click', () => {

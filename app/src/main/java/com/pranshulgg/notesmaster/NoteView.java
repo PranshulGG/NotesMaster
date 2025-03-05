@@ -45,7 +45,6 @@ public class NoteView extends AppCompatActivity {
             webview.goBack();
         } else {
             super.onBackPressed();
-
         }
     }
 
@@ -79,11 +78,28 @@ public class NoteView extends AppCompatActivity {
         webview.addJavascriptInterface(new NavigateActivityInterface(this), "OpenActivityInterface");
         webview.addJavascriptInterface(new BackActivityInterface(this), "BackActivityInterface");
         webview.addJavascriptInterface(new ShowSnackInterface(this), "ShowSnackMessage");
-
+        webview.addJavascriptInterface(new WebAppInterfaceShare(), "Android");
 
         webview.loadUrl("file:///android_asset/pages/note-editor.html");
 
 
+    }
+
+    public class WebAppInterfaceShare {
+        @JavascriptInterface
+        public void shareText(String title, String text) {
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("text/plain");
+
+            // Include the title in the text
+            String shareBody = title + "\n\n" + text;
+
+            shareIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+
+            Intent chooser = Intent.createChooser(shareIntent, "Share via");
+            chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(chooser);
+        }
     }
 
     public class NavigateActivityInterface {

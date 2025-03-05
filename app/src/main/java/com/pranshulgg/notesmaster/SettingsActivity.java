@@ -38,6 +38,8 @@ import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -62,7 +64,6 @@ public class SettingsActivity extends AppCompatActivity {
             webview.goBack();
         } else {
             super.onBackPressed();
-
         }
     }
     @Override
@@ -228,10 +229,10 @@ public class SettingsActivity extends AppCompatActivity {
 
                 String importedData = stringBuilder.toString();
 
-                String escapedData = importedData.replace("'", "\\'").replace("\"", "\\\"");
+                String safeJson = JSONObject.quote(importedData);
 
                 runOnUiThread(() -> {
-                    String jsCode = "handleImportedData('" + escapedData + "');";
+                    String jsCode = "handleImportedData(" + safeJson + ");";
                     webview.evaluateJavascript(jsCode, null);
                 });
             }
@@ -324,6 +325,7 @@ public class SettingsActivity extends AppCompatActivity {
 
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             mContext.startActivity(intent);
+
         }
     }
 

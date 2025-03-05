@@ -234,7 +234,7 @@
 
         <div style="margin-left: 8px;">
             <p>NotesMaster</p>
-            <span class="" id="checkUpdatesBtn">v1.3.0 <i icon-outlined style="font-size: 18px;"
+            <span class="" id="checkUpdatesBtn">v1.4.0 <i icon-outlined style="font-size: 18px;"
                                                           icon-weight="bold">refresh</i></span>
         </div>
         <div>
@@ -591,7 +591,7 @@
 
 
         document.getElementById('checkUpdatesBtn').addEventListener('click', async function () {
-            const currentVersion = 'v1.3.0';
+            const currentVersion = 'v1.4.0';
             const githubRepo = 'PranshulGG/NotesMaster';
             const releasesUrl = `https://api.github.com/repos/${githubRepo}/releases`;
             document.getElementById('checkUpdatesBtn').innerHTML = 'Checking...'
@@ -610,7 +610,7 @@
 
 
                         document.getElementById('checkUpdatesBtn').classList.remove('disabled')
-                     document.getElementById('checkUpdatesBtn').innerHTML = 'v1.3.0 <i icon-outlined style="font-size: 18px;" icon-weight="bold">refresh</i>'
+                     document.getElementById('checkUpdatesBtn').innerHTML = 'v1.4.0 <i icon-outlined style="font-size: 18px;" icon-weight="bold">refresh</i>'
 
                         setTimeout(() => {
                             window.location.href = 'https://github.com/PranshulGG/NotesMaster/releases';
@@ -620,7 +620,7 @@
                     } else {
                         ShowSnackMessage.ShowSnack('You are using the latest version!', "short");
                         document.getElementById('checkUpdatesBtn').classList.remove('disabled')
-                        document.getElementById('checkUpdatesBtn').innerHTML = 'v1.3.0 <i icon-outlined style="font-size: 18px;" icon-weight="bold">refresh</i>'
+                        document.getElementById('checkUpdatesBtn').innerHTML = 'v1.4.0 <i icon-outlined style="font-size: 18px;" icon-weight="bold">refresh</i>'
 
                     }
 
@@ -630,7 +630,7 @@
                 ShowSnackMessage.ShowSnack('Error checking for updates', "short");
 
                 document.getElementById('checkUpdatesBtn').classList.remove('disabled')
-                 document.getElementById('checkUpdatesBtn').innerHTML = 'v1.3.0 <i icon-outlined style="font-size: 18px;" icon-weight="bold">refresh</i>'
+                 document.getElementById('checkUpdatesBtn').innerHTML = 'v1.4.0 <i icon-outlined style="font-size: 18px;" icon-weight="bold">refresh</i>'
 
                 console.error('Error:', error);
             }

@@ -21,10 +21,10 @@
             </md-icon-button>
             <p>Note</p>
             <flex></flex>
-            <md-icon-button onclick="undo()">
+            <md-icon-button onclick="undo()" id="undo_btn_toggle">
                 <md-icon icon-outlined>undo</md-icon>
             </md-icon-button>
-            <md-icon-button onclick="redo()">
+            <md-icon-button onclick="redo()" id="redo_btn_toggle">
                 <md-icon icon-outlined>redo</md-icon>
             </md-icon-button>
             <md-icon-button onclick="toggleView(); changeNavStatusConfig()" toggle class="view-btn" >
@@ -35,7 +35,7 @@
                 <md-icon icon-outlined>more_vert</md-icon>
             </md-icon-button>
 
-            <md-menu positioning="popover" id="usage-popoverNoteOptions" anchor="usage-popover-anchorNoteOptions" anchor-corner="start-start">
+            <md-menu positioning="popover" id="usage-popoverNoteOptions" anchor="usage-popover-anchorNoteOptions" anchor-corner="start-start" style="--md-menu-container-shape: 10px;">
                 <md-menu-item menu-type id="pinThisNoteBtn">
                     <md-icon slot="start" id="pinThisNoteBtnIcon" icon-outlined>bookmark</md-icon>
                     <div slot="headline" id="pinThisNoteBtnText">Pin</div>
@@ -48,9 +48,13 @@
                     <md-icon slot="start" icon-outlined>new_label</md-icon>
                     <div slot="headline">Label</div>
                 </md-menu-item>
-                <md-menu-item menu-type>
+                <md-menu-item menu-type onclick="shareContent()" id="shareContentMenuOption">
                     <md-icon slot="start" icon-outlined>share</md-icon>
                     <div slot="headline">Share</div>
+                </md-menu-item>
+                <md-menu-item menu-type onclick="document.getElementById('editor').innerHTML = ''; setTimeout(()=>{document.getElementById('ClearNoteContentMenuOption').disabled = true; saveNote()},100);" id="ClearNoteContentMenuOption" disabled>
+                    <md-icon slot="start" icon-outlined>close</md-icon>
+                    <div slot="headline">Clear note<span style="opacity: 0;">31</span></div>
                 </md-menu-item>
             </md-menu>
 
@@ -68,7 +72,7 @@
                 </div>
                 <div class="input-section">
 <!--            <input type="text" id="noteTitle" placeholder="Title" autocomplete="off">-->
-                    <div  id="noteTitle" placeholder="Title" oninput="if(this.innerHTML.trim()==='<br>')this.innerHTML=''" autocomplete="off"  contenteditable="true"></div>
+                    <div  id="noteTitle" placeholder="Title" oninput="if(this.innerHTML.trim()==='<br>')this.innerHTML=''" autocomplete="off"  contenteditable="plaintext-only"></div>
         </div>
 
         <div class="editable" id="editor" contenteditable="true" placeholder="Note" oninput="if(this.innerHTML.trim()==='<br>')this.innerHTML=''"></div>
@@ -150,14 +154,13 @@
                   </script>
             </div>
 
-            <div class="format_item" onclick="execCmd('insertHorizontalRule')">
+            <div class="format_item" onclick="insertHR()" id="horizontal_rule_btn" style="pointer-events: none; opacity: 0.5;">
                 <label ><md-icon icon-outlined>horizontal_rule</md-icon></label>
             </div>
 
             <div class="format_item" id="openInsertLinkDialog">
                 <label ><md-icon icon-outlined>link</md-icon></label>
             </div>
-
 
             <div class="format_item">
                 <input type="checkbox" id="blockquote_checkbox">
@@ -169,27 +172,24 @@
                 <label for="formatBlockPre_checkbox" style="background-color: var(--Surface-Container-Low) !important; color: var(--On-Surface) !important;"><md-icon icon-outlined>code</md-icon></label>
             </div>
 
-            <div class="format_item">
+            <div class="format_item" onclick="document.getElementById('editor').focus()">
                 <label for="Color_checkboxToggle"  id="Colorusage-popover-anchor"><md-icon icon-outlined>format_color_text</md-icon></label>
-                <md-menu positioning="popover" id="Colorusage-popover" anchor="Colorusage-popover-anchor" style="min-width: 50px;" x-offset="-7">
+                <md-menu positioning="popover" id="Colorusage-popover" anchor="Colorusage-popover-anchor" style="min-width: 50px; --md-menu-container-shape: 10px;"  stay-open-on-focusout="true" skip-restore-focus="true" quick>
                     <md-menu-item onclick="applyColorDefault()">
                         <md-icon slot="headline" icon-outlined style="color: var(--On-Surface);">format_color_text</md-icon>
                     </md-menu-item>
                     <md-menu-item onclick="applyColorSurfaceVariant()">
                         <md-icon slot="headline" icon-outlined style="color: var(--On-Surface-Variant);">format_color_text</md-icon>
                     </md-menu-item>
-                    <md-menu-item  onclick="setTextColor('#d6a718')">
-                        <md-icon slot="headline" icon-outlined style="color: #d6a718;">format_color_text</md-icon>
+                    <md-menu-item  onclick="setTextColor('#fc4c3f')">
+                        <md-icon slot="headline" icon-outlined style="color: #fc4c3f;">format_color_text</md-icon>
                     </md-menu-item>
-                    <md-menu-item onclick="setTextColor('#e92315')">
-                        <md-icon slot="headline" icon-outlined style="color: #e92315;">format_color_text</md-icon>
+                    <md-menu-item onclick="setTextColor('#ff9900')">
+                        <md-icon slot="headline" icon-outlined style="color: #ff9900;">format_color_text</md-icon>
                     </md-menu-item>
-                    <md-menu-item onclick="setTextColor('#4caf50')">
-                        <md-icon slot="headline" icon-outlined style="color: #4caf50;">format_color_text</md-icon>
-                      </md-menu-item>
-                      <md-menu-item onclick="setTextColor('#fc03ec')">
-                        <md-icon slot="headline" icon-outlined style="color: #fc03ec;">format_color_text</md-icon>
-                      </md-menu-item>
+                    <md-menu-item onclick="setTextColor('#0a69fe')">
+                        <md-icon slot="headline" icon-outlined style="color: #0a69fe;">format_color_text</md-icon>
+                    </md-menu-item>
                   </md-menu>
                   <script type="module">
                     const anchorElColor = document.body.querySelector('#Colorusage-popover-anchor');
@@ -198,7 +198,38 @@
                   </script>
             </div>
 
+            <div class="format_item" onclick="document.getElementById('editor').focus()">
+                <label  id="Colorusage-popover-anchorBg"><md-icon icon-outlined>ink_highlighter</md-icon></label>
+                <md-menu positioning="popover" id="Colorusage-popoverBg" anchor="Colorusage-popover-anchorBg" style="min-width: 50px; --md-menu-item-one-line-container-height: 15px; --md-menu-container-shape: 10px;" x-offset="-7" stay-open-on-focusout="true" skip-restore-focus="true" quick>
+                    <md-menu-item onclick="removeBgColor()">
+                        <md-icon slot="headline" icon-outlined style="color: var(--On-Surface); width: 25px;">format_color_reset</md-icon>
+                    </md-menu-item>
+                    <md-menu-item onclick="setbgColor('var(--bg-hi-1)')" style="background-color: var(--bg-hi-1);">
+                        <md-icon slot="headline" icon-outlined>format_ink_highlighter</md-icon>
+                    </md-menu-item>
+                    <md-menu-item onclick="setbgColor('var(--bg-hi-2)')" style="background-color: var(--bg-hi-2);">
+                        <md-icon slot="headline" icon-outlined>format_ink_highlighter</md-icon>
+                    </md-menu-item>
+                    <md-menu-item  onclick="setbgColor('var(--bg-hi-3)')" style="background-color: var(--bg-hi-3);">
+                        <md-icon slot="headline" icon-outlined>format_ink_highlighter</md-icon>
+                    </md-menu-item>
+                    <md-menu-item onclick="setbgColor('var(--bg-hi-4)')" style="background-color: var(--bg-hi-4);">
+                        <md-icon slot="headline" icon-outlined>format_ink_highlighter</md-icon>
+                    </md-menu-item>
+                    <md-menu-item onclick="setbgColor('var(--bg-hi-5)')" style="background-color: var(--bg-hi-5);">
+                        <md-icon slot="headline" icon-outlined>format_ink_highlighter</md-icon>
+                    </md-menu-item>
+                </md-menu>
+                <script type="module">
+                    const anchorElColorBg = document.body.querySelector('#Colorusage-popover-anchorBg');
+                    const menuElColorBg = document.body.querySelector('#Colorusage-popoverBg');
+                    anchorElColorBg.addEventListener('click', () => { menuElColorBg.open = !menuElColorBg.open; });
+                  </script>
+            </div>
+
         </div>
+
+
 
         <md-dialog id="insertLinkDialog" quick>
             <div slot="headline">Insert link</div>
@@ -270,6 +301,7 @@
         sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), '1')
         }
     }
+
     </script>
 
     <script type="module" src="../index.js"></script>
