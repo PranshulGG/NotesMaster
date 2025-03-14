@@ -1,8 +1,8 @@
 package com.pranshulgg.notesmaster;
 
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.res.ResourcesCompat;
 
 import android.animation.ArgbEvaluator;
@@ -10,7 +10,6 @@ import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -18,19 +17,15 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.InputType;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowInsetsController;
 import android.webkit.JavascriptInterface;
-import android.webkit.JsPromptResult;
-import android.webkit.JsResult;
-import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,6 +33,7 @@ import com.google.android.material.snackbar.Snackbar;
 
 public class AboutPage extends AppCompatActivity {
     private WebView webview;
+    private FrameLayout overlayLayout;
 
     @Override
     public void onBackPressed() {
@@ -45,7 +41,6 @@ public class AboutPage extends AppCompatActivity {
             webview.goBack();
         } else {
             super.onBackPressed();
-
         }
     }
 
@@ -57,7 +52,7 @@ public class AboutPage extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        overlayLayout = findViewById(R.id.overlayLayout);
         webview = findViewById(R.id.webView);
         WebSettings webSettings = webview.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -79,11 +74,15 @@ public class AboutPage extends AppCompatActivity {
         webview.addJavascriptInterface(new NavigateActivityInterface(this), "OpenActivityInterface");
         webview.addJavascriptInterface(new BackActivityInterface(this), "BackActivityInterface");
         webview.addJavascriptInterface(new ShowSnackInterface(this), "ShowSnackMessage");
-
+        webview.addJavascriptInterface(new AndroidFunctionActivityInterface(this), "AndroidFunctionActivityInterface");
 
         webview.loadUrl("file:///android_asset/pages/aboutPage.html");
 
 
+    }
+
+    public void hideOverlay() {
+        overlayLayout.setVisibility(View.GONE);
     }
 
     public class ShowSnackInterface {
@@ -167,6 +166,29 @@ public class AboutPage extends AppCompatActivity {
     }
     public void goBack() {
         runOnUiThread(this::onBackPressed);
+    }
+
+    public class AndroidFunctionActivityInterface {
+        private AboutPage mActivity;
+
+        AndroidFunctionActivityInterface(AboutPage activity) {
+            mActivity = activity;
+        }
+
+        @JavascriptInterface
+        public void androidFunction(final String functiontype) {
+            mActivity.runOnUiThread(new Runnable() {
+                @SuppressLint("ResourceType")
+                @RequiresApi(api = Build.VERSION_CODES.O)
+                @Override
+                public void run() {
+                    if (functiontype.equals("hideSurfaceOverlay")){
+                        hideOverlay();
+                        return;
+                    }
+                }
+            });
+        }
     }
 
     public class AndroidInterface {
@@ -284,10 +306,16 @@ public class AboutPage extends AppCompatActivity {
 
         // Apply the theme
         if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
             context.setTheme(R.style.ThemeMainBlackDark);
         } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
             context.setTheme(R.style.ThemeMainBlackLight);
-        }
+                View decorView = getWindow().getDecorView();
+                decorView.setSystemUiVisibility(
+                        View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+                );
+            }
     }
 }
 

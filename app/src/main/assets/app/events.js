@@ -1,33 +1,24 @@
 function handleStorageChange(event) {
     switch (event.key) {
         case 'useDarkTheme':
-        case 'Materialtheme':
+        case 'materialThemeColorSource':
+        if(!localStorage.getItem('useDynamicColors') || localStorage.getItem('useDynamicColors') !== 'true'){
+             themeConfig(localStorage.getItem('materialThemeColorSource') || '#aac7ff')
+        }
+
         checkThemeFlag()
                 if(!document.querySelector('.search_container_screen').hidden){
                     window.history.back()
                 }
             if(localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') === 'true'){
-                document.documentElement.setAttribute('colorTheme', 'dark');
-                if(localStorage.getItem('Materialtheme')){
-                    document.documentElement.setAttribute(
-                "Theme",
-                localStorage.getItem('Materialtheme')
-              );
-                }
                 sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '0')
-                
             } else{
-                document.documentElement.setAttribute('colorTheme', 'light');
-                if(localStorage.getItem('Materialtheme')){
-                    document.documentElement.setAttribute(
-                "Theme",
-                localStorage.getItem('Materialtheme')
-              );
-                }
                 sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '1')
             }
             break;
             case 'notes':
+            case 'onlyShowTitle':
+            case 'noteLabels':
                 createNoteTile()
             case 'SelectedAPPfont':
                 applyAppFont()
@@ -36,6 +27,10 @@ function handleStorageChange(event) {
                  createLabels()
             case 'NotesView':
             useListView()
+            case 'useDynamicColors':
+                if(localStorage.getItem('useDynamicColors') && localStorage.getItem('useDynamicColors') === 'true'){
+                    AndroidFunctionActivityInterface.androidFunction('ReloadDynamicColors');
+                }
             default:
                 console.log('Untracked key changed:', event.key);
       }

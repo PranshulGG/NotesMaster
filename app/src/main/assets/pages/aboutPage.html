@@ -12,6 +12,24 @@
     <link rel="stylesheet" href="../ui-files/editorUi.css">
     <link rel="stylesheet" href="../components/components.css">
     <link rel="stylesheet" href="../components/modal-ver.css">
+    <script>
+
+    document.addEventListener('DOMContentLoaded', () => {
+        themeConfig(localStorage.getItem('materialThemeColorSource') || '#aac7ff')
+    setTimeout(()=>{
+        if(localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') === 'true'){
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), '0')
+        AndroidFunctionActivityInterface.androidFunction('hideSurfaceOverlay');
+
+    } else{
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), '1')
+        AndroidFunctionActivityInterface.androidFunction('hideSurfaceOverlay');
+    }
+    },80);
+
+});
+
+    </script>
     <style>
         p {
             margin: 0;
@@ -234,7 +252,7 @@
 
         <div style="margin-left: 8px;">
             <p>NotesMaster</p>
-            <span class="" id="checkUpdatesBtn">v1.4.0 <i icon-outlined style="font-size: 18px;"
+            <span class="" id="checkUpdatesBtn">v2.1.0 <i icon-outlined style="font-size: 18px;"
                                                           icon-weight="bold">refresh</i></span>
         </div>
         <div>
@@ -567,31 +585,10 @@
 <script>
 
 
-        if(localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') === 'true'){
-        document.documentElement.setAttribute('colorTheme', 'dark');
-        if(localStorage.getItem('Materialtheme')){
-            document.documentElement.setAttribute(
-        "Theme",
-        localStorage.getItem('Materialtheme')
-      );
-        }
-        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), '0')
-    } else{
-        document.documentElement.setAttribute('colorTheme', 'light');
-        if(localStorage.getItem('Materialtheme')){
-            document.documentElement.setAttribute(
-        "Theme",
-        localStorage.getItem('Materialtheme')
-      );
-        }
-        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), '1')
-    }
-
-
 
 
         document.getElementById('checkUpdatesBtn').addEventListener('click', async function () {
-            const currentVersion = 'v1.4.0';
+            const currentVersion = 'v2.1.0';
             const githubRepo = 'PranshulGG/NotesMaster';
             const releasesUrl = `https://api.github.com/repos/${githubRepo}/releases`;
             document.getElementById('checkUpdatesBtn').innerHTML = 'Checking...'
@@ -610,7 +607,7 @@
 
 
                         document.getElementById('checkUpdatesBtn').classList.remove('disabled')
-                     document.getElementById('checkUpdatesBtn').innerHTML = 'v1.4.0 <i icon-outlined style="font-size: 18px;" icon-weight="bold">refresh</i>'
+                     document.getElementById('checkUpdatesBtn').innerHTML = 'v2.1.0 <i icon-outlined style="font-size: 18px;" icon-weight="bold">refresh</i>'
 
                         setTimeout(() => {
                             window.location.href = 'https://github.com/PranshulGG/NotesMaster/releases';
@@ -620,7 +617,7 @@
                     } else {
                         ShowSnackMessage.ShowSnack('You are using the latest version!', "short");
                         document.getElementById('checkUpdatesBtn').classList.remove('disabled')
-                        document.getElementById('checkUpdatesBtn').innerHTML = 'v1.4.0 <i icon-outlined style="font-size: 18px;" icon-weight="bold">refresh</i>'
+                        document.getElementById('checkUpdatesBtn').innerHTML = 'v2.1.0 <i icon-outlined style="font-size: 18px;" icon-weight="bold">refresh</i>'
 
                     }
 
@@ -630,7 +627,7 @@
                 ShowSnackMessage.ShowSnack('Error checking for updates', "short");
 
                 document.getElementById('checkUpdatesBtn').classList.remove('disabled')
-                 document.getElementById('checkUpdatesBtn').innerHTML = 'v1.4.0 <i icon-outlined style="font-size: 18px;" icon-weight="bold">refresh</i>'
+                 document.getElementById('checkUpdatesBtn').innerHTML = 'v2.1.0 <i icon-outlined style="font-size: 18px;" icon-weight="bold">refresh</i>'
 
                 console.error('Error:', error);
             }
@@ -704,6 +701,8 @@
 <script type="module" src="../index.js"></script>
 <script src="../bundle.js"></script>
 <script src="../module/render.js"></script>
+<script src="../module/materialTheme.js" type="module"></script>
+
 </body>
 
 </html>

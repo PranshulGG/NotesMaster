@@ -5,9 +5,9 @@ document.getElementById('deleteThisNoteBtnAlert').addEventListener('click', () =
     window.history.pushState({ DeleteNoteDialogOpen: true }, "");
 
     if(document.querySelector('.view-btn').selected){
-    sendThemeToAndroid(colorsDialogsOpenContainer[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface[GetDialogOverlayContainerColor()], '0', '40');
+    sendThemeToAndroid(colorsDialogsOpenContainer()[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], '0', '225');
     }else{
-    sendThemeToAndroid(colorsDialogsOpenContainer[GetDialogOverlayContainerColor()], colorsDialogsOpenContainer[GetDialogOverlayContainerColor()], '0', '40');
+    sendThemeToAndroid(colorsDialogsOpenContainer()[GetDialogOverlayContainerColor()], colorsDialogsOpenContainer()[GetDialogOverlayContainerColor()], '0', '225');
     }
 });
 
@@ -25,9 +25,9 @@ document.getElementById('deleteNoteAlert').addEventListener('cancel', () =>{
 
 document.getElementById('deleteNoteAlert').addEventListener('close', () =>{
     if(document.querySelector('.view-btn').selected){
-    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '40')
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '210')
     } else{
-    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), Themeflag, '40')
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), Themeflag, '210')
     }
 });
 
@@ -76,9 +76,9 @@ document.getElementById('addLabelToThisNoteDialog').addEventListener('click', ()
 
     window.history.pushState({ NoteLabelDialogOpen: true }, "");
     if(document.querySelector('.view-btn').selected){
-    sendThemeToAndroid(colorsDialogsOpenContainer[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface[GetDialogOverlayContainerColor()], '0', '40');
+    sendThemeToAndroid(colorsDialogsOpenContainer()[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], '0', '225');
     }else{
-    sendThemeToAndroid(colorsDialogsOpenContainer[GetDialogOverlayContainerColor()], colorsDialogsOpenContainer[GetDialogOverlayContainerColor()], '0', '40');
+    sendThemeToAndroid(colorsDialogsOpenContainer()[GetDialogOverlayContainerColor()], colorsDialogsOpenContainer()[GetDialogOverlayContainerColor()], '0', '225');
     }
 
 });
@@ -90,11 +90,12 @@ function loadDialogLabels(){
 
     savedLabels.forEach(label => {
         const label_item = document.createElement('noteLabelitem');
+        label_item.classList.add('label-itemCheckboxes');
 
         label_item.innerHTML = `
-            <label>
-            <md-checkbox class="label-checkbox"></md-checkbox>
-            ${label}
+            <label ${label.locked ? 'lockedLabelItem' : ''}>
+            <md-checkbox class="label-checkbox" locked="${label.locked}" ${label.locked ? 'data-locked="true"' : ''}></md-checkbox>
+            ${label.label}
             </label>
             <md-ripple></md-ripple>
         `
@@ -104,6 +105,35 @@ function loadDialogLabels(){
     if(savedLabels.length === 0){
         label_holder.innerHTML = '<p style="margin: 0; color: var(--On-Surface-Variant); text-align: center;">No labels found</p>'
     }
+    attachCheckboxListeners()
+}
+
+function attachCheckboxListeners() {
+    const checkboxes = document.querySelectorAll('.label-checkbox');
+
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+            const isLocked = checkbox.getAttribute('data-locked') === "true";
+            if (isLocked && checkbox.checked) {
+                checkboxes.forEach(cb => {
+                    if (cb !== checkbox) {
+                        cb.disabled = true;
+                        cb.closest('noteLabelitem').classList.add('not-clickable');
+                        cb.checked = false;
+
+                    }
+                });
+            } else {
+                const lockedChecked = [...checkboxes].some(cb => cb.getAttribute('data-locked') === "true" && cb.checked);
+                if (!lockedChecked) {
+                    checkboxes.forEach(cb => {
+                        cb.disabled = false;
+                        cb.closest('noteLabelitem').classList.remove('not-clickable');
+                    });
+                }
+            }
+        });
+    });
 }
 
 loadDialogLabels()
@@ -122,9 +152,9 @@ document.getElementById('NoteLabelDialog').addEventListener('cancel', () =>{
 
 document.getElementById('NoteLabelDialog').addEventListener('close', () =>{
     if(document.querySelector('.view-btn').selected){
-    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '40')
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '210')
     } else{
-    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), Themeflag, '40')
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), Themeflag, '210')
     }
 });
 
@@ -166,7 +196,9 @@ function loadNoteLabels(noteId) {
     let notesLabels = JSON.parse(localStorage.getItem('notesLabels')) || [];
     let labelsForNote = savedLabels[noteId] || [];
 
-    labelsForNote = labelsForNote.filter(label => notesLabels.includes(label));
+    labelsForNote = labelsForNote.filter(label =>
+        notesLabels.some(noteLabel => noteLabel.label === label)
+    );
 
     savedLabels[noteId] = labelsForNote;
     localStorage.setItem('noteLabels', JSON.stringify(savedLabels));
@@ -184,7 +216,8 @@ function loadNoteLabels(noteId) {
 
         if(matchingCheckbox){
         matchingCheckbox.checked = true;
-        }
+        disableIFLocked()
+    }
 
     });
 
@@ -195,5 +228,31 @@ function loadNoteLabels(noteId) {
         } else{
             document.getElementById('noteTitle').style.marginTop = '0'
         }
+
+    function disableIFLocked() {
+        const checkboxes = document.querySelectorAll('.label-checkbox');
+
+        checkboxes.forEach(checkbox => {
+                const isLocked = checkbox.getAttribute('data-locked') === "true";
+                if (isLocked && checkbox.checked) {
+                    checkboxes.forEach(cb => {
+                        if (cb !== checkbox) {
+                            cb.disabled = true;
+                            cb.closest('noteLabelitem').classList.add('not-clickable');
+                            cb.checked = false;
+
+                        }
+                    });
+                } else {
+                    const lockedChecked = [...checkboxes].some(cb => cb.getAttribute('data-locked') === "true" && cb.checked);
+                    if (!lockedChecked) {
+                        checkboxes.forEach(cb => {
+                            cb.disabled = false;
+                            cb.closest('noteLabelitem').classList.remove('not-clickable');
+                        });
+                    }
+                }
+            });
+    }
 }
 

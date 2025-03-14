@@ -1,16 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.NotesMaster" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
-    </style>
 
     <style name="ThemeMainBlackDark" parent="Theme.Material3.Dark.NoActionBar">
-        <item name="android:statusBarColor">#000</item>
-        <item name="android:windowBackground">#000</item>
-        <item name="android:navigationBarColor">#000</item>
+        <item name="android:statusBarColor">#010101</item>
+        <item name="android:windowBackground">#010101</item>
+        <item name="android:navigationBarColor">#010101</item>
+        <item name="overlayBackgroundColor">#010101</item>
+
         <item name="colorAccent">#c6c6c6</item>
     </style>
-
 
 </resources>

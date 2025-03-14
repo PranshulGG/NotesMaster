@@ -8,6 +8,43 @@
     <link rel="stylesheet" href="ui-files/ui.css">
     <link rel="stylesheet" href="ui-files/font-usage.css">
     <link rel="stylesheet" href="ui-files/variables.css">
+    <script>
+    function dynamicMaterial(color){
+        if(localStorage.getItem('useDynamicColors') && localStorage.getItem('useDynamicColors') === 'true'){
+        themeConfig(color, '', 'dynamic')
+ localStorage.setItem('materialThemeColorSource', color)
+            setTimeout(()=>{
+        if(localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') === 'true'){
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '0')
+        AndroidFunctionActivityInterface.androidFunction('hideSurfaceOverlay');
+    } else{
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '1')
+        AndroidFunctionActivityInterface.androidFunction('hideSurfaceOverlay');
+    }
+
+    document.querySelector('.floatfab_div').style.display = 'flex'
+    },80);
+    }
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        if(!localStorage.getItem('useDynamicColors') || localStorage.getItem('useDynamicColors') !== 'true'){
+         themeConfig(localStorage.getItem('materialThemeColorSource') || '#aac7ff')
+
+    setTimeout(()=>{
+        if(localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') === 'true'){
+       sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '0')
+      AndroidFunctionActivityInterface.androidFunction('hideSurfaceOverlay');
+   } else{
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '1')
+       AndroidFunctionActivityInterface.androidFunction('hideSurfaceOverlay');
+    }
+
+    document.querySelector('.floatfab_div').style.display = 'flex'
+
+    },80);
+    }
+});
+    </script>
 </head>
 <body>
     <div id="app">
@@ -28,7 +65,7 @@
             </md-icon-button>
         </div>
 
-        <md-dialog id="deleteNoteAlert" quick style="min-width: 85%;">
+        <md-dialog id="deleteNoteAlert" style="min-width: 85%;">
             <div slot="headline">Delete Note?</div>
             <div slot="content">
                 This action cannot be undone.
@@ -36,6 +73,19 @@
             <div slot="actions">
                 <md-text-button onclick="window.history.back();">Cancel</md-text-button>
                 <md-filled-button onclick="deleteSelectedNotes(); window.history.back()">Delete</md-filled-button>
+            </div>
+        </md-dialog>
+
+        <md-dialog id="enterPinDialog" style="min-width: 85%;" >
+            <div slot="headline">Enter pin</div>
+            <div slot="content">
+                <md-outlined-text-field style="width: 100%;" id="LockedNotepinInput" error-text="Wrong pin">
+
+                </md-outlined-text-field>
+            </div>
+            <div slot="actions">
+                <md-text-button onclick="showAllNotes(); window.history.back();">Cancel</md-text-button>
+                <md-filled-button onclick="viewLockedNotes();">OK</md-filled-button>
             </div>
         </md-dialog>
     </div>
@@ -75,38 +125,14 @@
 
     </div>
 </div>
-
-
-
-
-
-    <script>
-        if(localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') === 'true'){
-        document.documentElement.setAttribute('colorTheme', 'dark');
-        if(localStorage.getItem('Materialtheme')){
-            document.documentElement.setAttribute(
-        "Theme",
-        localStorage.getItem('Materialtheme')
-      );
-        }
-        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '0')
-    } else{
-        document.documentElement.setAttribute('colorTheme', 'light');
-        if(localStorage.getItem('Materialtheme')){
-            document.documentElement.setAttribute(
-        "Theme",
-        localStorage.getItem('Materialtheme')
-      );
-        }
-        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '1')
-    }
-    </script>
     <script type="module" src="./index.js"></script>
     <script src="./bundle.js"></script>
     <script src="app/app.js"></script>
     <script src="module/render.js"></script>
     <script src="app/events.js"></script>
     <script src="app/scroll.js"></script>
+    <script src="app/lock.js"></script>
+    <script src="module/materialTheme.js" type="module"></script>
 
 </body>
 </html>

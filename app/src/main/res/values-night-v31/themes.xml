@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="ThemeMainBlackDark" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="android:statusBarColor">#010101</item>
+        <item name="android:windowBackground">#010101</item>
+        <item name="android:navigationBarColor">#010101</item>
+        <item name="overlayBackgroundColor">#010101</item>
+        <item name="colorPrimary">@android:color/system_accent1_200</item>
+        <item name="colorAccent">#c6c6c6</item>
+    </style>
+</resources>

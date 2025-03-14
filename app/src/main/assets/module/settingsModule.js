@@ -7,22 +7,10 @@ document.getElementById('darkThemeSwitch').addEventListener('change', () =>{
         document.documentElement.setAttribute('colorTheme', 'light');
         sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '1')
     }
-      document.querySelector('load_theme').hidden = false;
-      document.getElementById("headUser-1").scrollTop = 0
 
-      setTimeout(() =>{
-        document.querySelector('load_theme').hidden = true;
-      }, 500);
     checkThemeFlag()
 });
 
-if(localStorage.getItem('Materialtheme')){
-    document.documentElement.setAttribute(
-        "Theme",
-        localStorage.getItem('Materialtheme')
-      );
-      document.querySelector(`[theme-value="${localStorage.getItem("Materialtheme")}"]`).style.setProperty("--display-style", "block");
-}
 
 if(localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') === 'true'){
     document.getElementById('darkThemeSwitch').selected = true;
@@ -30,29 +18,23 @@ if(localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') 
     document.getElementById('darkThemeSwitch').selected = false;
 }
 
-// themes ----------
-
-
-const colorItems = document.querySelectorAll(".color-item");
-
-colorItems.forEach((item) => {
-  item.addEventListener("click", () => {
-    colorItems.forEach((i) => i.style.setProperty("--display-style", "none"));
-    item.style.setProperty("--display-style", "block");
-    document.documentElement.setAttribute(
-      "Theme",
-      item.getAttribute("theme-value")
-    );
-    localStorage.setItem('Materialtheme', item.getAttribute("theme-value"))
-    if(document.getElementById("headUser-1").scrollTop >= 50){
-    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '220')
-    } else{
-    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '220')
-    }
-  });
-});
 
 // app font
+
+function hexWithOpacity(hex, opacityPercent) {
+  hex = hex.replace("#", "");
+
+  const alpha = Math.round((opacityPercent / 100) * 255)
+    .toString(16)
+    .padStart(2, "0");
+
+  if (hex.length === 3) {
+    hex = hex.split('').map(char => char + char).join('');
+  }
+
+  return `#${hex}${alpha}`;
+}
+
 
 function openAppFontDialog() {
   document.getElementById("chooseAPPFontDialog").show();
@@ -67,10 +49,15 @@ function openAppFontDialog() {
     .setAttribute("checked", "true");
 
   if (document.getElementById("headUser-1").scrollTop >= 50) {
-    sendThemeToAndroid(colorsDialogsOpenContainer[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface[GetDialogOverlayContainerColor()], '0', '40');
+    sendThemeToAndroid(colorsDialogsOpenContainer()[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], '0colorOnly', '225');
   } else {
-    sendThemeToAndroid(colorsDialogsOpenSurface[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface[GetDialogOverlayContainerColor()], '0', '40');
+    sendThemeToAndroid(colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], '0colorOnly', '225');
   }
+//    if (document.getElementById("headUser-1").scrollTop >= 50) {
+//      sendThemeToAndroid(colorsDialogsOpenContainer[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface[GetDialogOverlayContainerColor()], '0', '40');
+//    } else {
+//      sendThemeToAndroid(colorsDialogsOpenSurface[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface[GetDialogOverlayContainerColor()], '0', '40');
+//    }
 }
 
 window.addEventListener("popstate", function (event) {
@@ -91,9 +78,9 @@ document
 
 document.getElementById("chooseAPPFontDialog").addEventListener("close", () => {
   if (document.getElementById("headUser-1").scrollTop >= 50) {
-    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '40')
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '210')
   } else {
-    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '40')
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '210')
 
   }
 });
@@ -215,3 +202,91 @@ if(localStorage.getItem('NotesView') && localStorage.getItem('NotesView') === 't
 } else{
   document.getElementById('listViewSwitch').selected = false;
 }
+
+// only title
+
+
+document.getElementById('onlyShowTitleSwitch').addEventListener('change', () =>{
+  localStorage.setItem('onlyShowTitle', document.getElementById('onlyShowTitleSwitch').selected)
+});
+
+if(localStorage.getItem('onlyShowTitle') && localStorage.getItem('onlyShowTitle') === 'true'){
+  document.getElementById('onlyShowTitleSwitch').selected = true;
+} else{
+  document.getElementById('onlyShowTitleSwitch').selected = false;
+}
+
+// -------
+
+document.getElementById('useFingerPrintSwitch').addEventListener('change', () =>{
+  localStorage.setItem('useFingerPrint', document.getElementById('useFingerPrintSwitch').selected)
+});
+
+if(localStorage.getItem('useFingerPrint') && localStorage.getItem('useFingerPrint') === 'true'){
+  document.getElementById('useFingerPrintSwitch').selected = true;
+} else{
+  document.getElementById('useFingerPrintSwitch').selected = false;
+}
+
+// ---------------
+
+document.getElementById('DynamicColorsSwitch').addEventListener('change', () =>{
+  localStorage.setItem('useDynamicColors', document.getElementById('DynamicColorsSwitch').selected)
+
+  if(document.getElementById('DynamicColorsSwitch').selected){
+  document.querySelector('.customthemeSlider').style.height = '0';
+        document.querySelector('load_theme').hidden = false;
+  setTimeout(() =>{
+    ActivityBack();
+  }, 100)
+  } else{
+  document.querySelector('.customthemeSlider').style.height = '';
+  }
+
+});
+
+if(localStorage.getItem('useDynamicColors') && localStorage.getItem('useDynamicColors') === 'true'){
+  document.getElementById('DynamicColorsSwitch').selected = true;
+  document.querySelector('.customthemeSlider').style.height = '0';
+} else{
+  document.getElementById('DynamicColorsSwitch').selected = false;
+  document.querySelector('.customthemeSlider').style.height = '';
+
+}
+
+
+// ----------
+
+function openColorSheet(){
+  document.getElementById("ColorPickerSheet").show();
+  window.history.pushState({ ColorPickerSheetOpen: true }, "");
+
+  if (document.getElementById("headUser-1").scrollTop >= 50) {
+    sendThemeToAndroid(colorsDialogsOpenContainer()[GetDialogOverlayContainerColor()], getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container-Low'), '0colorOnly', '225');
+  } else {
+    sendThemeToAndroid(colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container-Low'), '0colorOnly', '225');
+  }
+}
+
+window.addEventListener("popstate", function (event) {
+  if (document.getElementById("ColorPickerSheet").hasAttribute('open')) {
+    document.getElementById("ColorPickerSheet").close();
+  }
+});
+
+document.getElementById("ColorPickerSheet").addEventListener("closing", () => {
+  if (document.getElementById("headUser-1").scrollTop >= 50) {
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '210')
+  } else {
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '210')
+
+  }
+});
+
+document.getElementById("ColorPickerSheet").addEventListener("closed", () => {
+    if (window.history.state && window.history.state.ColorPickerSheetOpen === true) {
+      window.history.back();
+  } else {
+      console.log("ColorPickerSheet is not open.");
+  }
+})

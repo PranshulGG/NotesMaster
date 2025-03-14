@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" Theme="blue_material">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+    <title>Config lock</title>
+    <script src="../module/android.js"></script>
+    <link rel="stylesheet" href="../ui-files/font-usage.css">
+    <link rel="stylesheet" href="../ui-files/ui.css">
+    <link rel="stylesheet" href="../ui-files/variables.css">
+    <link rel="stylesheet" href="../components/components.css">
+    <link rel="stylesheet" href="../components/modal-ver.css">
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        themeConfig(localStorage.getItem('materialThemeColorSource') || '#aac7ff')
+    setTimeout(()=>{
+        if(localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') === 'true'){
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '0')
+        AndroidFunctionActivityInterface.androidFunction('hideSurfaceOverlay');
+
+    } else{
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '1')
+        AndroidFunctionActivityInterface.androidFunction('hideSurfaceOverlay');
+    }
+    },80);
+
+});
+
+    </script>
+</head>
+<body>
+    <div id="app">
+
+        <div class="full-activity-header transparent round" id="head-1">
+            <md-icon-button onclick="ActivityBack();">
+                <md-icon icon-outlined>arrow_back</md-icon>
+            </md-icon-button>
+            <p>Label lock</p>
+            <flex></flex>
+            <md-icon-button onclick="resetLockConfig()">
+                <md-icon icon-outlined>refresh</md-icon>
+            </md-icon-button>
+        </div>
+
+        <div class="lock_labels">
+            <p id="main_lock_labels">Create a pin</p>
+        </div>
+
+        <div class="inputs_lock_create_new">
+            <div class="input_create_pass" id="temp_pass_createDiv">
+                <md-icon-button style="pointer-events: none;">
+                    <md-icon icon-outlined>lock</md-icon>
+                </md-icon-button>
+                <input type="text" name="" id="temp_pass_create" placeholder="New pin" inputmode="none">
+            </div>
+
+            <div class="input_create_pass" hidden id="main_pass_createDiv">
+                <md-icon-button style="pointer-events: none;">
+                    <md-icon icon-outlined>lock</md-icon>
+                </md-icon-button>
+                <input type="text" name="" id="main_pass_create" placeholder="Confirm pin" inputmode="none">
+            </div>
+        </div>
+
+
+        <div class="input_pin_keys">
+
+            <div class="input_pin_keys_grid">
+
+                <button onclick="inputNum('1')">
+                    1
+                    <md-ripple></md-ripple>
+                </button>
+                <button onclick="inputNum('2')">
+                    2
+                    <md-ripple></md-ripple>
+                </button>
+                <button onclick="inputNum('3')">3
+                    <md-ripple></md-ripple>
+                </button>
+                <button onclick="inputNum('4')">4
+                    <md-ripple></md-ripple>
+                </button>
+                <button  onclick="inputNum('5')">5
+                    <md-ripple></md-ripple>
+                </button>
+                <button  onclick="inputNum('6')">6
+                    <md-ripple></md-ripple>
+                </button>
+                <button  onclick="inputNum('7')">7
+                    <md-ripple></md-ripple>
+                </button>
+                <button  onclick="inputNum('8')">8
+                    <md-ripple></md-ripple>
+                </button>
+                <button  onclick="inputNum('9')">9
+                    <md-ripple></md-ripple>
+                </button>
+                <button style="background-color: var(--Tertiary-Container); color: var(--On-Tertiary-Container);"  onclick="clearPinInput()">C
+                    <md-ripple></md-ripple>
+                </button>
+                <button onclick="inputNum('0')">0
+                    <md-ripple></md-ripple>
+                </button>
+                <button style="background-color: var(--Primary); color: var(--On-Primary);" id="verifyInputPinBtn" disabled onclick="verifyInputPin()"><md-icon icon-outlined>check</md-icon>
+                    <md-ripple></md-ripple>
+                </button>
+            </div>
+        </div>
+
+
+
+    </div>
+
+
+
+<script type="module" src="../index.js"></script>
+<script src="../bundle.js"></script>
+<script src="../module/render.js"></script>
+<script src="../module/lockConfig.js"></script>
+<script src="../module/materialTheme.js" type="module"></script>
+
+</body>
+</html>

@@ -11,6 +11,31 @@
     <link rel="stylesheet" href="../ui-files/editorUi.css">
     <link rel="stylesheet" href="../components/components.css">
     <link rel="stylesheet" href="../components/modal-ver.css">
+    <script>
+
+        document.addEventListener('DOMContentLoaded', () => {
+        themeConfig(localStorage.getItem('materialThemeColorSource') || '#aac7ff')
+    setTimeout(()=>{
+        if(localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') === 'true'){
+        if(localStorage.getItem('clickedNote')){
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '0')
+        } else{
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), '0')
+        }
+        AndroidFunctionActivityInterface.androidFunction('hideSurfaceOverlay');
+
+    } else{
+        if(localStorage.getItem('clickedNote')){
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '1')
+        } else{
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), '1')
+        }
+        AndroidFunctionActivityInterface.androidFunction('hideSurfaceOverlay');
+    }
+    },80);
+});
+
+    </script>
 </head>
 <body>
     <div id="app">
@@ -128,9 +153,9 @@
             </div>
 
 
-            <div class="format_item">
+            <div class="format_item" onclick="document.getElementById('editor').focus()">
                 <label for="heading_checkboxToggle"  id="Headingusage-popover-anchor"><md-icon icon-outlined>format_h1</md-icon></label>
-                <md-menu positioning="popover" id="Headingusage-popover" anchor="Headingusage-popover-anchor" style="min-width: 40px;">
+                <md-menu positioning="popover" id="Headingusage-popover" anchor="Headingusage-popover-anchor" style="min-width: 40px; --md-menu-container-shape: 10px;"  stay-open-on-focusout="true" skip-restore-focus="true" quick>
                     <md-menu-item onclick="execCmd('formatBlock', 'h1')">
                         <md-icon slot="headline" icon-outlined>format_h1</md-icon>
                     </md-menu-item>
@@ -164,7 +189,7 @@
 
             <div class="format_item">
                 <input type="checkbox" id="blockquote_checkbox">
-                <label for="blockquote_checkbox"><md-icon icon-outlined>format_quote</md-icon></label>
+                <label for="blockquote_checkbox"  style="background-color: var(--Surface-Container-Low) !important; color: var(--On-Surface) !important;"><md-icon icon-outlined>format_quote</md-icon></label>
             </div>
 
             <div class="format_item">
@@ -231,7 +256,7 @@
 
 
 
-        <md-dialog id="insertLinkDialog" quick>
+        <md-dialog id="insertLinkDialog">
             <div slot="headline">Insert link</div>
 
             <div slot="content">
@@ -245,7 +270,7 @@
             </div>
         </md-dialog>
 
-        <md-dialog id="deleteNoteAlert" quick style="min-width: 85%;">
+        <md-dialog id="deleteNoteAlert" style="min-width: 85%;">
             <div slot="headline">Delete Note?</div>
             <div slot="content">
                 This action cannot be undone.
@@ -256,7 +281,7 @@
             </div>
         </md-dialog>
 
-        <md-dialog id="NoteLabelDialog" quick style="min-width: 85%;">
+        <md-dialog id="NoteLabelDialog" style="min-width: 85%;">
             <div slot="headline">Select labels</div>
             <div slot="content" style="padding-left: 0; padding-right: 0;">
                 <div id="label_selection_list">
@@ -272,42 +297,13 @@
 
 
 </div>
-  
-    <script>
-        if(localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') === 'true'){
-        document.documentElement.setAttribute('colorTheme', 'dark');
-        if(localStorage.getItem('Materialtheme')){
-            document.documentElement.setAttribute(
-        "Theme",
-        localStorage.getItem('Materialtheme')
-      );
-        }
-        if(localStorage.getItem('clickedNote')){
-        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '0')
-        } else{
-        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), '0')
-        }
-    } else{
-        document.documentElement.setAttribute('colorTheme', 'light');
-        if(localStorage.getItem('Materialtheme')){
-            document.documentElement.setAttribute(
-        "Theme",
-        localStorage.getItem('Materialtheme')
-      );
-        }
-        if(localStorage.getItem('clickedNote')){
-        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '1')
-        } else{
-        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), '1')
-        }
-    }
-
-    </script>
 
     <script type="module" src="../index.js"></script>
     <script src="../bundle.js"></script>
     <script src="../app/note.js"></script>
     <script src="../app/editor.js"></script>
     <script src="../module/render.js"></script>
+    <script src="../module/materialTheme.js" type="module"></script>
+
 </body>
 </html>

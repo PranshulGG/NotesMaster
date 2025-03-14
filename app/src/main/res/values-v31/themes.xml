@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="ThemeMainBlackLight" parent="Theme.Material3.Light.NoActionBar">
+        <item name="android:statusBarColor">#fffafa</item>
+        <item name="android:windowBackground">#fffafa</item>
+        <item name="android:navigationBarColor">#fffafa</item>
+        <item name="overlayBackgroundColor">#fffafa</item>
+        <item name="colorPrimary">@android:color/system_accent1_600</item>
+
+        <item name="colorAccent">#000000</item>
+    </style>
+</resources>

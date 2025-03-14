@@ -49,6 +49,11 @@
     caret-color: var(--Primary);
     padding-top: 10px;
     min-height: 100px;
+    word-break: break-word;
+}
+
+#editor.usingInter{
+    font-size: 17px;
 }
 
 #editor *{
@@ -90,6 +95,7 @@
     margin: 0;
     padding-bottom: 5px;
     padding-top: 5px;
+    overflow: auto;
   }
 
   ol, ul{
@@ -167,4 +173,35 @@ ul li, ol li {
 }
 ul li:last-child, ol li:last-child {
   margin-bottom: 0;
+}
+
+.not-clickable{
+    pointer-events: none;
+    opacity: 0.4;
+}
+
+
+[lockedlabelitem]{
+    position: relative;
+}
+
+[lockedlabelitem]::before{
+    content: '';
+    content: 'lock';
+    font-family: 'Material symbols';
+    font-weight: normal !important;
+    font-style: normal !important;
+    font-variation-settings: 'FILL' 1;
+    line-height: 1;
+    position: absolute;
+    right: 25px;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    background-color: var(--Error);
+    color: var(--On-Error);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50px;
 }

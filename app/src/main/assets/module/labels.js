@@ -3,9 +3,9 @@ function openCreateLabelDialog(){
     window.history.pushState({ LabelDialogOpen: true }, "");
 
   if (document.getElementById("headUser-1").scrollTop >= 5) {
-    sendThemeToAndroid(colorsDialogsOpenContainer[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface[GetDialogOverlayContainerColor()], '0', '40');
+    sendThemeToAndroid(colorsDialogsOpenContainer()[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], '0', '225');
   } else {
-    sendThemeToAndroid(colorsDialogsOpenSurface[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface[GetDialogOverlayContainerColor()], '0', '40');
+    sendThemeToAndroid(colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], '0', '225');
   }
 }
 
@@ -14,20 +14,29 @@ function loadLabels() {
     const label_list = document.getElementById('label_list');
     label_list.innerHTML = ""; // Clear existing labels before rendering
 
+
     savedLabels.forEach((label, index) => {
         const label_list_item = document.createElement('note_label');
         label_list_item.setAttribute("data-id", index + 1);
 
+        let lockedLabelclass
+
+        if(label.locked){
+            lockedLabelclass = 'lockedlabel'
+        } else{
+            lockedLabelclass = ''
+        }
+
         label_list_item.innerHTML = `
             <div>
             <md-icon icon-outlined>drag_handle</md-icon>
-            <p>${label}</p>
+            <p class="${lockedLabelclass}">${label.label}</p>
             </div>
             <div>
-                <md-icon-button onclick="editLabel('${label}')">
+                <md-icon-button onclick="editLabel('${label.label}')">
                     <md-icon icon-outlined>edit</md-icon>
                 </md-icon-button>
-                <md-icon-button onclick="deleteLabel('${label}')">
+                <md-icon-button onclick="deleteLabel('${label.label}', '${label.locked}')">
                     <md-icon icon-outlined>delete</md-icon>
                 </md-icon-button>
             </div>
@@ -55,7 +64,15 @@ function createNewLabel() {
 
     }
 
+    let locked
     let notesLabels = JSON.parse(localStorage.getItem('notesLabels')) || [];
+
+
+    if(document.getElementById('toggleLockedLabelSwitch').selected){
+        locked = true;
+    } else{
+        locked = false;
+    }
 
     if (notesLabels.includes(labelValue)) {
         document.getElementById('NewLabel_input').setAttribute('error-text', "This label already exists");
@@ -64,22 +81,59 @@ function createNewLabel() {
     }
 
 
-    notesLabels.push(labelValue);
+    notesLabels.push({label: labelValue, locked: locked});
+
 
     localStorage.setItem('notesLabels', JSON.stringify(notesLabels));
 
     loadLabels();
 
     inputField.value = "";
+    if(document.getElementById('toggleLockedLabelSwitch').selected){
+    document.getElementById('toggleLockedLabelSwitch').click()}
     window.history.back();
 }
 
-function deleteLabel(label) {
+function deleteLabel(label, islocked) {
+    if(islocked === 'true' || islocked === 'true'){
+        sendThemeToAndroid(colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], '0', '225');
+        document.getElementById('enterPinDialog').show();
+        window.history.pushState({ enterPinDialogOpen: true }, "");
+        document.getElementById('LockedlabelpinInput').value = ''
+         document.getElementById('LockedlabelpinInput').error = false;
+         document.getElementById('deleteLockedLabel').setAttribute('lockedLabelId', label)
+        return
+    }
     let notesLabels = JSON.parse(localStorage.getItem('notesLabels')) || [];
-    notesLabels = notesLabels.filter(item => item !== label);
+        notesLabels = notesLabels.filter(item => item.label !== label);
     localStorage.setItem('notesLabels', JSON.stringify(notesLabels));
     loadLabels();
 }
+
+document.getElementById('deleteLockedLabel').addEventListener('click', () =>{
+    if(document.getElementById('LockedlabelpinInput').value === localStorage.getItem('applabelAccessPin')){
+        deleteLabel(document.getElementById('deleteLockedLabel').getAttribute('lockedLabelId'), 'false')
+        window.history.back()
+    } else{
+        document.getElementById('LockedlabelpinInput').error = true;
+    }
+})
+
+window.addEventListener("popstate", function (event) {
+    if(document.getElementById('enterPinDialog').open){
+        document.getElementById('enterPinDialog').close();
+    }
+});
+
+document.getElementById('enterPinDialog').addEventListener('cancel', () =>{
+    document.getElementById('enterPinDialog').addEventListener('closed', () =>{
+        window.history.back()
+
+    })
+})
+document.getElementById('enterPinDialog').addEventListener('close', () =>{
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '210')
+})
 
 function editLabel(oldLabel) {
     document.getElementById('editLabelDialog').show();
@@ -89,9 +143,9 @@ function editLabel(oldLabel) {
     window.history.pushState({ EditLabelDialogOpen: true }, "");
 
       if (document.getElementById("headUser-1").scrollTop >= 5) {
-        sendThemeToAndroid(colorsDialogsOpenContainer[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface[GetDialogOverlayContainerColor()], '0', '40');
+        sendThemeToAndroid(colorsDialogsOpenContainer()[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], '0', '225');
       } else {
-        sendThemeToAndroid(colorsDialogsOpenSurface[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface[GetDialogOverlayContainerColor()], '0', '40');
+        sendThemeToAndroid(colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], '0', '225');
       }
 
 }
@@ -99,11 +153,14 @@ function editLabel(oldLabel) {
 function updateLabel(){
     const newLabel = document.getElementById('editLabel_input').value
     const oldLabel = document.getElementById('editLabel_input').getAttribute('oldLabelValue');
-    if (newLabel && newLabel.trim() !== "") {
+    if (newLabel !== "") {
         let notesLabels = JSON.parse(localStorage.getItem('notesLabels')) || [];
-        const index = notesLabels.indexOf(oldLabel);
-        if (index !== -1) {
-            notesLabels[index] = newLabel.trim();
+
+        // Find the object and update its label
+        const labelObj = notesLabels.find(label => label.label === oldLabel);
+
+        if (labelObj) {
+            labelObj.label = newLabel;
             localStorage.setItem('notesLabels', JSON.stringify(notesLabels));
             loadLabels();
         }
@@ -139,9 +196,9 @@ document.getElementById('createLabelDialog').addEventListener('cancel', () =>{
 
 document.getElementById('createLabelDialog').addEventListener('close', () =>{
   if (document.getElementById("headUser-1").scrollTop >= 5) {
-    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '40')
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '210')
   } else {
-    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '40')
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '210')
 
   }
 })
@@ -157,9 +214,76 @@ document.getElementById('editLabelDialog').addEventListener('cancel', () =>{
 
 document.getElementById('editLabelDialog').addEventListener('close', () =>{
   if (document.getElementById("headUser-1").scrollTop >= 5) {
-    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '40')
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '210')
   } else {
-    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '40')
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '210')
 
   }
 })
+
+// ------------
+
+
+document.getElementById('toggleLockedLabelSwitch').addEventListener('change', () =>{
+    if(document.getElementById('toggleLockedLabelSwitch').selected){
+        if(!localStorage.getItem('applabelAccessPin')){
+            setTimeout(() =>{
+                document.getElementById('toggleLockedLabelSwitch').click()
+            }, 200)
+            navigateActivity('openLockConfigPage')
+        }
+    }
+});
+
+// ------------
+
+
+function deleteAllLabels() {
+    let labels = JSON.parse(localStorage.getItem('notesLabels')) || [];
+
+    let updatedLabels = labels.filter(label => label.locked);
+
+    localStorage.setItem('notesLabels', JSON.stringify(updatedLabels));
+
+    loadLabels();
+}
+
+function deleteAllLabelsDialog(){
+    document.getElementById('deleteLabelsAlert').show();
+
+    window.history.pushState({ deleteLabelsAlertOpen: true }, "");
+
+      if (document.getElementById("headUser-1").scrollTop >= 5) {
+        sendThemeToAndroid(colorsDialogsOpenContainer()[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], '0', '225');
+      } else {
+        sendThemeToAndroid(colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], '0', '225');
+      }
+}
+
+
+window.addEventListener("popstate", function (event) {
+    if(document.getElementById('deleteLabelsAlert').open){
+    document.getElementById('deleteLabelsAlert').close();
+    }
+});
+
+document.getElementById('deleteLabelsAlert').addEventListener('cancel', () =>{
+    document.getElementById('deleteLabelsAlert').addEventListener('closed', () =>{
+        window.history.back()
+    })
+})
+
+document.getElementById('deleteLabelsAlert').addEventListener('close', () =>{
+  if (document.getElementById("headUser-1").scrollTop >= 5) {
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '210')
+  } else {
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '210')
+
+  }
+})
+
+function showInfoDialog(){
+
+    alert("You can lock a label with a pin or fingerprint. Any note assigned to a locked label will require a pin to view. If a note is assigned to a locked label, you can't add other labels to it. If you forget your pin, it can't be reset unless you clear the app data, but you can change it in the settings.")
+
+}

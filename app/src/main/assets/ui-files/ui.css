@@ -7,7 +7,7 @@
 
 #app{
     opacity: 0;
-    transition: opacity 0.2s ease-out;
+    transition: opacity 0.1s ease-out;
 }
 
 body{
@@ -53,6 +53,8 @@ input[type="search"]::-webkit-search-results-decoration {
     flex-direction: column;
     align-items: flex-end;
     gap: 10px;
+    display: none;
+
 }
 
 .header_search{
@@ -168,7 +170,7 @@ flex{
 .saved-notes #savedNotesList noteTileWrap, .saved-notesPinned #pinnedNotesList noteTileWrap {
     display: inline-block;
     width: calc(100% - 10px - 10px);
-    background-color: var(--Surface-Container);
+    background-color: var(--Surface-Container-Low);
     border-radius: 10px;
     margin-bottom: 6px;
     padding: 10px;
@@ -176,6 +178,16 @@ flex{
     overflow: hidden;
     position: relative;
     padding-bottom: 40px;
+
+}
+
+[colorTheme="light"] .saved-notes #savedNotesList noteTileWrap, .saved-notesPinned #pinnedNotesList noteTileWrap{
+    background-color: var(--Surface-Container);
+}
+
+
+[colorTheme="light"] .saved-notes #savedNotesList noteTileWrap span::before, .saved-notesPinned #pinnedNotesList noteTileWrap span::before{
+    background: linear-gradient(0deg, var(--Surface-Container) 10%, rgba(255, 0, 0, 0)) !important;
 
 }
 
@@ -250,10 +262,13 @@ p_content h1, p_content h2, p_content h3, p_content h4{
     bottom: 0;
     content: '';
     width: 100%;
-    background: linear-gradient(0deg, var(--Surface-Container) 10%, rgba(255, 0, 0, 0));
+    background: linear-gradient(0deg, var(--Surface-Container-Low) 10%, rgba(255, 0, 0, 0));
     height: 10px;
     z-index: 1;
 }
+
+
+
 .noteCheckboxWrap{
     position: absolute;
     width: 100%;
@@ -291,6 +306,8 @@ p_content h1, p_content h2, p_content h3, p_content h4{
     padding-top: 15px;
     padding-left: 0;
     padding-right: 0;
+    overflow: auto;
+    height: calc(100% - 80px - 20px);
 }
 
 #notesContainerSearched searchednote{
@@ -427,5 +444,128 @@ note_label div md-icon{
 
 blockquote{
     margin: 0;
+}
+
+
+.switch-small{
+    --md-switch-pressed-handle-height: 16px;
+    --md-switch-pressed-handle-width: 16px;
+    --md-switch-track-width: 42px;
+    --md-switch-track-height: 22px;
+    --md-switch-selected-handle-height: 16px;
+    --md-switch-selected-handle-width: 16px;
+}
+
+.lock_labels{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--Secondary);
+    font-size: 30px;
+    font-family: var(--google-mid);
+}
+
+.inputs_lock_create_new{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-top: 10px;
+}
+
+.input_create_pass{
+    background-color: var(--Surface-Container-High);
+    height: 56px;
+    display: flex;
+    align-items: center;
+    padding-left: 11px;
+    padding-right: 11px;
+    border-radius: 50px;
+    gap: 10px;
+    position: relative;
+    width: 100%;
+}
+.input_create_pass input{
+    background-color: transparent;
+    caret-color: var(--Primary);
+    border: none;
+    font-family: var(--google-normal);
+    font-size: 18px;
+    width: 100%;
+    color: var(--On-Surface);
+}
+
+
+.input_pin_keys{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+}
+
+.input_pin_keys .input_pin_keys_grid button{
+    width: 75px;
+    height: 75px;
+    border-radius: 50px;
+    border: none;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--google-normal);
+    color: var(--On-Surface);
+    background-color: var(--Surface-Container);
+    position: relative;
+}
+
+.input_pin_keys .input_pin_keys_grid button[disabled]{
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+.input_pin_keys .input_pin_keys_grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.lockedlabel{
+    position: relative;
+}
+
+.lockedlabel::before{
+    content: 'lock';
+    font-family: 'Material symbols';
+    font-weight: normal !important;
+    font-style: normal !important;
+    font-variation-settings: 'FILL' 1;
+    line-height: 1;
+    position: absolute;
+    right: -5px;
+    top: -10px;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    background-color: var(--Error);
+    color: var(--On-Error);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50px;
+}
+
+.hiddenNoteLabel{
+    display: none !important;
+}
+
+#colorPickerSheetContent{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+    padding-bottom: 10px;
 }
 

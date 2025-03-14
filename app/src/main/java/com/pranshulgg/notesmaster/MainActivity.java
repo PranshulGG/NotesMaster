@@ -1,7 +1,12 @@
 package com.pranshulgg.notesmaster;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.biometric.BiometricManager;
+import androidx.biometric.BiometricPrompt;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 
 import android.animation.ArgbEvaluator;
@@ -11,29 +16,36 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ShortcutInfo;
-import android.content.pm.ShortcutManager;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.Icon;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.TypedValue;
+import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowInsetsController;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.color.DynamicColors;
+import com.google.android.material.color.MaterialColors;
 import com.google.android.material.snackbar.Snackbar;
+
+import java.util.concurrent.Executor;
 
 public class MainActivity extends AppCompatActivity {
     private WebView webview;
+    private FrameLayout overlayLayout;
+    private boolean isFirstLoad = true;
 
     @Override
     public void onBackPressed() {
@@ -50,10 +62,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         SharedPreferences prefs = getSharedPreferences("theme_prefs", MODE_PRIVATE);
         boolean isDarkMode = prefs.getBoolean("theme_mode", false);
+
         setAppTheme(this, isDarkMode);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        overlayLayout = findViewById(R.id.overlayLayout);
         webview = findViewById(R.id.webView);
         WebSettings webSettings = webview.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -74,14 +87,101 @@ public class MainActivity extends AppCompatActivity {
         webview.addJavascriptInterface(androidInterface, "AndroidInterface");
         webview.addJavascriptInterface(new NavigateActivityInterface(this), "OpenActivityInterface");
         webview.addJavascriptInterface(new ShowSnackInterface(this), "ShowSnackMessage");
-
+        webview.addJavascriptInterface(new AndroidFunctionActivityInterface(this), "AndroidFunctionActivityInterface");
 
 
         webview.loadUrl("file:///android_asset/index.html");
 
+        webview.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+
+                if (isFirstLoad) {
+                    isFirstLoad = false;
+
+                    int primaryColor = new ContextThemeWrapper(MainActivity.this, R.style.ThemeMainBlackDark)
+                            .getTheme()
+                            .obtainStyledAttributes(new int[]{com.google.android.material.R.attr.colorPrimary})
+                            .getColor(0, 0);
+
+                    String hexColor = String.format("#%06X", (0xFFFFFF & primaryColor));
+                    String jsCodePrimaryColor = "dynamicMaterial('" + hexColor + "');";
+                    webview.evaluateJavascript(jsCodePrimaryColor, null);
+
+                }
+            }
+        });
+
+    }
+
+    public void hideOverlay() {
+        overlayLayout.setVisibility(View.GONE);
     }
 
 
+
+    private void checkBiometricSupport() {
+        BiometricManager biometricManager = BiometricManager.from(this);
+
+        switch (biometricManager.canAuthenticate()) {
+            case BiometricManager.BIOMETRIC_SUCCESS:
+
+                break;
+
+            case BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE:
+                break;
+
+            case BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE:
+
+                break;
+
+            case BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED:
+
+                break;
+        }
+    }
+
+    private void showBiometricPrompt() {
+        Executor executor = ContextCompat.getMainExecutor(this);
+        BiometricPrompt biometricPrompt = new BiometricPrompt(MainActivity.this, executor, new BiometricPrompt.AuthenticationCallback() {
+            @Override
+            public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
+                super.onAuthenticationError(errorCode, errString);
+
+                if (errorCode == BiometricPrompt.ERROR_USER_CANCELED || errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON) {
+                }
+
+            }
+
+            @Override
+            public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
+                super.onAuthenticationSucceeded(result);
+                callJavaScriptFunction();
+
+            }
+
+            @Override
+            public void onAuthenticationFailed() {
+                super.onAuthenticationFailed();
+
+            }
+        });
+
+        BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
+                .setTitle("Unlock locked label")
+                .setSubtitle("Authenticate using your biometric credentials")
+                .setConfirmationRequired(false)
+                .setNegativeButtonText("Cancel")
+                .build();
+
+        biometricPrompt.authenticate(promptInfo);
+    }
+
+    private void callJavaScriptFunction() {
+
+        webview.evaluateJavascript("javascript:viewLockedNotes();", null);
+    }
 
 
     public class NavigateActivityInterface {
@@ -164,6 +264,37 @@ public class MainActivity extends AppCompatActivity {
     public void back() {
         onBackPressed();
     }
+
+    public class AndroidFunctionActivityInterface {
+        private MainActivity mActivity;
+
+        AndroidFunctionActivityInterface(MainActivity activity) {
+            mActivity = activity;
+        }
+
+        @JavascriptInterface
+        public void androidFunction(final String functiontype) {
+            mActivity.runOnUiThread(new Runnable() {
+                @SuppressLint("ResourceType")
+                @RequiresApi(api = Build.VERSION_CODES.O)
+                @Override
+                public void run() {
+                    if (functiontype.equals("ShowBiometric")){
+                        checkBiometricSupport();
+                        showBiometricPrompt();
+                        return;
+                    } else if (functiontype.equals("hideSurfaceOverlay")){
+                        hideOverlay();
+                        return;
+                    } else if (functiontype.equals("ReloadDynamicColors")){
+                        recreate();
+                        return;
+                    }
+                }
+            });
+        }
+    }
+
     public class AndroidInterface {
         private MainActivity mActivity;
 
@@ -245,6 +376,8 @@ public class MainActivity extends AppCompatActivity {
             view.loadUrl(url);
             return true;
         }
+
+
     }
 
     public void setAppTheme(Context context, boolean isDarkMode) {
@@ -255,9 +388,15 @@ public class MainActivity extends AppCompatActivity {
         // Apply the theme
         if (isDarkMode) {
             context.setTheme(R.style.ThemeMainBlackDark);
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         } else {
             context.setTheme(R.style.ThemeMainBlackLight);
-        }
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                View decorView = getWindow().getDecorView();
+                decorView.setSystemUiVisibility(
+                        View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+                );
+            }
     }
 }
 

@@ -10,27 +10,32 @@
     <link rel="stylesheet" href="../ui-files/variables.css">
     <link rel="stylesheet" href="../components/components.css">
     <link rel="stylesheet" href="../components/modal-ver.css">
+    <script src="../module/iroJs.js"></script>
 
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        themeConfig(localStorage.getItem('materialThemeColorSource') || '#aac7ff')
+
+    setTimeout(()=>{
+               document.querySelectorAll('md-switch').forEach((snglSwitch) =>{
+        snglSwitch.style.opacity = 'unset'
+    })
+        if(localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') === 'true'){
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '0')
+        AndroidFunctionActivityInterface.androidFunction('hideSurfaceOverlay');
+
+    } else{
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '1')
+        AndroidFunctionActivityInterface.androidFunction('hideSurfaceOverlay');
+    }
+
+
+    },80);
+
+
+});
+    </script>
     <style>
-     /*   md-list-item{
-            background-color: var(--Surface-Container-Lowest);
-            margin-bottom: 6px;
-            border-radius: 10px;
-        }
-
-        md-list{
-            padding: 8px;
-            padding-top: 0;
-        }
-
-        md-list md-list-item:first-child{
-            border-radius: 18px 18px 10px 10px;
-        }
-
-        md-list md-list-item:last-child{
-            border-radius: 10px 10px 18px 18px ;
-        } */
-
         .custom_theme .color-item{
             width: 45px;
             height: 45px;
@@ -68,7 +73,6 @@
 
         .custom_theme_items{
             opacity: 1;
-            height: 60px;
             overflow: hidden;
         }
         .main_provider_item {
@@ -83,6 +87,12 @@
 
         .main_provider_item:first-child {
             padding-top: 5px;
+        }
+
+
+        md-switch{
+            opacity: 0;
+            z-index: 1;
         }
     </style>
 
@@ -104,28 +114,31 @@
             <md-list>
 
                 <md-list-item>
+                    <md-icon icon-filled slot="start">palette</md-icon>
+                    <div slot="headline">Dynamic colors</div>
+                    <div slot="supporting-text">Use wallpaper colors</div>
+                    <md-switch slot="end" id="DynamicColorsSwitch" icons show-only-selected-icon></md-switch>
+                    <label for="DynamicColorsSwitch" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" slot="end"><md-ripple></md-ripple></label>
+                </md-list-item>
+
+                <md-list-item class="custom_theme_items customthemeSlider" type="button" onclick="openColorSheet()">
+                    <md-icon icon-filled slot="start">colorize</md-icon>
+                    <div slot="headline">Color accent</div>
+                    <div slot="supporting-text">Select a seed color to generate the theme</div>
+                    <div class="colorPrevSeed" style="width: 40px; height: 40px; border-radius: 50px; border: 1px solid var(--Outline-Variant);" slot="end">
+                    </div>
+                </md-list-item>
+
+                <md-list-item>
                     <md-icon icon-filled slot="start">dark_mode</md-icon>
                     <div slot="headline">Dark theme</div>
                     <div slot="supporting-text">Use dark theme colors</div>
-                    <md-switch slot="end" id="darkThemeSwitch"></md-switch>
+                    <md-switch slot="end" id="darkThemeSwitch" icons show-only-selected-icon></md-switch>
+                    <label for="darkThemeSwitch" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" slot="end"><md-ripple></md-ripple></label>
                   </md-list-item>
 
-                  <md-list-item class="custom_theme_items">
-                      <md-icon icon-filled slot="start"></md-icon>
-                      <div class="custom_theme_wrap" slot="headline">
-                      <div class="custom_theme">
-                        <div class="color-item" style="--clr:  #2196f3; --clr-check: rgb(255, 255, 255);" theme-value="blue_material"></div>
-                        <div class="color-item" style="--clr: #673ab7; --clr-check: rgb(255, 255, 255);" theme-value="purple_material"></div>
-                        <div class="color-item" style="--clr: #ffeb3b; --clr-check: rgb(0, 0, 0);" theme-value="yellow_material"></div>
-                        <div class="color-item" style="--clr:  #4caf50; --clr-check: rgb(255, 255, 255);" theme-value="green_material"></div>
-                        <div class="color-item" style="--clr: #e92315; --clr-check: rgb(255, 255, 255);"  theme-value="red_material"></div>
-                        <div class="color-item" style="--clr: #e91e63; --clr-check: rgb(255, 255, 255);"  theme-value="pink_material"></div>
-                        <div class="color-item" style="--clr:  #da7e07; --clr-check: rgb(255, 255, 255);"theme-value="orange_material"></div>
-                        <div class="color-item" style="--clr:  #414141; --clr-check: rgb(255, 255, 255);" theme-value="mono_material"></div>
-          
-                      </div>
-                    </div>
-                  </md-list-item>
+
+
 
                 <md-list-item onclick="openAppFontDialog()" type="button">
                     <md-icon icon-filled slot="start">font_download</md-icon>
@@ -136,7 +149,37 @@
                 <md-list-item>
                     <md-icon icon-filled slot="start">view_agenda</md-icon>
                     <div slot="headline" data-translate="font">List view for notes</div>
-                    <md-switch slot="end" id="listViewSwitch"></md-switch>
+                    <md-switch slot="end" id="listViewSwitch" icons show-only-selected-icon></md-switch>
+                    <label for="listViewSwitch" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" slot="end"><md-ripple></md-ripple></label>
+                </md-list-item>
+
+                <md-list-item>
+                    <md-icon icon-filled slot="start">title</md-icon>
+                    <div slot="headline">Title only</div>
+                    <div slot="supporting-text">Show only the title on note tiles</div>
+                    <md-switch slot="end" id="onlyShowTitleSwitch" icons show-only-selected-icon></md-switch>
+                    <label for="onlyShowTitleSwitch" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" slot="end"><md-ripple></md-ripple></label>
+                </md-list-item>
+
+                <md-list-item type="button" id="changeAppPinCodeBtn">
+                    <md-icon icon-filled slot="start">pin</md-icon>
+                    <div slot="headline">Change pin code</div>
+                    <div slot="supporting-text">Pin code used for locked labels</div>
+                </md-list-item>
+
+                <md-list-item id="useFingerItem">
+                    <md-icon icon-filled slot="start">fingerprint</md-icon>
+                    <div slot="headline">Unlock with fingerprint</div>
+                    <div slot="supporting-text">Use fingerprint to unlock locked labels</div>
+                    <div slot="overline" id="overLineTextFinger">Pin is required to use this</div>
+                    <md-switch slot="end" id="useFingerPrintSwitch" icons show-only-selected-icon></md-switch>
+                    <label for="useFingerPrintSwitch" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" slot="end"><md-ripple></md-ripple></label>
+                    <script>
+                        if(!localStorage.getItem('applabelAccessPin')){
+                            document.getElementById('useFingerPrintSwitch').disabled = true
+                            document.querySelector('label[for="useFingerPrintSwitch"]').style.pointerEvents = 'none';
+                        }
+                    </script>
                 </md-list-item>
 
             </md-list>
@@ -175,9 +218,26 @@
               <br>
               <br>
 
+              <bottom-sheet id="ColorPickerSheet">
+                  <close-touch-sheet></close-touch-sheet>
+                  <bottom-sheet-content>
+                      <handle></handle>
+                      <content-holder-sheet >
+                          <div id="colorPickerSheetContent">
+                              <div id="colorPicker" slot="headline">
+
+                              </div>
+                          </div>
+                          <div class="button_ok_sheet_area" style="display: flex; align-items: center; justify-content: center; padding-bottom: 10px; border-top: 1px solid var(--Outline-Variant); padding-top: 10px;">
+                              <md-text-button onclick="window.history.back();" style="width: 70%;">CLOSE</md-text-button>
+                          </div>
+                      </content-holder-sheet>
+                  </bottom-sheet-content>
+              </bottom-sheet>
+
           <!-- dialogs -->
 
-          <md-dialog id="chooseAPPFontDialog" style="min-width: 85%;" quick>
+          <md-dialog id="chooseAPPFontDialog" style="min-width: 85%;">
               <div slot="headline" data-translate="app_font">App font</div>
 
               <div slot="content">
@@ -187,13 +247,27 @@
                   </label>
                   <label class="main_provider_item">
                       <md-radio slot="start" value="roboto" name="app_font_radio"></md-radio>
-                      Roboto
+                      Inter
                   </label>
               </div>
 
               <div slot="actions">
                   <md-text-button onclick="window.history.back()" data-translate="cancel">Cancel</md-text-button>
                   <md-text-button id="saveSelectedFont" data-translate="ok">OK</md-text-button>
+              </div>
+          </md-dialog>
+
+          <md-dialog style="min-width: 85%;" id="changePinCodeDialog">
+              <div slot="headline">Change pin</div>
+
+              <div slot="content">
+                  <md-outlined-text-field style="width: 100%; margin-bottom: 10px;" placeholder="Old pin" id="oldPinInput"></md-outlined-text-field>
+                  <md-outlined-text-field style="width: 100%;" placeholder="New pin" id="newPinInput"></md-outlined-text-field>
+              </div>
+
+              <div slot="actions">
+                  <md-text-button onclick="window.history.back()">Cancel</md-text-button>
+                  <md-text-button id="changePinCode">Change</md-text-button>
               </div>
           </md-dialog>
 
@@ -204,25 +278,6 @@
 </div>
 </div>
     <script>
-        if(localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') === 'true'){
-        document.documentElement.setAttribute('colorTheme', 'dark');
-        if(localStorage.getItem('Materialtheme')){
-            document.documentElement.setAttribute(
-        "Theme",
-        localStorage.getItem('Materialtheme')
-      );
-        }
-        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '0')
-    } else{
-        document.documentElement.setAttribute('colorTheme', 'light');
-        if(localStorage.getItem('Materialtheme')){
-            document.documentElement.setAttribute(
-        "Theme",
-        localStorage.getItem('Materialtheme')
-      );
-        }
-        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '1')
-    }
 
         const user1 = document.getElementById("headUser-1");
 
@@ -282,5 +337,8 @@
     <script src="../components-script.js/components.js"></script>
     <script src="../module/settingsModule.js"></script>
     <script src="../module/render.js"></script>
+    <script src="../app/changeLock.js"></script>
+    <script src="../module/materialTheme.js" type="module"></script>
+
 </body>
 </html>

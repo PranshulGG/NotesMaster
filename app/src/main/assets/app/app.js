@@ -60,12 +60,18 @@ window.addEventListener("popstate", function (event) {
            notes_ripple_elem.hidden = false;
        })
 })
+let hiddenNote = '';
 
 function createNoteTile(){
     setTimeout(() =>{
         loadCheckboxListeners()
         disableEnableDeleteBtn()
     }, 200);
+        if(localStorage.getItem('onlyShowTitle') && localStorage.getItem('onlyShowTitle') === 'true'){
+            hiddenNote = 'hidden'
+        } else{
+            hiddenNote = ''
+        }
         const savedNotesList = document.getElementById('savedNotesList');
         const pinnedNotesList = document.getElementById('pinnedNotesList');
         savedNotesList.innerHTML = '';
@@ -96,7 +102,7 @@ function createNoteTile(){
                   <md-checkbox class="noteCheckbox"></md-checkbox></check_label>
                 </label>
                 <p>${note.title}</p>
-                <span>${note.content}</span>
+                <span ${hiddenNote}>${note.content}</span>
                 <time>${formattedDate}</time>
                 <md-ripple class="notes_ripple_elem"></md-ripple>
             `
@@ -151,6 +157,7 @@ function createNoteTile(){
         });
         createLabels()
 
+                hideLockedLabelNotes()
 
 
 
@@ -241,7 +248,8 @@ displayWaterMark()
 
 function searchNotes() {
     let notes = JSON.parse(localStorage.getItem('notes')) || [];
-
+    const savedLabelsLocked = JSON.parse(localStorage.getItem('notesLabels')) || [];
+    const noteLabelsLocked = JSON.parse(localStorage.getItem('noteLabels')) || {};
     const query = document.getElementById('Search_notes_input').value.toLowerCase();
     const container = document.getElementById('notesContainerSearched');
     container.innerHTML = "";
@@ -249,8 +257,14 @@ function searchNotes() {
     if (query === "") return;
 
     const filtered = notes
-        .map((note, originalIndex) => ({ ...note, originalIndex })) // Keep track of original index
-        .filter(note => note.title.toLowerCase().includes(query));
+    .map((note, originalIndex) => ({ ...note, originalIndex }))
+    .filter(note => {
+        const labels = noteLabelsLocked[note.noteID] || [];
+        const hasLockedLabel = savedLabelsLocked.some(labelObj =>
+            labelObj.locked && labels.includes(labelObj.label)
+        );
+        return note.title.toLowerCase().includes(query) && !hasLockedLabel;
+    });
 
     if (filtered.length === 0) {
         container.innerHTML = "<error style='color: var(--On-Surface); margin-left: 15px;'>No matching notes found.</error>";
@@ -312,7 +326,7 @@ function disableEnableDeleteBtn() {
 
 function showDeleteAlertDialog(){
     document.getElementById('deleteNoteAlert').show();
-    sendThemeToAndroid(colorsDialogsOpenSurface[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface[GetDialogOverlayContainerColor()], '0', '40');
+    sendThemeToAndroid(colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], '0', '225');
 
     window.history.pushState({ DeleteAlertDialogOpen: true }, "");
     sessionStorage.setItem('DeleteAlertDialogOpen', "true");
@@ -334,13 +348,15 @@ document.getElementById('deleteNoteAlert').addEventListener('cancel', () =>{
 
 
 document.getElementById('deleteNoteAlert').addEventListener('close', () =>{
-    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '40')
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '210')
         setTimeout(() =>{
             sessionStorage.setItem('DeleteAlertDialogOpen', "false");
         }, 200);
 })
 
 // labels
+
+let selectedLabelLocked = null
 
 function createLabels(){
 if (JSON.parse(localStorage.getItem('notesLabels'))) {
@@ -350,18 +366,43 @@ if (JSON.parse(localStorage.getItem('notesLabels'))) {
 
     savedLabels.forEach((label, index) => {
         const label_item = document.createElement('md-filter-chip');
-        label_item.setAttribute('label', label);
+        label_item.setAttribute('label', label.label);
         label_item.setAttribute("data-id", index + 1);
+
+        if(label.locked){
+            const createLabelLockedIcon = document.createElement('md-icon');
+            createLabelLockedIcon.setAttribute('icon-outlined', '')
+            createLabelLockedIcon.setAttribute('slot', 'icon')
+            createLabelLockedIcon.innerHTML = 'lock'
+            label_item.appendChild(createLabelLockedIcon)
+        }
+
 
         label_item.addEventListener('click', () => {
             const isSelected = label_item.hasAttribute('selected');
             label_holder.querySelectorAll('md-filter-chip').forEach(chip => {
                 chip.removeAttribute('selected');
-
             });
             if (!isSelected) {
+                if(label.locked){
+                    selectedLabelLocked = { element: label_item, label: label };
+                    if(localStorage.getItem('useFingerPrint') === 'true'){
+                        AndroidFunctionActivityInterface.androidFunction('ShowBiometric');
+                    } else{
+                    sendThemeToAndroid(colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], '0', '225');
+                    document.getElementById('enterPinDialog').show();
+                    window.history.pushState({ enterPinDialogOpen: true }, "");
+                    }
+                    document.getElementById('LockedNotepinInput').value = ''
+                     document.getElementById('LockedNotepinInput').error = false;
+                    setTimeout(() =>{
+                        label_item.removeAttribute('selected')
+                    }, 100);
+                    return
+                }
                 label_item.setAttribute('selected', '');
-                filterNotesByLabel(label);
+                filterNotesByLabel(label.label);
+                hideLockedLabelNotes()
             } else {
                 showAllNotes();
             }
@@ -406,6 +447,24 @@ if (JSON.parse(localStorage.getItem('notesLabels'))) {
 
 }
 
+window.addEventListener("popstate", function (event) {
+    if(document.getElementById('enterPinDialog').open){
+        document.getElementById('enterPinDialog').close();
+    }
+});
+
+document.getElementById('enterPinDialog').addEventListener('cancel', () =>{
+    document.getElementById('enterPinDialog').addEventListener('closed', () =>{
+        window.history.back()
+
+    })
+})
+
+
+document.getElementById('enterPinDialog').addEventListener('close', () =>{
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '210')
+})
+
 function filterNotesByLabel(selectedLabel) {
     let noteLabels = JSON.parse(localStorage.getItem('noteLabels')) || {};
 
@@ -425,6 +484,7 @@ function showAllNotes() {
     document.querySelectorAll('#savedNotesList noteTileWrap, #pinnedNotesList noteTileWrap').forEach(noteTile => {
         noteTile.hidden = false;
     });
+    hideLockedLabelNotes()
 }
 
 // toggle list or grid view
@@ -441,3 +501,38 @@ function useListView(){
 }
 
 useListView()
+
+
+function hideLockedLabelNotes(){
+    const savedLabelsLocked = JSON.parse(localStorage.getItem('notesLabels')) || [];
+    let noteLabelsLocked = JSON.parse(localStorage.getItem('noteLabels')) || {};
+
+    document.querySelectorAll('#savedNotesList noteTileWrap, #pinnedNotesList noteTileWrap').forEach(noteTile => {
+        const noteID = noteTile.getAttribute('noteID');
+        const labels = noteLabelsLocked[noteID] || [];
+
+        const hasLockedLabel = savedLabelsLocked.some(labelObj =>
+            labelObj.locked && labels.includes(labelObj.label)
+        );
+
+        if(hasLockedLabel){
+        noteTile.classList.add('hiddenNoteLabel')
+        }
+    });
+
+        const updateDisplay = (listId) => {
+            const list = document.getElementById(listId);
+            const visibleNotes = list.querySelectorAll('noteTileWrap:not(.hiddenNoteLabel)').length;
+
+            if (visibleNotes === 2) {
+                list.style.display = 'flex';
+            } else {
+                list.style.display = '';
+            }
+        };
+
+        updateDisplay('savedNotesList');
+        updateDisplay('pinnedNotesList');
+}
+
+

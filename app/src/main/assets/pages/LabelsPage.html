@@ -12,6 +12,26 @@
     <link rel="stylesheet" href="../components/components.css">
     <link rel="stylesheet" href="../components/modal-ver.css">
     <script src="../module/Sortable.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        themeConfig(localStorage.getItem('materialThemeColorSource') || '#aac7ff')
+    setTimeout(()=>{
+        if(localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') === 'true'){
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '0')
+        AndroidFunctionActivityInterface.androidFunction('hideSurfaceOverlay');
+
+    } else{
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '1')
+        AndroidFunctionActivityInterface.androidFunction('hideSurfaceOverlay');
+    }
+
+    document.querySelector('.floatfab_div').style.display = 'flex'
+
+    },80);
+
+});
+
+    </script>
     <style>
         .sortable-ghost{
           opacity: 0;
@@ -26,6 +46,10 @@
                 <md-icon icon-outlined>arrow_back</md-icon>
             </md-icon-button>
             <p>Labels</p>
+            <flex></flex>
+            <md-icon-button onclick="deleteAllLabelsDialog()">
+                <md-icon icon-outlined>delete_forever</md-icon>
+            </md-icon-button>
         </div>
         <div class="full-activity-content" id="headUser-1">
 
@@ -45,13 +69,24 @@
                 <p>No labels</p>
             </div>
 
-            <md-dialog quick style="min-width: 85%;" id="createLabelDialog">
+            <md-dialog  style="min-width: 85%;" id="createLabelDialog">
                 <div slot="headline">New label</div>
 
                 <div slot="content">
                     <md-outlined-text-field style="width: 100%;" id="NewLabel_input" maxlength="15">
 
                     </md-outlined-text-field>
+
+                    <div style="display: flex; align-items: center; margin-top: 16px;">
+                    <label style="width: 100%; display: flex; align-items: center; justify-content: space-between; color: var(--On-Surface); font-family: var(--google-normal); font-size: 17px; position: relative; padding: 10px; padding-right: 0; padding-left: 0;">
+                        Lock label PIN
+                        <md-switch class="switch-small" id="toggleLockedLabelSwitch"></md-switch>
+                        <md-ripple></md-ripple>
+                    </label>
+                    <md-icon-button onclick="showInfoDialog()" style="margin-left: 5px;">
+                        <md-icon icon-outlined>info</md-icon>
+                    </md-icon-button>
+                </div>
                 </div>
 
                 <div slot="actions">
@@ -61,18 +96,44 @@
             </md-dialog>
 
 
-            <md-dialog quick style="min-width: 85%;" id="editLabelDialog">
+            <md-dialog  style="min-width: 85%;" id="editLabelDialog">
                 <div slot="headline">Edit label</div>
 
                 <div slot="content">
                     <md-outlined-text-field style="width: 100%;" id="editLabel_input" maxlength="15">
 
                     </md-outlined-text-field>
+
+                    Editing a label will remove it from any note it's applied to
                 </div>
 
                 <div slot="actions">
                     <md-text-button onclick="window.history.back();">Cancel</md-text-button>
                     <md-text-button onclick="updateLabel();">Update</md-text-button>
+                </div>
+            </md-dialog>
+
+            <md-dialog id="enterPinDialog" style="min-width: 85%;" >
+                <div slot="headline">Enter pin</div>
+                <div slot="content">
+                    <md-outlined-text-field style="width: 100%;" id="LockedlabelpinInput" error-text="Wrong pin">
+
+                    </md-outlined-text-field>
+                </div>
+                <div slot="actions">
+                    <md-text-button onclick="window.history.back();">Cancel</md-text-button>
+                    <md-filled-button id="deleteLockedLabel">Delete</md-filled-button>
+                </div>
+            </md-dialog>
+
+            <md-dialog id="deleteLabelsAlert" style="min-width: 85%;">
+                <div slot="headline">Delete all labels?</div>
+                <div slot="content">
+                    This action cannot be undone. Locked labels will stay and won’t be removed
+                </div>
+                <div slot="actions">
+                    <md-text-button onclick="window.history.back();">Cancel</md-text-button>
+                    <md-filled-button onclick="deleteAllLabels(); window.history.back()">Delete</md-filled-button>
                 </div>
             </md-dialog>
         </div>
@@ -81,26 +142,6 @@
 
     let sortableInstance;
 
-
-        if(localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') === 'true'){
-        document.documentElement.setAttribute('colorTheme', 'dark');
-        if(localStorage.getItem('Materialtheme')){
-            document.documentElement.setAttribute(
-        "Theme",
-        localStorage.getItem('Materialtheme')
-      );
-        }
-        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '0')
-    } else{
-        document.documentElement.setAttribute('colorTheme', 'light');
-        if(localStorage.getItem('Materialtheme')){
-            document.documentElement.setAttribute(
-        "Theme",
-        localStorage.getItem('Materialtheme')
-      );
-        }
-        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '1')
-    }
 
         const user1 = document.getElementById("headUser-1");
 
@@ -199,6 +240,7 @@
         <script src="../bundle.js"></script>
         <script src="../module/render.js"></script>
         <script src="../module/labels.js"></script>
+        <script src="../module/materialTheme.js" type="module"></script>
 
 </body>
 </html>

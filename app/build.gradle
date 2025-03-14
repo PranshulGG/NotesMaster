@@ -8,10 +8,10 @@ android {
 
     defaultConfig {
         applicationId "com.pranshulgg.notesmaster"
-        minSdk 25
+        minSdk 21
         targetSdk 33
-        versionCode 8
-        versionName "1.4.0"
+        versionCode 18
+        versionName "2.1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -40,4 +40,5 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
+    implementation 'androidx.biometric:biometric:1.1.0'
 }

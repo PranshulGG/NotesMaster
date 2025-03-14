@@ -4,6 +4,8 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.biometric.BiometricManager;
 import androidx.core.content.res.ResourcesCompat;
 
 import android.animation.ArgbEvaluator;
@@ -19,11 +21,13 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.InputType;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowInsetsController;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
@@ -33,6 +37,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,6 +62,8 @@ public class SettingsActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_CODE = 3;
     private static final int SAVE_DOCUMENT_REQUEST_CODE = 2;
     private static final int IMPORT_REQUEST_CODE = 3;
+
+    private FrameLayout overlayLayout;
     private String dataToSave;
     @Override
     public void onBackPressed() {
@@ -73,7 +80,7 @@ public class SettingsActivity extends AppCompatActivity {
         setAppTheme(this, isDarkMode);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        overlayLayout = findViewById(R.id.overlayLayout);
         webview = findViewById(R.id.webView);
         WebSettings webSettings = webview.getSettings();
         webSettings.setJavaScriptEnabled(true);
@@ -96,9 +103,17 @@ public class SettingsActivity extends AppCompatActivity {
         webview.addJavascriptInterface(new BackActivityInterface(this), "BackActivityInterface");
         webview.addJavascriptInterface(new ShowSnackInterface(this), "ShowSnackMessage");
         webview.addJavascriptInterface(new WebAppInterface(), "Android");
+        webview.addJavascriptInterface(new AndroidFunctionActivityInterface(this), "AndroidFunctionActivityInterface");
 
         webview.loadUrl("file:///android_asset/pages/settings.html");
 
+        webview.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                checkBiometricSupportSwitch();
+            }
+        });
         webview.setWebChromeClient(new WebChromeClient() {
             @Override
             public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
@@ -143,13 +158,16 @@ public class SettingsActivity extends AppCompatActivity {
                 return true;
             }
 
+
         });
-
-
-
 
     }
 
+
+
+    public void hideOverlay() {
+        overlayLayout.setVisibility(View.GONE);
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -303,6 +321,34 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
+
+
+    private void checkBiometricSupportSwitch() {
+        BiometricManager biometricManager = BiometricManager.from(this);
+
+        switch (biometricManager.canAuthenticate()) {
+            case BiometricManager.BIOMETRIC_SUCCESS:
+                break;
+
+            case BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE:
+            case BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE:
+            case BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED:
+                callNotSupportedJavaScriptFunction();
+                break;
+
+            default:
+                callNotSupportedJavaScriptFunction();
+                break;
+        }
+    }
+
+    private void callNotSupportedJavaScriptFunction() {
+
+        webview.evaluateJavascript("javascript:notSupported();", null);
+    }
+
+
+
     public class NavigateActivityInterface {
         private final Context mContext;
 
@@ -329,6 +375,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
+
     public class BackActivityInterface {
         private final Activity gActivity;
 
@@ -344,6 +391,32 @@ public class SettingsActivity extends AppCompatActivity {
     public void goBack() {
         runOnUiThread(this::onBackPressed);
     }
+
+
+    public class AndroidFunctionActivityInterface {
+        private SettingsActivity mActivity;
+
+        AndroidFunctionActivityInterface(SettingsActivity activity) {
+            mActivity = activity;
+        }
+
+        @JavascriptInterface
+        public void androidFunction(final String functiontype) {
+            mActivity.runOnUiThread(new Runnable() {
+                @SuppressLint("ResourceType")
+                @RequiresApi(api = Build.VERSION_CODES.O)
+                @Override
+                public void run() {
+                    if (functiontype.equals("hideSurfaceOverlay")){
+                            hideOverlay();
+                        return;
+                    }
+                }
+            });
+        }
+    }
+
+
 
     public class AndroidInterface {
         private SettingsActivity mActivity;
@@ -366,7 +439,9 @@ public class SettingsActivity extends AppCompatActivity {
                     if (colorStatus != null && !colorStatus.isEmpty()) {
                         statusBarColor = Color.parseColor(colorStatus);
                         navigationBarColor = Color.parseColor(colorNav);
-                        if ("1".equals(UiFlag)) {
+                        if ("0colorOnly".equals(UiFlag)){
+                            systemUiVisibilityFlags = 0;
+                        }else if ("1".equals(UiFlag)) {
                             systemUiVisibilityFlags = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
                             setAppTheme(mActivity, false);
                         } else {
@@ -437,9 +512,15 @@ public class SettingsActivity extends AppCompatActivity {
 
         // Apply the theme
         if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
             context.setTheme(R.style.ThemeMainBlackDark);
         } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
             context.setTheme(R.style.ThemeMainBlackLight);
+                View decorView = getWindow().getDecorView();
+                decorView.setSystemUiVisibility(
+                        View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+                );
         }
     }
 

@@ -40,6 +40,7 @@ document.getElementById('editor').addEventListener('input', () =>{
 
 });
 
+
 let inputDebounceTitle
 
 document.getElementById('noteTitle').addEventListener('input', () =>{
@@ -108,8 +109,11 @@ if(localStorage.getItem('clickedNote')){
         document.querySelector('.view-btn').selected = true;
         toggleView()
         openedNoteId = localStorage.getItem('clickedNoteId')
-        localStorage.removeItem('clickedNote')
-        localStorage.removeItem('clickedNoteId')
+        setTimeout(() =>{
+                localStorage.removeItem('clickedNote')
+                localStorage.removeItem('clickedNoteId')
+        }, 200)
+
 } else{
     document.querySelector('id').setAttribute('id', Date.now() + '_note')
     openedNoteId = document.querySelector('id').getAttribute('id');
@@ -148,6 +152,8 @@ function setbgColor(color) {
 
     if (!selection.isCollapsed) {
         range.surroundContents(span);
+        document.querySelector("#editor").dispatchEvent(new Event("input", { bubbles: true }));
+
     } else {
 
         span.innerHTML = '&#8203;';
@@ -208,7 +214,6 @@ function updateCheckboxes() {
     document.getElementById('insertUnorderedList_checkbox').checked = document.queryCommandState('insertUnorderedList');
     document.getElementById('underline_checkbox').checked = document.queryCommandState('underline');
     document.getElementById('strikethrough_checkbox').checked = document.queryCommandState('strikethrough');
-    document.getElementById('blockquote_checkbox').checked = document.queryCommandState('formatBlock', '<blockquote>');
 
 
 }
@@ -256,7 +261,7 @@ function insertLink() {
     }, 50);
 
     setTimeout(() =>{
-        const link = `<a href="${document.getElementById('linkURLInput').value}" target="_blank">${document.getElementById('linkTitleInput').value}</a>`;
+        const link = `<a style="-webkit-user-drag: none;" href="${document.getElementById('linkURLInput').value}" target="_blank">${document.getElementById('linkTitleInput').value}</a>`;
         document.execCommand('insertHTML', false, link);
         document.getElementById('linkURLInput').value = ''
         document.getElementById('linkTitleInput').value = ''
@@ -268,7 +273,7 @@ function insertLink() {
 document.getElementById('openInsertLinkDialog').addEventListener('click', () =>{
     document.getElementById('insertLinkDialog').show();
     window.history.pushState({ InsertLinkDialogOpen: true }, "");
-    sendThemeToAndroid(colorsDialogsOpenContainer[GetDialogOverlayContainerColor()], colorsDialogsOpenContainer[GetDialogOverlayContainerColor()], '0', '40');
+    sendThemeToAndroid(colorsDialogsOpenContainer()[GetDialogOverlayContainerColor()], colorsDialogsOpenContainer()[GetDialogOverlayContainerColor()], '0', '225');
 });
 
 document.getElementById('linkURLInput').addEventListener('input', () =>{
@@ -296,7 +301,7 @@ document.getElementById('insertLinkDialog').addEventListener('cancel', () =>{
 })
 
 document.getElementById('insertLinkDialog').addEventListener('close', () =>{
-    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), Themeflag, '40');
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), Themeflag, '210');
 })
 
 
@@ -378,4 +383,10 @@ function insertHR() {
     document.execCommand("insertHTML", false, "<br>");
 }
 
+if(localStorage.getItem('SelectedAPPfont') === 'roboto'){
+    document.getElementById('editor').classList.add('usingInter');
+} else{
+    document.documentElement.setAttribute('sys-font', ' ');
+    document.getElementById('editor').classList.remove('usingInter');
+}
 
