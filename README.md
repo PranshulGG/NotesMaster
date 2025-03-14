@@ -2,7 +2,7 @@
    <img src="repo_imgs/repo_app_icon.svg" alt="" width="120px">
 </div>
 <h1 align="center">
- WeatherMaster
+ NotesMaster
 </h1>
    <div  align="center">
       <img src="https://img.shields.io/github/license/PranshulGG/NotesMaster?style=for-the-badge&color=cba6f7&labelColor=302D41">
