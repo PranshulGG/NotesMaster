@@ -21,13 +21,10 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.InputType;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowInsetsController;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
@@ -79,6 +76,7 @@ public class SettingsActivity extends AppCompatActivity {
         boolean isDarkMode = prefs.getBoolean("theme_mode", false);
         setAppTheme(this, isDarkMode);
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         overlayLayout = findViewById(R.id.overlayLayout);
         webview = findViewById(R.id.webView);

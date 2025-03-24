@@ -44,7 +44,9 @@
             <md-icon-button onclick="ActivityBack();">
                 <md-icon icon-outlined>arrow_back</md-icon>
             </md-icon-button>
-            <p>Note</p>
+            <p style="display: flex ; flex-direction: column; overflow: hidden;">Note
+                <span style="color: var(--On-Surface-Variant); opacity: 0.5; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%;" id="lastEditedTime"></span>
+            </p>
             <flex></flex>
             <md-icon-button onclick="undo()" id="undo_btn_toggle">
                 <md-icon icon-outlined>undo</md-icon>
@@ -81,6 +83,10 @@
                     <md-icon slot="start" icon-outlined>close</md-icon>
                     <div slot="headline">Clear note<span style="opacity: 0;">31</span></div>
                 </md-menu-item>
+                <md-menu-item menu-type onclick="openInfoSheetNote()">
+                    <md-icon slot="start" icon-outlined>info</md-icon>
+                    <div slot="headline">Info</div>
+                </md-menu-item>
             </md-menu>
 
             <script type="module">
@@ -91,7 +97,7 @@
               </script>
         </div>
         <div class="full-activity-content" id="Content" style="height: calc(100% - 65px - 65px - 20px); top: 65px; width: calc(100% - 32px); padding: 0 16px 0 16px; padding-bottom: 20px;">
-    
+
             <div class="editor">
                 <div id="added_note_labels" hidden>
                 </div>
@@ -103,7 +109,7 @@
         <div class="editable" id="editor" contenteditable="true" placeholder="Note" oninput="if(this.innerHTML.trim()==='<br>')this.innerHTML=''"></div>
 
     </div>
-    
+
         </div>
         <id hidden></id>
 
@@ -115,9 +121,9 @@
             <button type="button" onclick="execCmd('insertOrderedList')">Ordered List</button>
             <button type="button" onclick="execCmd('formatBlock', 'h1')">Heading 1</button>
             <button type="button" onclick="execCmd('formatBlock', 'p')">Paragraph</button>
-            <button type="button" onclick="setTextColor('#ff0000')" style="background-color: #ff0000;"></button> 
-            <button type="button" onclick="setTextColor('#00ff00')" style="background-color: #00ff00;"></button> 
-            <button type="button" onclick="setTextColor('#0000ff')" style="background-color: #0000ff;"></button> 
+            <button type="button" onclick="setTextColor('#ff0000')" style="background-color: #ff0000;"></button>
+            <button type="button" onclick="setTextColor('#00ff00')" style="background-color: #00ff00;"></button>
+            <button type="button" onclick="setTextColor('#0000ff')" style="background-color: #0000ff;"></button>
             <button type="button" onclick="undo()">Undo</button>
             <button type="button" onclick="redo()">Redo</button> -->
 
@@ -273,7 +279,7 @@
         <md-dialog id="deleteNoteAlert" style="min-width: 85%;">
             <div slot="headline">Delete Note?</div>
             <div slot="content">
-                This action cannot be undone.
+                Note will be moved to the bin. You can restore them from there
             </div>
             <div slot="actions">
                 <md-text-button onclick="window.history.back();">Cancel</md-text-button>
@@ -293,6 +299,36 @@
                 <md-text-button id="addNoteLabel">Add</md-text-button>
             </div>
         </md-dialog>
+
+        <bottom-sheet id="NoteInfoSheet">
+            <close-touch-sheet></close-touch-sheet>
+            <bottom-sheet-content>
+                <handle></handle>
+                <div class="note_info_content" style="padding-top: 5px;">
+                    <div class="info_item_note">
+                        <p>Created</p>
+                        <span id="createdBalls">Just now</span>
+                    </div>
+                    <div class="info_item_note">
+                        <p>Last edited</p>
+                        <span id="editedBalls">No data</span>
+                    </div>
+                    <div class="info_item_note">
+                        <p>Words</p>
+                        <span id="wordBalls">--</span>
+                    </div>
+                    <div class="info_item_note">
+                        <p>Characters</p>
+                        <span id="charactersBalls">--</span>
+                    </div>
+                    <div class="info_item_note">
+                        <p>Labels</p>
+                        <span id="LabelBalls">--</span>
+                    </div>
+                </div>
+                </content-holder-sheet>
+            </bottom-sheet-content>
+        </bottom-sheet>
     </div>
 
 
@@ -304,6 +340,7 @@
     <script src="../app/editor.js"></script>
     <script src="../module/render.js"></script>
     <script src="../module/materialTheme.js" type="module"></script>
+    <script src="../components-script.js/components.js"></script>
 
 </body>
 </html>

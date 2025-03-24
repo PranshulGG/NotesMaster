@@ -18,7 +18,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.view.WindowInsetsController;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
@@ -27,8 +26,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.Toast;
-
-import com.google.android.material.snackbar.Snackbar;
 
 public class LabelsActivity extends AppCompatActivity {
     private WebView webview;
@@ -40,6 +37,7 @@ public class LabelsActivity extends AppCompatActivity {
             webview.goBack();
         } else {
             super.onBackPressed();
+
 
         }
     }
@@ -119,6 +117,7 @@ public class LabelsActivity extends AppCompatActivity {
 
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             mContext.startActivity(intent);
+
         }
     }
 

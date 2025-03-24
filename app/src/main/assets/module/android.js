@@ -6,15 +6,16 @@ function sendThemeToAndroid(status, nav, flag, flagAnimAndroid) {
 let Themeflag = '0'
 
 function checkThemeFlag(){
-    if(localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') === 'true'){
+    if(localStorage.getItem('useDarkTheme') === 'true'){
         Themeflag = '0'
     } else{
         Themeflag = '1'
     } 
 }
 
-checkThemeFlag()
-
+document.addEventListener('DOMContentLoaded', () =>{
+    checkThemeFlag()
+});
 // -----------------
 
 function navigateActivity(name) {

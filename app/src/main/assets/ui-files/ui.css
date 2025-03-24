@@ -152,22 +152,22 @@ flex{
     z-index: 2;
 }
 
-.saved-notes #savedNotesList, .saved-notesPinned #pinnedNotesList {
+.saved-notes #savedNotesList, .saved-notesPinned #pinnedNotesList, .saved-notes #binNotesList {
     column-count: 2;
     gap: 10px;
 }
 
-.saved-notes #savedNotesList.listView, .saved-notesPinned #pinnedNotesList.listView{
+.saved-notes #savedNotesList.cardsView, .saved-notesPinned #pinnedNotesList.cardsView, .saved-notes #binNotesList.cardsView{
     display: flex !important;
     flex-direction: column !important;
     gap: 5px !important;
 }
 
-.saved-notes #savedNotesList.listView noteTileWrap, .saved-notesPinned #pinnedNotesList.listView noteTileWrap{
+.saved-notes #savedNotesList.cardsView noteTileWrap, .saved-notesPinned #pinnedNotesList.cardsView noteTileWrap, .saved-notes #binNotesList.cardsView noteTileWrap{
     border-radius: 15px;
 }
 
-.saved-notes #savedNotesList noteTileWrap, .saved-notesPinned #pinnedNotesList noteTileWrap {
+.saved-notes #savedNotesList noteTileWrap, .saved-notesPinned #pinnedNotesList noteTileWrap, .saved-notes #binNotesList noteTileWrap {
     display: inline-block;
     width: calc(100% - 10px - 10px);
     background-color: var(--Surface-Container-Low);
@@ -177,21 +177,21 @@ flex{
     max-height: 120px;
     overflow: hidden;
     position: relative;
-    padding-bottom: 40px;
+    padding-bottom: 35px;
 
 }
 
-[colorTheme="light"] .saved-notes #savedNotesList noteTileWrap, .saved-notesPinned #pinnedNotesList noteTileWrap{
+[colorTheme="light"] .saved-notes #savedNotesList noteTileWrap, [colorTheme="light"] .saved-notesPinned #pinnedNotesList noteTileWrap, [colorTheme="light"] .saved-notes #binNotesList noteTileWrap{
     background-color: var(--Surface-Container);
 }
 
 
-[colorTheme="light"] .saved-notes #savedNotesList noteTileWrap span::before, .saved-notesPinned #pinnedNotesList noteTileWrap span::before{
+[colorTheme="light"] .saved-notes #savedNotesList noteTileWrap span::before, [colorTheme="light"] .saved-notesPinned #pinnedNotesList noteTileWrap span::before, [colorTheme="light"] .saved-notes #binNotesList noteTileWrap span::before{
     background: linear-gradient(0deg, var(--Surface-Container) 10%, rgba(255, 0, 0, 0)) !important;
 
 }
 
-.saved-notes #savedNotesList noteTileWrap p, .saved-notesPinned #pinnedNotesList noteTileWrap p{
+.saved-notes #savedNotesList noteTileWrap p, .saved-notesPinned #pinnedNotesList noteTileWrap p, .saved-notes #binNotesList noteTileWrap p{
     margin: 0;
     margin-bottom: 10px;
     font-family: var(--google-mid);
@@ -201,9 +201,11 @@ flex{
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    word-break: break-word;
+    text-overflow: ellipsis;
 }
 
-.saved-notes #savedNotesList noteTileWrap span, p_content, .saved-notesPinned #pinnedNotesList noteTileWrap span{
+.saved-notes #savedNotesList noteTileWrap span, p_content, .saved-notesPinned #pinnedNotesList noteTileWrap span, .saved-notes #binNotesList noteTileWrap span{
     opacity: 0.4;
     font-family: var(--google-normal);
     overflow: hidden;
@@ -219,14 +221,14 @@ flex{
 
 }
 
-.saved-notes #savedNotesList noteTileWrap span pre, p_content pre, .saved-notesPinned #pinnedNotesList noteTileWrap span pre{
+.saved-notes #savedNotesList noteTileWrap span pre, p_content pre, .saved-notesPinned #pinnedNotesList noteTileWrap span pre, .saved-notes #binNotesList noteTileWrap span pre{
     margin: 0;
     word-break: break-word;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.saved-notes #savedNotesList noteTileWrap span ul, p_content ul, .saved-notesPinned #pinnedNotesList noteTileWrap span ul{
+.saved-notes #savedNotesList noteTileWrap span ul, p_content ul, .saved-notesPinned #pinnedNotesList noteTileWrap span ul, .saved-notes #binNotesList noteTileWrap span ul{
     list-style: none;
     display: flex;
     flex-direction: column;
@@ -234,7 +236,7 @@ flex{
     margin: 0;
 }
 
-.saved-notes #savedNotesList noteTileWrap span ol, p_content ol, .saved-notesPinned #pinnedNotesList noteTileWrap span ol{
+.saved-notes #savedNotesList noteTileWrap span ol, p_content ol, .saved-notesPinned #pinnedNotesList noteTileWrap span ol, .saved-notes #binNotesList noteTileWrap span ol{
     list-style: none;
     display: flex;
     flex-direction: column;
@@ -257,7 +259,12 @@ p_content h1, p_content h2, p_content h3, p_content h4{
     font-size: 18px;
 }
 
-.saved-notes #savedNotesList noteTileWrap span::before, p_content::before, .saved-notesPinned #pinnedNotesList noteTileWrap span::before {
+.saved-notes #binNotesList noteTileWrap span h1, .saved-notes #binNotesList noteTileWrap span h2, .saved-notes #binNotesList noteTileWrap span h3, .saved-notes #binNotesList noteTileWrap span h4{
+    margin-top: 0;
+    font-size: 18px;
+}
+
+.saved-notes #savedNotesList noteTileWrap span::before, p_content::before, .saved-notesPinned #pinnedNotesList noteTileWrap span::before, .saved-notes #binNotesList noteTileWrap span::before {
     position: absolute;
     bottom: 0;
     content: '';
@@ -288,14 +295,15 @@ p_content h1, p_content h2, p_content h3, p_content h4{
     overflow: hidden;
     width: 18px;
 }
-.saved-notes #savedNotesList noteTileWrap time, .saved-notesPinned #pinnedNotesList noteTileWrap time{
+.saved-notes #savedNotesList noteTileWrap time, .saved-notesPinned #pinnedNotesList noteTileWrap time, .saved-notes #binNotesList noteTileWrap time{
     position: absolute;
-    bottom: 10px;
+    bottom: 8px;
     z-index: 1;
     font-family: var(--google-mid);
-    font-size: 13px;
+    font-size: 11px;
     left: 10px;
     color: var(--On-Surface-Variant);
+    opacity: 0.7;
 }
 
 #notesContainerSearched{
@@ -346,6 +354,7 @@ p_content{
 #notesContainerSearched searchednote span{
     font-family: var(--google-normal);
     color: var(--On-Surface-Variant);
+    font-size: 14px;
 }
 
 textheading{
@@ -407,10 +416,10 @@ note_label{
 
 
 note_label p{
-    color: var(--On-Primary);
+    color: var(--On-Secondary-Container);
     font-family: var(--google-normal);
     font-size: 15px;
-    background-color: var(--Primary);
+    background-color: var(--Secondary-Container);
     padding-left: 10px;
     padding-right: 10px;
     padding-top: 5px;
@@ -435,11 +444,23 @@ note_label div md-icon{
     padding-left: 20px;
     padding-right: 20px;
     margin-bottom: 20px;
-    gap: 10px;
+    gap: 8px;
     display: flex;
     overflow: auto;
     overflow-y: hidden;
     flex-shrink: 0;
+}
+
+#label_holder.stackView{
+    display: block;
+    margin-bottom: calc(20px - 8px);
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+#label_holder.stackView > md-filter-chip {
+    margin-bottom: 8px;
+    margin-right: 8px;
 }
 
 blockquote{
@@ -532,11 +553,11 @@ blockquote{
     gap: 10px;
 }
 
-.lockedlabel{
+.lockedlabel, .binLabel{
     position: relative;
 }
 
-.lockedlabel::before{
+.lockedlabel::before, .binLabel::before{
     content: 'lock';
     font-family: 'Material symbols';
     font-weight: normal !important;
@@ -557,6 +578,10 @@ blockquote{
     border-radius: 50px;
 }
 
+.binLabel::before{
+    content: 'auto_delete';
+}
+
 .hiddenNoteLabel{
     display: none !important;
 }
@@ -569,3 +594,105 @@ blockquote{
     padding-bottom: 10px;
 }
 
+
+notetilewrap{
+    animation: notetilewrapEnter 0.2s ease-in;
+}
+
+
+
+@keyframes notetilewrapEnter{
+    0%{
+        transform: translateY(10%);
+        opacity: 0;
+    }
+    100%{
+        transform: translateY(0%);
+        opacity: 1;
+    }
+}
+
+/* List view code */
+
+.saved-notes #savedNotesList.listView, .saved-notesPinned #pinnedNotesList.listView, .saved-notes #binNotesList.listView{
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0px !important;
+}
+
+.saved-notes #savedNotesList.listView noteTileWrap, .saved-notesPinned #pinnedNotesList.listView noteTileWrap, .saved-notes #binNotesList.listView noteTileWrap{
+    border-radius: 15px;
+    display: inline-block;
+    width: calc(100% - 10px - 10px);
+    background-color: var(--Surface-Container-Low);
+    border-radius: 0 !important;
+    margin-bottom: 0px;
+    padding: 10px;
+    height: 40px;
+    overflow: hidden;
+    position: relative;
+    padding-bottom: 35px;
+    border-bottom: 1px solid var(--Outline-Variant);
+}
+
+.saved-notes #savedNotesList.listView noteTileWrap:first-child, .saved-notesPinned #pinnedNotesList.listView noteTileWrap:first-child, .saved-notes #binNotesList.listView noteTileWrap:first-child{
+    border-radius: 10px 10px 0 0 !important;
+}
+
+.saved-notes #savedNotesList.listView noteTileWrap:last-child, .saved-notesPinned #pinnedNotesList.listView noteTileWrap:last-child, .saved-notes #binNotesList.listView noteTileWrap:last-child{
+    border-radius: 0px 0px 10px 10px !important;
+    border: none !important;
+}
+
+.saved-notes #savedNotesList.listView noteTileWrap:only-child, .saved-notesPinned #pinnedNotesList.listView noteTileWrap:only-child, .saved-notes #binNotesList.listView noteTileWrap:only-child{
+    border-radius: 10px !important;
+    border: none !important;
+}
+
+
+.saved-notes #savedNotesList.listView noteTileWrap span::before, .saved-notesPinned #pinnedNotesList.listView noteTileWrap span::before, .saved-notes #binNotesList.listView noteTileWrap span::before{
+    background: linear-gradient(0deg, var(--Surface-Container) 10%, rgba(255, 0, 0, 0)) !important;
+
+}
+
+.saved-notes #savedNotesList noteTileWrap span hr, p_content hr, .saved-notesPinned #pinnedNotesList noteTileWrap span hr, .saved-notes #binNotesList noteTileWrap span hr{
+    display: none;
+}
+
+.saved-notes #savedNotesList.listView noteTileWrap span, .saved-notesPinned #pinnedNotesList.listView noteTileWrap span, .saved-notes #binNotesList.listView noteTileWrap span {
+    height: 20px !important;
+    font-size: 14px !important;
+}
+
+
+/* bin note icon */
+
+.deletedBinNote::after{
+    content: 'restore_from_trash';
+    font-family: 'Material symbols';
+    font-weight: normal !important;
+    font-style: normal !important;
+    font-variation-settings: 'FILL' 1;
+    line-height: 1;
+    position: absolute;
+    right: -6px;
+    top: -6px;
+    border-radius: inherit;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: var(--On-Error-Container);
+    width: 40px;
+    height: 40px;
+    background: radial-gradient(circle, var(--Error-Container) 0%, rgba(0,0,0,0) 100%);
+}
+
+.deletedBinNote{
+    background-color: var(--Error-Container) !important;
+}
+
+.saved-notes #binNotesList noteTileWrap.deletedBinNote span::before{
+    background: linear-gradient(0deg, var(--Error-Container) 10%, rgba(255, 0, 0, 0)) !important;
+}

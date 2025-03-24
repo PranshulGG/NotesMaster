@@ -57,18 +57,23 @@
                 <md-icon icon-outlined>arrow_back</md-icon>
             </md-icon-button>
             <input type="search" name="Search notes" placeholder="Search..." id="Search_notes_input">
+            <div style="display: flex;">
+                <md-icon-button onclick="showRestoreAlertDialog(); event.stopPropagation();" hidden id="restoreNoteBtn" disabled>
+                    <md-icon icon-outlined>restore_from_trash</md-icon>
+                </md-icon-button>
             <md-icon-button onclick="showDeleteAlertDialog(); event.stopPropagation();" hidden id="deleteNoteBtn" disabled>
                 <md-icon icon-outlined>delete</md-icon>
             </md-icon-button>
             <md-icon-button onclick="navigateActivity('SettingsActivity');  event.stopPropagation();">
                 <md-icon icon-outlined>settings</md-icon>
             </md-icon-button>
+            </div>
         </div>
 
         <md-dialog id="deleteNoteAlert" style="min-width: 85%;">
-            <div slot="headline">Delete Note?</div>
-            <div slot="content">
-                This action cannot be undone.
+            <div slot="headline" id="deleteNoteHeadline">Delete Note?</div>
+            <div slot="content" id="deleteNoteContent-Text">
+                Notes will be moved to the bin. You can restore them from there
             </div>
             <div slot="actions">
                 <md-text-button onclick="window.history.back();">Cancel</md-text-button>
@@ -88,6 +93,17 @@
                 <md-filled-button onclick="viewLockedNotes();">OK</md-filled-button>
             </div>
         </md-dialog>
+        <md-dialog id="restoreNoteAlert" style="min-width: 85%;" >
+            <div slot="headline">Restore</div>
+            <div slot="content">
+                Selected notes will be restored
+            </div>
+            <div slot="actions">
+                <md-text-button onclick="window.history.back();">Cancel</md-text-button>
+                <md-filled-button onclick="restoreSelectedNote(); window.history.back()" id="selectedNoteRestoreBtn">Restore</md-filled-button>
+                <md-filled-button onclick="restoreSingleNote(document.getElementById('singleNoteRestoreBtn').getAttribute('noteData')); window.history.back()" id="singleNoteRestoreBtn" hidden>Restore</md-filled-button>
+            </div>
+        </md-dialog>
     </div>
 
     <div class="floatfab_div">
@@ -100,7 +116,7 @@
     </div>
         <div class="main_app_wrap" style="padding-top: 10px;">
 
-            <div id="label_holder" hidden>
+            <div id="label_holder">
 
             </div>
 
@@ -112,6 +128,7 @@
         <div class="saved-notes">
             <p style="color: var(--Primary); font-family: var(--google-mid); margin-top: 0; font-size: 18px; margin-bottom: 10px;" id="textheadingNotes">Notes</p>
             <div id="savedNotesList"></div>
+            <div id="binNotesList" style="height: 0; overflow: hidden;"></div>
         </div>
         </div>
 

@@ -9,25 +9,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     const setColorPickerWidth = () => {
-        colorPicker.resize(Math.min(document.querySelector('.customthemeSlider').offsetWidth - 100, 300));
+        colorPicker.resize(Math.min(document.querySelector('.customthemeSlider').offsetWidth - 120, 300));
     };
 
     const colorPicker = new iro.ColorPicker(colorPickerElement, {
-        width: Math.min(document.querySelector('.customthemeSlider').offsetWidth - 100, 300),
+        width: Math.min(document.querySelector('.customthemeSlider').offsetWidth - 120, 300),
         color: localStorage.getItem('materialThemeColorSource') || '#ff0000',
-        layout: [
-          {
-            component: iro.ui.Box,
-          },
-          {
-            component: iro.ui.Slider,
-            options: {
-              id: 'hue-slider',
-              sliderType: 'hue'
-            }
-          }
-        ],
-        layoutDirection: 'horizontal'
     });
 
 
@@ -81,7 +68,7 @@ export function themeConfig(color, isSlider, isDynamic){
     } else{
     localStorage.setItem('materialThemeColorSource', color)
     }
-    
+
     if(localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') === 'true'){
         setCustomTheme(darkScheme, theme.palettes, '', isSlider);
         document.documentElement.setAttribute('colorTheme', 'dark');
@@ -155,12 +142,12 @@ function setCustomTheme(scheme, palettes, type, isSlider) {
 
     if(isSlider){
 
-        if (document.getElementById("ColorPickerSheet").hasAttribute('open')){
+        if (document.getElementById("chooseMaterialColorDialog").open){
             if(localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') === 'true'){
                 if (document.getElementById("headUser-1").scrollTop >= 50) {
-                    sendThemeToAndroid(colorsDialogsOpenContainer()[GetDialogOverlayContainerColor()], getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container-Low'), '0colorOnly', '225');
+                     sendThemeToAndroid(colorsDialogsOpenContainer()[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], '0colorOnly', '225');
                   } else {
-                    sendThemeToAndroid(colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container-Low'), '0colorOnly', '225');
+                    sendThemeToAndroid(colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], '0colorOnly', '225');
                   }
        }
 
@@ -184,4 +171,69 @@ function setCustomTheme(scheme, palettes, type, isSlider) {
 }
 
 }
+
+
+//dialog
+
+  document.addEventListener('DOMContentLoaded', () =>{
+
+
+
+    const customOpenAnimation = {
+      dialog: [
+          [
+              // Dialog fades in
+              [{ 'transform': 'scale(1.1)' }, { 'transform': 'scale(1)' }],
+              { duration: 150, easing: 'ease-out' },
+          ],
+      ],
+      scrim: [
+          [
+              // Scrim fades in
+              [{ opacity: 0 }, { opacity: 0.6 }],
+              { duration: 170, easing: 'ease-in' },
+          ],
+      ],
+      container: [
+          [
+              // Container fades in
+              [{ opacity: 0 }, { opacity: 1 }],
+              { duration: 170, easing: 'ease-in' },
+          ],
+      ],
+  };
+
+  const customCloseAnimation = {
+      dialog: [
+          [
+              // Dialog fades out
+              [{ 'transform': 'scale(1)' }, { 'transform': 'scale(1.05)' }],
+              { duration: 150, easing: 'ease-in' },
+          ],
+      ],
+      scrim: [
+          [
+              // Scrim fades out
+              [{ opacity: 0.6 }, { opacity: 0 }],
+              { duration: 190, easing: 'ease-out' },
+          ],
+      ],
+      container: [
+          [
+              [{ opacity: 1 }, { opacity: 0 }],
+              { duration: 190, easing: 'ease-in' },
+          ],
+      ],
+  };
+
+  const dialogs = document.querySelectorAll('md-dialog');
+
+  dialogs.forEach((dialog) => {
+      dialog.getOpenAnimation = () => customOpenAnimation;
+      dialog.getCloseAnimation = () => customCloseAnimation;
+  });
+
+
+});
+
 

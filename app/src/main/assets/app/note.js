@@ -34,7 +34,14 @@ document.getElementById('deleteNoteAlert').addEventListener('close', () =>{
 
 document.getElementById('deleteThisNoteBtn').addEventListener('click', () =>{
     let notes = JSON.parse(localStorage.getItem('notes')) || [];
-    notes = notes.filter(note => note.noteID !== openedNoteId);
+    const noteIndex = notes.findIndex(note => note.noteID === openedNoteId);
+
+    if (noteIndex !== -1) {
+        notes[noteIndex].prevPinned = notes[noteIndex].pinned;
+        notes[noteIndex].binNote = true;
+        notes[noteIndex].pinned = false;
+    }
+
     localStorage.setItem('notes', JSON.stringify(notes));
     ActivityBack();
 
@@ -88,7 +95,8 @@ function loadDialogLabels(){
     const label_holder = document.getElementById('label_selection_list');
     label_holder.innerHTML = ""
 
-    savedLabels.forEach(label => {
+    const filteredLabels = savedLabels.filter(label => !label.bin);
+    filteredLabels.forEach(label => {
         const label_item = document.createElement('noteLabelitem');
         label_item.classList.add('label-itemCheckboxes');
 
@@ -102,7 +110,8 @@ function loadDialogLabels(){
         label_holder.appendChild(label_item);
     });
 
-    if(savedLabels.length === 0){
+
+    if(filteredLabels.length === 0){
         label_holder.innerHTML = '<p style="margin: 0; color: var(--On-Surface-Variant); text-align: center;">No labels found</p>'
     }
     attachCheckboxListeners()
@@ -254,5 +263,107 @@ function loadNoteLabels(noteId) {
                 }
             });
     }
+}
+
+// ----------------
+
+
+function openInfoSheetNote(){
+    document.getElementById("NoteInfoSheet").show();
+    window.history.pushState({ NoteInfoSheetOpen: true }, "");
+
+    displayWordsCount()
+    displayCharacterCount()
+    setTimeout(() =>{
+    displayLabelCount()
+    }, 200);
+      sendThemeToAndroid(colorsDialogsOpenContainer()[GetDialogOverlayContainerColor()], getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container-Low'), '0colorOnly', '225');
+
+
+  }
+
+  window.addEventListener("popstate", function (event) {
+    if (document.getElementById("NoteInfoSheet").hasAttribute('open')) {
+      document.getElementById("NoteInfoSheet").close();
+    }
+  });
+
+  document.getElementById("NoteInfoSheet").addEventListener("closing", () => {
+    if(document.querySelector('.view-btn').selected){
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '200')
+        } else{
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), Themeflag, '200')
+        }
+  });
+
+  document.getElementById("NoteInfoSheet").addEventListener("closed", () => {
+      if (window.history.state && window.history.state.NoteInfoSheetOpen === true) {
+        window.history.back();
+    } else {
+        console.log("NoteInfoSheet is not open.");
+    }
+  })
+
+
+// -------
+
+function displayCreatedTime(data){
+    const timestampMainCreated = data;
+    const dateCreatedMain = new Date(timestampMainCreated);
+
+
+    const hoursCreatedMain = dateCreatedMain.getHours();
+    const minutesCreatedMain = dateCreatedMain.getMinutes().toString().padStart(2, '0');
+    const ampmCreatedMain = hoursCreatedMain >= 12 ? 'PM' : 'AM';
+    const formattedHoursCreatedMain = (hoursCreatedMain % 12 || 12).toString();
+
+    const formattedDateCreatedMain = `${formattedHoursCreatedMain}:${minutesCreatedMain}${ampmCreatedMain} - ${(dateCreatedMain.getMonth() + 1).toString().padStart(2, '0')}/${dateCreatedMain.getDate().toString().padStart(2, '0')}/${dateCreatedMain.getFullYear()}`;
+
+    document.getElementById('createdBalls').innerHTML = formattedDateCreatedMain;
+}
+
+function displayEditedTime(data){
+    const timestampMainCreated = data;
+    const dateCreatedMain = new Date(timestampMainCreated);
+
+
+    const hoursCreatedMain = dateCreatedMain.getHours();
+    const minutesCreatedMain = dateCreatedMain.getMinutes().toString().padStart(2, '0');
+    const ampmCreatedMain = hoursCreatedMain >= 12 ? 'PM' : 'AM';
+    const formattedHoursCreatedMain = (hoursCreatedMain % 12 || 12).toString();
+
+    const formattedDateCreatedMain = `${formattedHoursCreatedMain}:${minutesCreatedMain}${ampmCreatedMain} - ${(dateCreatedMain.getMonth() + 1).toString().padStart(2, '0')}/${dateCreatedMain.getDate().toString().padStart(2, '0')}/${dateCreatedMain.getFullYear()}`;
+
+    document.getElementById('editedBalls').innerHTML = formattedDateCreatedMain;
+}
+
+function displayWordsCount(){
+    var content = document.getElementById('editor').innerText;
+
+    var words = content.split(/\s+/);
+
+    var wordCount = words.length;
+    if(document.getElementById('editor').innerHTML.trim() === ''){
+        document.getElementById('wordBalls').innerHTML = 0;
+
+    }else{
+        document.getElementById('wordBalls').innerHTML = wordCount;
+    }
+
+}
+
+
+function displayCharacterCount(){
+        var content = document.getElementById('editor').innerText;
+        var charCount = content.length;
+        document.getElementById('charactersBalls').innerHTML = charCount;
+}
+
+
+function displayLabelCount(){
+    var content = document.querySelectorAll('#added_note_labels md-assist-chip');
+    var labelCount = content.length;
+    document.getElementById('LabelBalls').innerHTML = labelCount;
+
 }
 

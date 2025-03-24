@@ -30,13 +30,13 @@ function loadLabels() {
         label_list_item.innerHTML = `
             <div>
             <md-icon icon-outlined>drag_handle</md-icon>
-            <p class="${lockedLabelclass}">${label.label}</p>
+            <p class="${lockedLabelclass} ${label.bin ? 'binLabel' : ''}">${label.label}</p>
             </div>
-            <div>
-                <md-icon-button onclick="editLabel('${label.label}')">
+            <div style="gap: 0;">
+                <md-icon-button onclick="editLabel('${label.label}')" ${label.bin ? 'disabled' : ''}>
                     <md-icon icon-outlined>edit</md-icon>
                 </md-icon-button>
-                <md-icon-button onclick="deleteLabel('${label.label}', '${label.locked}')">
+                <md-icon-button onclick="deleteLabel('${label.label}', '${label.locked}')" ${label.bin ? 'disabled' : ''}>
                     <md-icon icon-outlined>delete</md-icon>
                 </md-icon-button>
             </div>
@@ -74,7 +74,14 @@ function createNewLabel() {
         locked = false;
     }
 
-    if (notesLabels.includes(labelValue)) {
+    if(labelValue === 'Bin' || labelValue === 'bin'){
+        document.getElementById('NewLabel_input').setAttribute('error-text', "You cannot create a bin label");
+        document.getElementById('NewLabel_input').error = true;
+        return;
+    }
+
+
+    if (notesLabels.some((notesLabel) => notesLabel.label === labelValue)) {
         document.getElementById('NewLabel_input').setAttribute('error-text', "This label already exists");
         document.getElementById('NewLabel_input').error = true;
         return;
@@ -241,7 +248,7 @@ document.getElementById('toggleLockedLabelSwitch').addEventListener('change', ()
 function deleteAllLabels() {
     let labels = JSON.parse(localStorage.getItem('notesLabels')) || [];
 
-    let updatedLabels = labels.filter(label => label.locked);
+    let updatedLabels = labels.filter(label => label.locked || label.bin);
 
     localStorage.setItem('notesLabels', JSON.stringify(updatedLabels));
 

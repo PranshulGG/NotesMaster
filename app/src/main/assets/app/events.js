@@ -25,10 +25,14 @@ function handleStorageChange(event) {
             case 'notesLabels':
             case 'dragAndDropState':
                  createLabels()
-            case 'NotesView':
-            useListView()
+            case 'SelectedNotesView':
+            useView()
+            case 'StackedLabel':
+            labelsView()
+            case 'SelectedClearBinTime':
+            checkIfTimeExceeded();
             case 'useDynamicColors':
-                if(localStorage.getItem('useDynamicColors') && localStorage.getItem('useDynamicColors') === 'true'){
+                if(localStorage.getItem('useDynamicColors') === 'true'){
                     AndroidFunctionActivityInterface.androidFunction('ReloadDynamicColors');
                 }
             default:

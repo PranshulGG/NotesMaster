@@ -94,6 +94,9 @@
             opacity: 0;
             z-index: 1;
         }
+        md-list{
+                padding-bottom: 0;
+        }
     </style>
 
 </head>
@@ -110,18 +113,18 @@
           <p class="label-large-main">Settings</p>
           <div class="content-parent-large" style="padding-bottom: 32px;">
 
-              <p class="title" style="margin-top: 5px;">App looks</p>
             <md-list>
+                <p class="title" style="margin-top: 0px; padding-bottom: 0;">App looks</p>
 
                 <md-list-item>
                     <md-icon icon-filled slot="start">palette</md-icon>
                     <div slot="headline">Dynamic colors</div>
                     <div slot="supporting-text">Use wallpaper colors</div>
-                    <md-switch slot="end" id="DynamicColorsSwitch" icons show-only-selected-icon></md-switch>
+                    <md-switch slot="end" id="DynamicColorsSwitch"></md-switch>
                     <label for="DynamicColorsSwitch" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" slot="end"><md-ripple></md-ripple></label>
                 </md-list-item>
 
-                <md-list-item class="custom_theme_items customthemeSlider" type="button" onclick="openColorSheet()">
+                <md-list-item class="custom_theme_items customthemeSlider" type="button" onclick="openColorDialog()">
                     <md-icon icon-filled slot="start">colorize</md-icon>
                     <div slot="headline">Color accent</div>
                     <div slot="supporting-text">Select a seed color to generate the theme</div>
@@ -133,11 +136,9 @@
                     <md-icon icon-filled slot="start">dark_mode</md-icon>
                     <div slot="headline">Dark theme</div>
                     <div slot="supporting-text">Use dark theme colors</div>
-                    <md-switch slot="end" id="darkThemeSwitch" icons show-only-selected-icon></md-switch>
+                    <md-switch slot="end" id="darkThemeSwitch"></md-switch>
                     <label for="darkThemeSwitch" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" slot="end"><md-ripple></md-ripple></label>
                   </md-list-item>
-
-
 
 
                 <md-list-item onclick="openAppFontDialog()" type="button">
@@ -146,19 +147,40 @@
                     <div slot="supporting-text" data-translate="change_apps_font">Change app's font</div>
                 </md-list-item>
 
-                <md-list-item>
-                    <md-icon icon-filled slot="start">view_agenda</md-icon>
-                    <div slot="headline" data-translate="font">List view for notes</div>
-                    <md-switch slot="end" id="listViewSwitch" icons show-only-selected-icon></md-switch>
-                    <label for="listViewSwitch" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" slot="end"><md-ripple></md-ripple></label>
+            </md-list>
+
+
+                <md-list>
+                    <p class="title" style="margin-top: 0px; padding-bottom: 0;">Notes</p>
+
+
+
+                <md-list-item onclick="openNotesViewDialog()" type="button">
+                    <md-icon icon-filled slot="start">grid_view</md-icon>
+                    <div slot="headline" data-translate="font">Notes view</div>
+                    <div slot="supporting-text" id="selectedNotesViewText">Grid view</div>
                 </md-list-item>
 
+                    <md-list-item>
+                        <md-icon icon-filled slot="start">title</md-icon>
+                        <div slot="headline">Title only</div>
+                        <div slot="supporting-text">Show only the title on note tiles</div>
+                        <md-switch slot="end" id="onlyShowTitleSwitch"></md-switch>
+                        <label for="onlyShowTitleSwitch" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" slot="end"><md-ripple></md-ripple></label>
+                    </md-list-item>
+
                 <md-list-item>
-                    <md-icon icon-filled slot="start">title</md-icon>
-                    <div slot="headline">Title only</div>
-                    <div slot="supporting-text">Show only the title on note tiles</div>
-                    <md-switch slot="end" id="onlyShowTitleSwitch" icons show-only-selected-icon></md-switch>
-                    <label for="onlyShowTitleSwitch" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" slot="end"><md-ripple></md-ripple></label>
+                    <md-icon icon-filled slot="start">bookmarks</md-icon>
+                    <div slot="headline">Stack labels</div>
+                    <div slot="supporting-text">Labels will be stacked in a grid instead of a row</div>
+                    <md-switch slot="end" id="showStackedLabelSwitch"></md-switch>
+                    <label for="showStackedLabelSwitch" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" slot="end"><md-ripple></md-ripple></label>
+                </md-list-item>
+
+                <md-list-item type="button" onclick="openClearBinAfterDialog()">
+                    <md-icon icon-filled slot="start">delete_forever</md-icon>
+                    <div slot="headline">Auto-Clear Bin</div>
+                    <div slot="supporting-text" id="SelectedClearBinTimeText">Never</div>
                 </md-list-item>
 
                 <md-list-item type="button" id="changeAppPinCodeBtn">
@@ -167,12 +189,14 @@
                     <div slot="supporting-text">Pin code used for locked labels</div>
                 </md-list-item>
 
+
+
                 <md-list-item id="useFingerItem">
                     <md-icon icon-filled slot="start">fingerprint</md-icon>
                     <div slot="headline">Unlock with fingerprint</div>
                     <div slot="supporting-text">Use fingerprint to unlock locked labels</div>
                     <div slot="overline" id="overLineTextFinger">Pin is required to use this</div>
-                    <md-switch slot="end" id="useFingerPrintSwitch" icons show-only-selected-icon></md-switch>
+                    <md-switch slot="end" id="useFingerPrintSwitch"></md-switch>
                     <label for="useFingerPrintSwitch" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" slot="end"><md-ripple></md-ripple></label>
                     <script>
                         if(!localStorage.getItem('applabelAccessPin')){
@@ -184,8 +208,8 @@
 
             </md-list>
 
-              <p class="title" style="margin-top: 5px;">Additional</p>
               <md-list>
+                  <p class="title" style="margin-top: 0px; padding-bottom: 0;">Additional</p>
 
                   <md-list-item type="button" id="exportAppData">
                       <md-icon icon-filled slot="start">upload</md-icon>
@@ -218,23 +242,18 @@
               <br>
               <br>
 
-              <bottom-sheet id="ColorPickerSheet">
-                  <close-touch-sheet></close-touch-sheet>
-                  <bottom-sheet-content>
-                      <handle></handle>
-                      <content-holder-sheet >
-                          <div id="colorPickerSheetContent">
-                              <div id="colorPicker" slot="headline">
-
-                              </div>
+              <md-dialog id="chooseMaterialColorDialog" style="min-width: 85%;">
+                  <div slot="content">
+                      <div id="colorPickerSheetContent" style="padding-bottom: 0;">
+                          <div id="colorPicker" slot="headline">
                           </div>
-                          <div class="button_ok_sheet_area" style="display: flex; align-items: center; justify-content: center; padding-bottom: 10px; border-top: 1px solid var(--Outline-Variant); padding-top: 10px;">
-                              <md-text-button onclick="window.history.back();" style="width: 70%;">CLOSE</md-text-button>
-                          </div>
-                      </content-holder-sheet>
-                  </bottom-sheet-content>
-              </bottom-sheet>
+                      </div>
+                  </div>
 
+                  <div slot="actions">
+                      <md-filled-tonal-button onclick="window.history.back();" data-translate="ok" style="width: 100%; --md-filled-tonal-button-container-elevation: none; --md-filled-tonal-button-hover-container-elevation: none;">OK</md-filled-tonal-button>
+                  </div>
+              </md-dialog>
           <!-- dialogs -->
 
           <md-dialog id="chooseAPPFontDialog" style="min-width: 85%;">
@@ -257,7 +276,63 @@
               </div>
           </md-dialog>
 
-          <md-dialog style="min-width: 85%;" id="changePinCodeDialog">
+              <md-dialog id="chooseNotesViewDialog" style="min-width: 85%;">
+                  <div slot="headline">Notes view</div>
+
+                  <div slot="content">
+                      <label class="main_provider_item">
+                          <md-radio slot="start" value="grid_view" name="notes_view_radio"></md-radio>
+                          Grid view
+                      </label>
+                      <label class="main_provider_item">
+                          <md-radio slot="start" value="cards_view" name="notes_view_radio"></md-radio>
+                          Cards view
+                      </label>
+                      <label class="main_provider_item">
+                          <md-radio slot="start" value="list_view" name="notes_view_radio"></md-radio>
+                          List view
+                      </label>
+                  </div>
+
+                  <div slot="actions">
+                      <md-text-button onclick="window.history.back()" data-translate="cancel">Cancel</md-text-button>
+                      <md-text-button id="saveSelectedViewBtn" data-translate="ok">OK</md-text-button>
+                  </div>
+              </md-dialog>
+
+              <md-dialog id="chooseAutoClearBinDialog" style="min-width: 85%;">
+                  <div slot="headline">Auto-Clear Bin</div>
+
+                  <div slot="content">
+                      <label class="main_provider_item">
+                          <md-radio slot="start" value="clear_never" name="bin_clear_radio"></md-radio>
+                          Never
+                      </label>
+                      <label class="main_provider_item">
+                          <md-radio slot="start" value="clear_24hrs" name="bin_clear_radio"></md-radio>
+                          After 24 hours
+                      </label>
+                      <label class="main_provider_item">
+                          <md-radio slot="start" value="clear_7days" name="bin_clear_radio"></md-radio>
+                          After 7 days
+                      </label>
+                      <label class="main_provider_item">
+                          <md-radio slot="start" value="clear_14days" name="bin_clear_radio"></md-radio>
+                          After 14 days
+                      </label>
+                      <label class="main_provider_item">
+                          <md-radio slot="start" value="clear_30days" name="bin_clear_radio"></md-radio>
+                          After 30 days
+                      </label>
+                  </div>
+
+                  <div slot="actions">
+                      <md-text-button onclick="window.history.back()" data-translate="cancel">Cancel</md-text-button>
+                      <md-text-button id="saveSelectedClearBinTime" data-translate="ok">Save</md-text-button>
+                  </div>
+              </md-dialog>
+
+              <md-dialog style="min-width: 85%;" id="changePinCodeDialog">
               <div slot="headline">Change pin</div>
 
               <div slot="content">
@@ -332,6 +407,9 @@
         }
     </script>
 
+    <script>
+
+</script>
     <script type="module" src="../index.js"></script>
     <script src="../bundle.js"></script>
     <script src="../components-script.js/components.js"></script>

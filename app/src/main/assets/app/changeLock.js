@@ -1,13 +1,5 @@
 const changeAppPinCodeBtn = document.getElementById('changeAppPinCodeBtn');
 
-changeAppPinCodeBtn.addEventListener('click', () =>{
-    if(localStorage.getItem('applabelAccessPin')){
-
-    } else{
-        ShowSnackMessage.ShowSnack('No saved pin found', 'short');
-    }
-});
-
 const oldPinInput = document.getElementById('oldPinInput');
 const newPinInput = document.getElementById('newPinInput');
 const changePinCode = document.getElementById('changePinCode');
@@ -27,6 +19,7 @@ changePinCode.addEventListener('click', () =>{
 
 
 document.getElementById('changeAppPinCodeBtn').addEventListener('click', () =>{
+    if(localStorage.getItem('applabelAccessPin')){
     changePinCodeDialog.show();
     window.history.pushState({ changePinCodeDialogOpen: true }, "");
     if (document.getElementById("headUser-1").scrollTop >= 50) {
@@ -37,6 +30,10 @@ document.getElementById('changeAppPinCodeBtn').addEventListener('click', () =>{
       oldPinInput.value = ''
       newPinInput.value = ''
         oldPinInput.error = false;
+    } else{
+        ShowSnackMessage.ShowSnack('No saved pin found', 'short');
+
+    }
 
 })
 

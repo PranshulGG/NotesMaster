@@ -99,10 +99,10 @@
     --md-menu-item-pressed-state-layer-opacity: 0.08;
 
     --md-filled-button-pressed-state-layer-opacity: 0.25;
-    --md-outlined-button-pressed-state-layer-opacity: 0.25;
+    --md-outlined-button-pressed-state-layer-opacity: 0.08;
 
-    --md-text-button-pressed-state-layer-opacity: 0.25;
-    --md-filled-tonal-button-pressed-state-layer-opacity: 0.25;
+    --md-text-button-pressed-state-layer-opacity: 0.08;
+    --md-filled-tonal-button-pressed-state-layer-opacity: 0.08;
     --md-elevated-button-pressed-state-layer-opacity: 0.25;
 
     --md-text-button-label-text-size: 1rem;;

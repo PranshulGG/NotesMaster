@@ -41,7 +41,6 @@ public class NoteView extends AppCompatActivity {
             webview.goBack();
         } else {
             super.onBackPressed();
-
         }
     }
 

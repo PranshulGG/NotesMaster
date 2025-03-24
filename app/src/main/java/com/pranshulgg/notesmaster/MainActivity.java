@@ -16,18 +16,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowInsetsController;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -36,8 +32,6 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.material.color.DynamicColors;
-import com.google.android.material.color.MaterialColors;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.concurrent.Executor;
@@ -56,8 +50,6 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
-
-    @SuppressLint("WrongThread")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         SharedPreferences prefs = getSharedPreferences("theme_prefs", MODE_PRIVATE);
@@ -65,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
         setAppTheme(this, isDarkMode);
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         overlayLayout = findViewById(R.id.overlayLayout);
         webview = findViewById(R.id.webView);
@@ -93,6 +86,11 @@ public class MainActivity extends AppCompatActivity {
         webview.loadUrl("file:///android_asset/index.html");
 
         webview.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                view.loadUrl(url);
+                return true;
+            }
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
@@ -287,7 +285,8 @@ public class MainActivity extends AppCompatActivity {
                         hideOverlay();
                         return;
                     } else if (functiontype.equals("ReloadDynamicColors")){
-                        recreate();
+                        isFirstLoad = true;
+                        webview.reload();
                         return;
                     }
                 }
@@ -370,12 +369,7 @@ public class MainActivity extends AppCompatActivity {
 }
 
     private class WebViewClientDemo extends WebViewClient {
-        @Override
-        //Keep webview in app when clicking links
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            view.loadUrl(url);
-            return true;
-        }
+
 
 
     }

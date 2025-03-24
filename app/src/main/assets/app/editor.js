@@ -55,6 +55,7 @@ function saveNote() {
     const title = document.getElementById('noteTitle').innerHTML.trim();
     const content = document.getElementById('editor').innerHTML.trim();
     const noteID = document.querySelector('id').getAttribute('id')
+    const lastEdited = Date.now()
 
 
     if(title === "" && content === ""){
@@ -79,11 +80,29 @@ function saveNote() {
     if (existingNoteIndex !== -1) {
         notes[existingNoteIndex].content = content;
         notes[existingNoteIndex].title = title;
+        notes[existingNoteIndex].lastEdited = lastEdited;
     } else {
         notes.push({ title, content, noteID});
     }
 
+    const timestamp = parseInt(lastEdited);
+    const date = new Date(timestamp);
+
+    const hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const formattedHours = (hours % 12 || 12).toString();
+
+    const formattedDate = `Last edited: ${formattedHours}:${minutes}${ampm} - ${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}`;
+
+
+
+    document.getElementById('lastEditedTime').innerHTML = formattedDate
+
     localStorage.setItem('notes', JSON.stringify(notes));
+
+        displayCreatedTime(parseInt(noteID.split('_')))
+        displayEditedTime(parseInt(lastEdited))
 
     clearEditor();
 }
@@ -101,6 +120,26 @@ function displaySavedNotes(note) {
           setTimeout(()=>{
              loadNoteLabels(note.noteID)
           }, 100)
+
+        if(note.lastEdited){
+        const timestamp = parseInt(note.lastEdited);
+          const date = new Date(timestamp);
+
+          const hours = date.getHours();
+          const minutes = date.getMinutes().toString().padStart(2, '0');
+          const ampm = hours >= 12 ? 'PM' : 'AM';
+          const formattedHours = (hours % 12 || 12).toString();
+
+          const formattedDate = `Last edited: ${formattedHours}:${minutes}${ampm} - ${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}`;
+          document.getElementById('lastEditedTime').innerHTML = formattedDate
+        }
+
+        // --------------------------------------
+
+        displayCreatedTime(parseInt(note.noteID.split('_')))
+        if(note.lastEdited){
+        displayEditedTime(parseInt(note.lastEdited))
+        }
 
 }
 

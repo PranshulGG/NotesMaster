@@ -53,11 +53,6 @@ function openAppFontDialog() {
   } else {
     sendThemeToAndroid(colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], '0colorOnly', '225');
   }
-//    if (document.getElementById("headUser-1").scrollTop >= 50) {
-//      sendThemeToAndroid(colorsDialogsOpenContainer[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface[GetDialogOverlayContainerColor()], '0', '40');
-//    } else {
-//      sendThemeToAndroid(colorsDialogsOpenSurface[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface[GetDialogOverlayContainerColor()], '0', '40');
-//    }
 }
 
 window.addEventListener("popstate", function (event) {
@@ -191,18 +186,6 @@ function handleImportedData(importedData) {
   }
 }
 
-// use list view
-
-document.getElementById('listViewSwitch').addEventListener('change', () =>{
-  localStorage.setItem('NotesView', document.getElementById('listViewSwitch').selected)
-});
-
-if(localStorage.getItem('NotesView') && localStorage.getItem('NotesView') === 'true'){
-  document.getElementById('listViewSwitch').selected = true;
-} else{
-  document.getElementById('listViewSwitch').selected = false;
-}
-
 // only title
 
 
@@ -255,26 +238,45 @@ if(localStorage.getItem('useDynamicColors') && localStorage.getItem('useDynamicC
 }
 
 
-// ----------
+// ---------------
 
-function openColorSheet(){
-  document.getElementById("ColorPickerSheet").show();
-  window.history.pushState({ ColorPickerSheetOpen: true }, "");
+
+function openNotesViewDialog() {
+  document.getElementById("chooseNotesViewDialog").show();
+  window.history.pushState({ NotesViewDialogOpen: true }, "");
+
+  document
+    .querySelector(
+      `md-radio[value="${
+        localStorage.getItem("SelectedNotesView") || "grid_view"
+      }"]`
+    )
+    .setAttribute("checked", "true");
 
   if (document.getElementById("headUser-1").scrollTop >= 50) {
-    sendThemeToAndroid(colorsDialogsOpenContainer()[GetDialogOverlayContainerColor()], getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container-Low'), '0colorOnly', '225');
+    sendThemeToAndroid(colorsDialogsOpenContainer()[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], '0colorOnly', '225');
   } else {
-    sendThemeToAndroid(colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container-Low'), '0colorOnly', '225');
+    sendThemeToAndroid(colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], '0colorOnly', '225');
   }
 }
 
 window.addEventListener("popstate", function (event) {
-  if (document.getElementById("ColorPickerSheet").hasAttribute('open')) {
-    document.getElementById("ColorPickerSheet").close();
+  if (document.getElementById("chooseNotesViewDialog").open) {
+    document.getElementById("chooseNotesViewDialog").close();
   }
 });
 
-document.getElementById("ColorPickerSheet").addEventListener("closing", () => {
+document
+  .getElementById("chooseNotesViewDialog")
+  .addEventListener("cancel", () => {
+    document
+      .getElementById("chooseNotesViewDialog")
+      .addEventListener("closed", () => {
+        window.history.back();
+      });
+  });
+
+document.getElementById("chooseNotesViewDialog").addEventListener("close", () => {
   if (document.getElementById("headUser-1").scrollTop >= 50) {
     sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '210')
   } else {
@@ -283,10 +285,155 @@ document.getElementById("ColorPickerSheet").addEventListener("closing", () => {
   }
 });
 
-document.getElementById("ColorPickerSheet").addEventListener("closed", () => {
-    if (window.history.state && window.history.state.ColorPickerSheetOpen === true) {
-      window.history.back();
-  } else {
-      console.log("ColorPickerSheet is not open.");
+document.getElementById("saveSelectedViewBtn").addEventListener("click", () => {
+  if (document.querySelector('md-radio[value="cards_view"]').checked) {
+    localStorage.setItem("SelectedNotesView", "cards_view");
+    document.getElementById('selectedNotesViewText').innerHTML = 'Cards view';
+  } else if (document.querySelector('md-radio[value="list_view"]').checked){
+    localStorage.setItem("SelectedNotesView", "list_view");
+    document.getElementById('selectedNotesViewText').innerHTML = 'List view';
+  } else{
+    localStorage.setItem("SelectedNotesView", "grid_view");
+    document.getElementById('selectedNotesViewText').innerHTML = 'Grid view';
   }
-})
+  window.history.back();
+});
+
+if(localStorage.getItem("SelectedNotesView") === 'cards_view'){
+  document.getElementById('selectedNotesViewText').innerHTML = 'Cards view';
+} else if (localStorage.getItem("SelectedNotesView") === 'list_view'){
+  document.getElementById('selectedNotesViewText').innerHTML = 'List view';
+} else{
+  document.getElementById('selectedNotesViewText').innerHTML = 'Grid view';
+}
+
+// -----------
+
+function openColorDialog() {
+  document.getElementById("chooseMaterialColorDialog").show();
+  window.history.pushState({ MaterialColorDialogOpen: true }, "");
+
+  if (document.getElementById("headUser-1").scrollTop >= 50) {
+    sendThemeToAndroid(colorsDialogsOpenContainer()[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], '0colorOnly', '225');
+  } else {
+    sendThemeToAndroid(colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], '0colorOnly', '225');
+  }
+}
+
+window.addEventListener("popstate", function (event) {
+  if (document.getElementById("chooseMaterialColorDialog").open) {
+    document.getElementById("chooseMaterialColorDialog").close();
+  }
+});
+
+document
+  .getElementById("chooseMaterialColorDialog")
+  .addEventListener("cancel", () => {
+    document
+      .getElementById("chooseMaterialColorDialog")
+      .addEventListener("closed", () => {
+        window.history.back();
+      });
+  });
+
+document.getElementById("chooseMaterialColorDialog").addEventListener("close", () => {
+  if (document.getElementById("headUser-1").scrollTop >= 50) {
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '210')
+  } else {
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '210')
+
+  }
+});
+
+// ---------
+
+document.getElementById('showStackedLabelSwitch').addEventListener('change', () =>{
+  localStorage.setItem('StackedLabel', document.getElementById('showStackedLabelSwitch').selected)
+  });
+
+  if(localStorage.getItem('StackedLabel') && localStorage.getItem('StackedLabel') === 'true'){
+  document.getElementById('showStackedLabelSwitch').selected = true;
+  } else{
+  document.getElementById('showStackedLabelSwitch').selected = false;
+  }
+
+// -----------
+
+function openClearBinAfterDialog() {
+  document.getElementById("chooseAutoClearBinDialog").show();
+  window.history.pushState({ NotesViewDialogOpen: true }, "");
+
+  document
+    .querySelector(
+      `md-radio[value="${
+        localStorage.getItem("SelectedClearBinTime") || "clear_never"
+      }"]`
+    )
+    .setAttribute("checked", "true");
+
+  if (document.getElementById("headUser-1").scrollTop >= 50) {
+    sendThemeToAndroid(colorsDialogsOpenContainer()[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], '0colorOnly', '225');
+  } else {
+    sendThemeToAndroid(colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], '0colorOnly', '225');
+  }
+  }
+
+  window.addEventListener("popstate", function (event) {
+  if (document.getElementById("chooseAutoClearBinDialog").open) {
+    document.getElementById("chooseAutoClearBinDialog").close();
+  }
+  });
+
+  document
+  .getElementById("chooseAutoClearBinDialog")
+  .addEventListener("cancel", () => {
+    document
+      .getElementById("chooseAutoClearBinDialog")
+      .addEventListener("closed", () => {
+        window.history.back();
+      });
+  });
+
+  document.getElementById("chooseAutoClearBinDialog").addEventListener("close", () => {
+  if (document.getElementById("headUser-1").scrollTop >= 50) {
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '210')
+  } else {
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '210')
+
+  }
+  });
+
+
+
+document.getElementById("saveSelectedClearBinTime").addEventListener("click", () => {
+  if (document.querySelector('md-radio[value="clear_24hrs"]').checked) {
+    localStorage.setItem("SelectedClearBinTime", "clear_24hrs");
+    document.getElementById('SelectedClearBinTimeText').innerHTML = 'After 24 hours';
+  } else if (document.querySelector('md-radio[value="clear_7days"]').checked){
+    localStorage.setItem("SelectedClearBinTime", "clear_7days");
+    document.getElementById('SelectedClearBinTimeText').innerHTML = 'After 7 days';
+  } else if (document.querySelector('md-radio[value="clear_14days"]').checked){
+    localStorage.setItem("SelectedClearBinTime", "clear_14days");
+    document.getElementById('SelectedClearBinTimeText').innerHTML = 'After 14 days';
+  } else if (document.querySelector('md-radio[value="clear_30days"]').checked){
+    localStorage.setItem("SelectedClearBinTime", "clear_30days");
+    document.getElementById('SelectedClearBinTimeText').innerHTML = 'After 30 days';
+  } else{
+    localStorage.setItem("SelectedClearBinTime", "clear_never");
+    document.getElementById('SelectedClearBinTimeText').innerHTML = 'Never';
+  }
+    localStorage.setItem("ClearBinTimeTimestamp", Date.now());
+  window.history.back();
+  });
+
+  if (localStorage.getItem("SelectedClearBinTime") === 'clear_24hrs') {
+    document.getElementById('SelectedClearBinTimeText').innerHTML = 'After 24 hours';
+  } else if (localStorage.getItem("SelectedClearBinTime") === 'clear_7days'){
+    document.getElementById('SelectedClearBinTimeText').innerHTML = 'After 7 days';
+  } else if (localStorage.getItem("SelectedClearBinTime") === 'clear_14days'){
+    document.getElementById('SelectedClearBinTimeText').innerHTML = 'After 14 days';
+  } else if (localStorage.getItem("SelectedClearBinTime") === 'clear_30days'){
+    document.getElementById('SelectedClearBinTimeText').innerHTML = 'After 30 days';
+  } else{
+    document.getElementById('SelectedClearBinTimeText').innerHTML = 'Never';
+  }
