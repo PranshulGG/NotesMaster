@@ -35,6 +35,8 @@ function handleStorageChange(event) {
                 if(localStorage.getItem('useDynamicColors') === 'true'){
                     AndroidFunctionActivityInterface.androidFunction('ReloadDynamicColors');
                 }
+            case 'linesToDisplay':
+                  displayLines()
             default:
                 console.log('Untracked key changed:', event.key);
       }

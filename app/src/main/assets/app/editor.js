@@ -108,8 +108,16 @@ function saveNote() {
 }
 
 function displaySavedNotes(note) {
+
         document.getElementById('noteTitle').innerHTML = note.title;
         document.getElementById('editor').innerHTML = note.content;
+        if (document.getElementById('editor').textContent.trim().length > 0) {
+            document.getElementById('placeholderEditor').style.display = 'none';
+        }
+
+        if (document.getElementById('noteTitle').textContent.trim().length > 0) {
+            document.getElementById('placeholderTitle').style.display = 'none';
+        }
      document.querySelector('id').setAttribute('id', note.noteID)
 
       if(note.pinned){
@@ -140,6 +148,8 @@ function displaySavedNotes(note) {
         if(note.lastEdited){
         displayEditedTime(parseInt(note.lastEdited))
         }
+
+
 
 }
 
@@ -253,7 +263,9 @@ function updateCheckboxes() {
     document.getElementById('insertUnorderedList_checkbox').checked = document.queryCommandState('insertUnorderedList');
     document.getElementById('underline_checkbox').checked = document.queryCommandState('underline');
     document.getElementById('strikethrough_checkbox').checked = document.queryCommandState('strikethrough');
-
+    document.getElementById('justifyLeft_checkbox').checked = document.queryCommandState('justifyLeft');
+    document.getElementById('justifyCenter_checkbox').checked = document.queryCommandState('justifyCenter');
+    document.getElementById('justifyRight_checkbox').checked = document.queryCommandState('justifyRight');
 
 }
 
@@ -275,41 +287,21 @@ function restoreCursorPosition() {
     sel.addRange(range);
 }
 
-editor.addEventListener('keyup', saveCursorPosition);
-editor.addEventListener('mouseup', saveCursorPosition);
+editor.addEventListener('click', saveCursorPosition);
+
 
 
 
 function insertLink() {
-    document.getElementById('editor').focus();
+    window.history.back();
 
-
-    if(document.getElementById('linkTitleInput').value < 1){
-        document.getElementById('linkTitleInput').error = true;
-        return;
-    }
-
-    if(document.getElementById('linkURLInput').value < 1){
-        document.getElementById('linkURLInput').error = true;
-        return;
-    }
-
-
-    setTimeout(() => {
-        restoreCursorPosition();
-    }, 50);
-
-    setTimeout(() =>{
-        const link = `<a style="-webkit-user-drag: none;" href="${document.getElementById('linkURLInput').value}" target="_blank">${document.getElementById('linkTitleInput').value}</a>`;
-        document.execCommand('insertHTML', false, link);
-        document.getElementById('linkURLInput').value = ''
-        document.getElementById('linkTitleInput').value = ''
-    }, 200);
-
-    window.history.back()
+    sessionStorage.setItem('insertLinkPressed', true);
 }
 
 document.getElementById('openInsertLinkDialog').addEventListener('click', () =>{
+        sessionStorage.removeItem('insertLinkPressed')
+    document.getElementById('linkURLInput').value = ''
+    document.getElementById('linkTitleInput').value = ''
     document.getElementById('insertLinkDialog').show();
     window.history.pushState({ InsertLinkDialogOpen: true }, "");
     sendThemeToAndroid(colorsDialogsOpenContainer()[GetDialogOverlayContainerColor()], colorsDialogsOpenContainer()[GetDialogOverlayContainerColor()], '0', '225');
@@ -339,10 +331,42 @@ document.getElementById('insertLinkDialog').addEventListener('cancel', () =>{
     })
 })
 
+document.getElementById('insertLinkDialog').addEventListener('closed', () =>{
+    if(sessionStorage.getItem('insertLinkPressed') === 'true' || sessionStorage.getItem('insertLinkPressed') === true){
+            addLinkIfAdded()
+    }
+})
+
 document.getElementById('insertLinkDialog').addEventListener('close', () =>{
     sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), Themeflag, '210');
 })
 
+function addLinkIfAdded(){
+    document.getElementById('editor').focus();
+
+
+    if(document.getElementById('linkTitleInput').value < 1){
+        document.getElementById('linkTitleInput').error = true;
+        return;
+    }
+
+    if(document.getElementById('linkURLInput').value < 1){
+        document.getElementById('linkURLInput').error = true;
+        return;
+    }
+
+
+    setTimeout(() => {
+        restoreCursorPosition();
+    }, 50);
+
+
+    setTimeout(() =>{
+        const link = `<a style="-webkit-user-drag: none;" href="${document.getElementById('linkURLInput').value}" target="_blank">${document.getElementById('linkTitleInput').value}</a>`;
+        document.execCommand('insertHTML', false, link);
+    }, 200);
+
+}
 
 
 function toggleView() {
@@ -424,8 +448,11 @@ function insertHR() {
 
 if(localStorage.getItem('SelectedAPPfont') === 'roboto'){
     document.getElementById('editor').classList.add('usingInter');
+    document.getElementById('placeholderEditor').classList.add('usingInter');
 } else{
     document.documentElement.setAttribute('sys-font', ' ');
     document.getElementById('editor').classList.remove('usingInter');
+    document.getElementById('placeholderEditor').classList.remove('usingInter');
+
 }
 

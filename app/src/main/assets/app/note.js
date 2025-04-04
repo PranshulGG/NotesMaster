@@ -101,8 +101,8 @@ function loadDialogLabels(){
         label_item.classList.add('label-itemCheckboxes');
 
         label_item.innerHTML = `
-            <label ${label.locked ? 'lockedLabelItem' : ''}>
-            <md-checkbox class="label-checkbox" locked="${label.locked}" ${label.locked ? 'data-locked="true"' : ''}></md-checkbox>
+            <label ${label.locked ? 'lockedLabelItem' : ''} ${label.isFolder ? 'folderLabelItem' : ''}>
+            <md-checkbox class="label-checkbox" folder="${label.isFolder}" ${label.isFolder ? 'data-folder="true"' : ''}" locked="${label.locked}" ${label.locked ? 'data-locked="true"' : ''}></md-checkbox>
             ${label.label}
             </label>
             <md-ripple></md-ripple>
@@ -138,6 +138,37 @@ function attachCheckboxListeners() {
                     checkboxes.forEach(cb => {
                         cb.disabled = false;
                         cb.closest('noteLabelitem').classList.remove('not-clickable');
+                    });
+                }
+            }
+        });
+    });
+
+
+    attachCheckboxListenersFolders()
+}
+
+function attachCheckboxListenersFolders() {
+    const checkboxes = document.querySelectorAll('.label-checkbox');
+
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+            const isLocked = checkbox.getAttribute('data-folder') === "true";
+            if (isLocked && checkbox.checked) {
+                checkboxes.forEach(cb => {
+                    if (cb !== checkbox) {
+                        cb.disabled = true;
+                        cb.closest('noteLabelitem').classList.add('not-clickable-folder');
+                        cb.checked = false;
+
+                    }
+                });
+            } else {
+                const lockedChecked = [...checkboxes].some(cb => cb.getAttribute('data-folder') === "true" && cb.checked);
+                if (!lockedChecked) {
+                    checkboxes.forEach(cb => {
+                        cb.disabled = false;
+                        cb.closest('noteLabelitem').classList.remove('not-clickable-folder');
                     });
                 }
             }

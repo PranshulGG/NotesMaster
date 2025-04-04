@@ -289,12 +289,22 @@ document.getElementById("saveSelectedViewBtn").addEventListener("click", () => {
   if (document.querySelector('md-radio[value="cards_view"]').checked) {
     localStorage.setItem("SelectedNotesView", "cards_view");
     document.getElementById('selectedNotesViewText').innerHTML = 'Cards view';
+    document.getElementById('onlyShowTitleSwitch').disabled = false;
+    document.getElementById('displayLinesSlider').disabled = false
   } else if (document.querySelector('md-radio[value="list_view"]').checked){
     localStorage.setItem("SelectedNotesView", "list_view");
     document.getElementById('selectedNotesViewText').innerHTML = 'List view';
+      if(document.getElementById('onlyShowTitleSwitch').selected){
+        document.getElementById('onlyShowTitleSwitch').click()
+      }
+      document.getElementById('onlyShowTitleSwitch').disabled = true;
+       document.getElementById('displayLinesSlider').disabled = true
   } else{
     localStorage.setItem("SelectedNotesView", "grid_view");
     document.getElementById('selectedNotesViewText').innerHTML = 'Grid view';
+    document.getElementById('onlyShowTitleSwitch').disabled = false;
+    document.getElementById('displayLinesSlider').disabled = false
+
   }
   window.history.back();
 });
@@ -303,6 +313,11 @@ if(localStorage.getItem("SelectedNotesView") === 'cards_view'){
   document.getElementById('selectedNotesViewText').innerHTML = 'Cards view';
 } else if (localStorage.getItem("SelectedNotesView") === 'list_view'){
   document.getElementById('selectedNotesViewText').innerHTML = 'List view';
+  if(document.getElementById('onlyShowTitleSwitch').selected){
+    document.getElementById('onlyShowTitleSwitch').click()
+  }
+  document.getElementById('onlyShowTitleSwitch').disabled = true;
+  document.getElementById('displayLinesSlider').disabled = true
 } else{
   document.getElementById('selectedNotesViewText').innerHTML = 'Grid view';
 }
@@ -423,7 +438,7 @@ document.getElementById("saveSelectedClearBinTime").addEventListener("click", ()
     document.getElementById('SelectedClearBinTimeText').innerHTML = 'Never';
   }
     localStorage.setItem("ClearBinTimeTimestamp", Date.now());
-  window.history.back();
+    window.history.back();
   });
 
   if (localStorage.getItem("SelectedClearBinTime") === 'clear_24hrs') {
@@ -437,3 +452,29 @@ document.getElementById("saveSelectedClearBinTime").addEventListener("click", ()
   } else{
     document.getElementById('SelectedClearBinTimeText').innerHTML = 'Never';
   }
+
+    // ---------
+document.getElementById('RememberLastLabelSwitch').addEventListener('change', () =>{
+  localStorage.setItem('RememberLastLabelS', document.getElementById('RememberLastLabelSwitch').selected)
+  });
+
+  if(localStorage.getItem('RememberLastLabelS') && localStorage.getItem('RememberLastLabelS') === 'true'){
+  document.getElementById('RememberLastLabelSwitch').selected = true;
+  } else{
+  document.getElementById('RememberLastLabelSwitch').selected = false;
+  }
+
+
+  // --------------
+
+document.getElementById('displayLinesSlider').addEventListener('input', () =>{
+    localStorage.setItem('linesToDisplay', document.getElementById('displayLinesSlider').value);
+});
+
+if(localStorage.getItem('linesToDisplay')){
+  document.getElementById('displayLinesSlider').value = localStorage.getItem('linesToDisplay')
+  } else{
+    document.getElementById('displayLinesSlider').value = 3
+  }
+
+

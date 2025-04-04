@@ -75,6 +75,8 @@ window.addEventListener("popstate", function (event) {
 
 })
 let hiddenNote = '';
+let hiddenNoteMargin = '';
+let isImportant = '';
 
 function createNoteTile(){
     setTimeout(() =>{
@@ -82,9 +84,15 @@ function createNoteTile(){
         disableEnableDeleteBtn()
     }, 200);
         if(localStorage.getItem('onlyShowTitle') && localStorage.getItem('onlyShowTitle') === 'true'){
+        if(localStorage.getItem('SelectedNotesView') !== 'list_view'){
             hiddenNote = 'hidden'
+            hiddenNoteMargin = 'margin-bottom: 0px;'
+            isImportant = '!important';
+        }
         } else{
             hiddenNote = ''
+            hiddenNoteMargin = ''
+            isImportant = '';
         }
         const savedNotesList = document.getElementById('savedNotesList');
         const pinnedNotesList = document.getElementById('pinnedNotesList');
@@ -116,14 +124,19 @@ function createNoteTile(){
                 } else{
                     noteTile.classList.remove('deletedBinNote')
                 }
-
+                let hiddenNoteMarginNocontent
+                if(note.content === ""){
+                    hiddenNoteMarginNocontent = 'margin-bottom: 0px;';
+                } else{
+                    hiddenNoteMarginNocontent = '';
+                }
             noteTile.innerHTML = `
                 <label class="noteCheckboxWrap" hidden onclick="event.stopPropagation();">
                   <check_label>
-                  <md-checkbox class="noteCheckbox" data-id="${note.noteID}"></md-checkbox></check_label>
+                  <md-checkbox class="noteCheckbox" data-id="${note.noteID}" style="border-radius: 50px;"></md-checkbox></check_label>
                 </label>
-                <p>${note.title}</p>
-                <span ${hiddenNote}>${note.content}</span>
+                <p style="${hiddenNoteMargin} ${hiddenNoteMarginNocontent}">${note.title}</p>
+                <span ${hiddenNote}>${stripHtmlTags(note.content)}</span>
                 <time>Created: ${formattedDate}</time>
                 <md-ripple class="notes_ripple_elem"></md-ripple>
             `
@@ -215,6 +228,8 @@ if(JSON.parse(localStorage.getItem('notesLabels'))){
 }
 
 createNoteTile()
+
+
 
 function deleteSelectedNotes() {
     if(document.querySelector('md-filter-chip[label="Bin"]').selected){
@@ -395,7 +410,7 @@ function searchNotes() {
 
         searchedItem.innerHTML = `
         <p>${note.title}</p>
-        <p_content>${note.content}</p_content>
+        <p_content>${stripHtmlTags(note.content)}</p_content>
         <span>Created: ${formattedDate}</span>
         <md-ripple></md-ripple>
         `;
@@ -416,6 +431,29 @@ function searchNotes() {
 
 
 document.getElementById('Search_notes_input').addEventListener('input', searchNotes)
+
+function stripHtmlTags(html) {
+    const tempElement = document.createElement('div');
+    tempElement.innerHTML = html;
+
+    tempElement.querySelectorAll('br').forEach(br => br.replaceWith('\n'));
+
+    const blockElements = [
+        'p', 'div', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol',
+        'header', 'footer', 'section', 'article', 'aside', 'address', 'blockquote',
+        'pre', 'figure', 'figcaption', 'nav', 'main', 'details', 'summary',
+        'dt', 'dd', 'fieldset', 'legend'
+    ];
+
+    tempElement.querySelectorAll(blockElements.join(', ')).forEach(el => {
+        el.appendChild(document.createTextNode('\n'));
+    });
+
+    let textContent = tempElement.textContent || tempElement.innerText || '';
+
+    return textContent.replace(/\n\s*\n/g, '\n').trim();
+}
+
 
 // check delete btn
 
@@ -557,6 +595,14 @@ if (JSON.parse(localStorage.getItem('notesLabels')) || !JSON.parse(localStorage.
 
         }
 
+        if(label.isFolder){
+            const createLabelFolderIcon = document.createElement('md-icon');
+            createLabelFolderIcon.setAttribute('icon-outlined', '')
+            createLabelFolderIcon.setAttribute('slot', 'icon')
+            createLabelFolderIcon.innerHTML = 'folder'
+            label_item.appendChild(createLabelFolderIcon)
+        }
+
         label_item.addEventListener('click', () => {
             const isSelected = label_item.hasAttribute('selected');
             label_holder.querySelectorAll('md-filter-chip').forEach(chip => {
@@ -579,6 +625,13 @@ if (JSON.parse(localStorage.getItem('notesLabels')) || !JSON.parse(localStorage.
                     }, 100);
                     return
                 }
+                    if(label.locked){
+//                    do nothing!
+                    } else if (label.bin){
+//                    do nothing! ezz
+                    } else{
+                        localStorage.setItem('lastSelectedLabelId', label.label)
+                    }
                 if(label.bin){
                     document.getElementById('savedNotesList').style.height = '0';
                     document.getElementById('savedNotesList').style.overflow = 'hidden';
@@ -603,6 +656,14 @@ if (JSON.parse(localStorage.getItem('notesLabels')) || !JSON.parse(localStorage.
                 document.getElementById('binNotesList').style.height = '0'
                 document.getElementById('binNotesList').style.pointerEvents = 'none'
                 }
+                if(label.isFolder){
+                    document.querySelectorAll('.hiddenNoteLabelFolder').forEach((hiddenLockedEl) =>{
+                        hiddenLockedEl.classList.remove('hiddenNoteLabelFolder')
+                    })
+                    label_item.setAttribute('selected', '');
+                    filterNotesByLabel(label.label);
+                    return
+                }
                 label_item.setAttribute('selected', '');
                 filterNotesByLabel(label.label);
                 hideLockedLabelNotes()
@@ -622,6 +683,13 @@ if (JSON.parse(localStorage.getItem('notesLabels')) || !JSON.parse(localStorage.
 
         label_holder.appendChild(label_item);
     });
+    if(localStorage.getItem('RememberLastLabelS') && localStorage.getItem('RememberLastLabelS') === 'true'){
+        if(localStorage.getItem('lastSelectedLabelId')){
+            if(document.querySelector(`[label="${localStorage.getItem('lastSelectedLabelId')}"]`)){
+                document.querySelector(`[label="${localStorage.getItem('lastSelectedLabelId')}"]`).click()
+            }
+        }
+    }
 }
 
 
@@ -742,35 +810,38 @@ function hideLockedLabelNotes(){
         }
     });
 
-        const updateDisplay = (listId) => {
-            const list = document.getElementById(listId);
-            const visibleNotes = list.querySelectorAll('noteTileWrap:not(.hiddenNoteLabel)').length;
+        hideFolderLabelNotes()
 
-            if (visibleNotes === 2) {
-                list.style.display = 'flex';
-            } else {
-                list.style.display = '';
-            }
-        };
-
-        updateDisplay('savedNotesList');
-        updateDisplay('pinnedNotesList');
 }
 
+function hideFolderLabelNotes(){
+    const savedLabelsLocked = JSON.parse(localStorage.getItem('notesLabels')) || [];
+    let noteLabelsLocked = JSON.parse(localStorage.getItem('noteLabels')) || {};
+
+    document.querySelectorAll('#savedNotesList noteTileWrap, #pinnedNotesList noteTileWrap').forEach(noteTile => {
+        const noteID = noteTile.getAttribute('noteID');
+        const labels = noteLabelsLocked[noteID] || [];
+
+        const hasLockedLabel = savedLabelsLocked.some(labelObj =>
+            labelObj.isFolder && labels.includes(labelObj.label)
+        );
+
+        if(hasLockedLabel){
+        noteTile.classList.add('hiddenNoteLabelFolder')
+        }
+    });
+
+}
 
 function disabledLockedLabels(){
     if (window.history.state && window.history.state.SelectionOpen === true) {
             JSON.parse(localStorage.getItem('notesLabels')).forEach((label, index) => {
-                if(label.locked){
                     document.querySelector(`[label="${label.label}"]`).disabled = true
-                }
             });
     } else{
     if(JSON.parse(localStorage.getItem('notesLabels'))){
         JSON.parse(localStorage.getItem('notesLabels')).forEach((label, index) => {
-            if(label.locked){
                 document.querySelector(`[label="${label.label}"]`).disabled = false
-            }
         });
         }
     }
@@ -929,4 +1000,10 @@ function checkIfTimeExceeded() {
         return;
     }
   }
+
+  function displayLines(){
+      document.documentElement.setAttribute('lines_to_display', localStorage.getItem('linesToDisplay') || 3)
+  }
+
+  displayLines()
 

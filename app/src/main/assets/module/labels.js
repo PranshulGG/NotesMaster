@@ -27,10 +27,11 @@ function loadLabels() {
             lockedLabelclass = ''
         }
 
+
         label_list_item.innerHTML = `
             <div>
             <md-icon icon-outlined>drag_handle</md-icon>
-            <p class="${lockedLabelclass} ${label.bin ? 'binLabel' : ''}">${label.label}</p>
+            <p class="${lockedLabelclass} ${label.bin ? 'binLabel' : ''} ${label.isFolder ? 'folderLabel' : ''}">${label.label}</p>
             </div>
             <div style="gap: 0;">
                 <md-icon-button onclick="editLabel('${label.label}')" ${label.bin ? 'disabled' : ''}>
@@ -65,6 +66,7 @@ function createNewLabel() {
     }
 
     let locked
+    let folder
     let notesLabels = JSON.parse(localStorage.getItem('notesLabels')) || [];
 
 
@@ -72,6 +74,12 @@ function createNewLabel() {
         locked = true;
     } else{
         locked = false;
+    }
+
+    if(document.getElementById('toggleTypeFolderSwitch').selected){
+        folder = true;
+    } else{
+        folder = false;
     }
 
     if(labelValue === 'Bin' || labelValue === 'bin'){
@@ -88,7 +96,7 @@ function createNewLabel() {
     }
 
 
-    notesLabels.push({label: labelValue, locked: locked});
+    notesLabels.push({label: labelValue, locked: locked, isFolder: folder});
 
 
     localStorage.setItem('notesLabels', JSON.stringify(notesLabels));
@@ -290,7 +298,38 @@ document.getElementById('deleteLabelsAlert').addEventListener('close', () =>{
 })
 
 function showInfoDialog(){
-
+    AndroidFunctionActivityInterface.androidFunction('openedLockedLabelInfoAlert')
     alert("You can lock a label with a pin or fingerprint. Any note assigned to a locked label will require a pin to view. If a note is assigned to a locked label, you can't add other labels to it. If you forget your pin, it can't be reset unless you clear the app data, but you can change it in the settings.")
+}
 
+function showInfoDialogTypeFolder(){
+    AndroidFunctionActivityInterface.androidFunction('openedFolderTypeInfoAlert')
+    alert("Notes assigned to folder-type labels will only be visible when the label is selected, acting as a folder.");
+}
+
+document.getElementById('toggleLockedLabelSwitchLabel').addEventListener('click', () =>{
+    checktoggleLockedLabelSwitchLabel()
+})
+
+document.getElementById('toggleTypeFolderSwitchLabel').addEventListener('click', () =>{
+    checktoggleTypeFolderSwitch()
+})
+
+document.getElementById('toggleLockedLabelSwitch').addEventListener('change', checktoggleLockedLabelSwitchLabel)
+document.getElementById('toggleTypeFolderSwitch').addEventListener('change', checktoggleTypeFolderSwitch)
+
+function checktoggleTypeFolderSwitch(){
+    if(document.getElementById('toggleTypeFolderSwitch').selected){
+        if(document.getElementById('toggleLockedLabelSwitch').selected){
+                document.getElementById('toggleLockedLabelSwitch').click();
+            }
+        }
+}
+
+function checktoggleLockedLabelSwitchLabel(){
+    if(document.getElementById('toggleLockedLabelSwitch').selected){
+        if(document.getElementById('toggleTypeFolderSwitch').selected){
+            document.getElementById('toggleTypeFolderSwitch').click();
+        }
+    }
 }

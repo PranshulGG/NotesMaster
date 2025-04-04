@@ -54,7 +54,7 @@ input[type="search"]::-webkit-search-results-decoration {
     align-items: flex-end;
     gap: 10px;
     display: none;
-
+    --md-fab-container-elevation: 2;
 }
 
 .header_search{
@@ -160,11 +160,11 @@ flex{
 .saved-notes #savedNotesList.cardsView, .saved-notesPinned #pinnedNotesList.cardsView, .saved-notes #binNotesList.cardsView{
     display: flex !important;
     flex-direction: column !important;
-    gap: 5px !important;
+    gap: 3px !important;
 }
 
 .saved-notes #savedNotesList.cardsView noteTileWrap, .saved-notesPinned #pinnedNotesList.cardsView noteTileWrap, .saved-notes #binNotesList.cardsView noteTileWrap{
-    border-radius: 15px;
+    border-radius: 10px;
 }
 
 .saved-notes #savedNotesList noteTileWrap, .saved-notesPinned #pinnedNotesList noteTileWrap, .saved-notes #binNotesList noteTileWrap {
@@ -177,7 +177,7 @@ flex{
     max-height: 120px;
     overflow: hidden;
     position: relative;
-    padding-bottom: 35px;
+    padding-bottom: 30px;
 
 }
 
@@ -185,15 +185,9 @@ flex{
     background-color: var(--Surface-Container);
 }
 
-
-[colorTheme="light"] .saved-notes #savedNotesList noteTileWrap span::before, [colorTheme="light"] .saved-notesPinned #pinnedNotesList noteTileWrap span::before, [colorTheme="light"] .saved-notes #binNotesList noteTileWrap span::before{
-    background: linear-gradient(0deg, var(--Surface-Container) 10%, rgba(255, 0, 0, 0)) !important;
-
-}
-
 .saved-notes #savedNotesList noteTileWrap p, .saved-notesPinned #pinnedNotesList noteTileWrap p, .saved-notes #binNotesList noteTileWrap p{
     margin: 0;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     font-family: var(--google-mid);
     color: var(--On-Surface);
     font-size: 17px;
@@ -211,13 +205,60 @@ flex{
     overflow: hidden;
     position: relative;
     max-height: 60px;
-    display: block;
     pointer-events: none;
-    display: flex;
-    align-items: flex-start;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
     word-break: break-word;
     text-overflow: ellipsis;
     flex-direction: column;
+    color: var(--On-Surface-Variant);
+    font-size: 14.5px;
+}
+
+[lines_to_display="1"] .saved-notes #savedNotesList noteTileWrap span, [lines_to_display="1"] .saved-notesPinned #pinnedNotesList noteTileWrap span, [lines_to_display="1"] .saved-notes #binNotesList noteTileWrap span{
+    -webkit-line-clamp: 1;
+}
+
+[lines_to_display="2"] .saved-notes #savedNotesList noteTileWrap span, [lines_to_display="2"] .saved-notesPinned #pinnedNotesList noteTileWrap span, [lines_to_display="2"] .saved-notes #binNotesList noteTileWrap span{
+    -webkit-line-clamp: 2;
+}
+
+[lines_to_display="4"] .saved-notes #savedNotesList noteTileWrap span, [lines_to_display="4"] .saved-notesPinned #pinnedNotesList noteTileWrap span, [lines_to_display="4"] .saved-notes #binNotesList noteTileWrap span{
+    -webkit-line-clamp: 4;
+    max-height: 80px;
+}
+
+[lines_to_display="5"] .saved-notes #savedNotesList noteTileWrap span, [lines_to_display="5"] .saved-notesPinned #pinnedNotesList noteTileWrap span, [lines_to_display="5"] .saved-notes #binNotesList noteTileWrap span{
+    -webkit-line-clamp: 5;
+    max-height: 100px;
+}
+
+[lines_to_display="6"] .saved-notes #savedNotesList noteTileWrap span, [lines_to_display="6"] .saved-notesPinned #pinnedNotesList noteTileWrap span, [lines_to_display="6"] .saved-notes #binNotesList noteTileWrap span{
+    -webkit-line-clamp: 6;
+    max-height: 120px;
+}
+
+[lines_to_display="7"] .saved-notes #savedNotesList noteTileWrap span, [lines_to_display="7"] .saved-notesPinned #pinnedNotesList noteTileWrap span, [lines_to_display="7"] .saved-notes #binNotesList noteTileWrap span{
+    -webkit-line-clamp: 7;
+    max-height: 160px;
+}
+
+[lines_to_display="8"] .saved-notes #savedNotesList noteTileWrap span, [lines_to_display="8"] .saved-notesPinned #pinnedNotesList noteTileWrap span, [lines_to_display="8"] .saved-notes #binNotesList noteTileWrap span{
+    -webkit-line-clamp: 8;
+    max-height: 200px;
+}
+
+[lines_to_display="6"] .saved-notes #savedNotesList noteTileWrap, [lines_to_display="6"] .saved-notesPinned #pinnedNotesList noteTileWrap, [lines_to_display="6"] .saved-notes #binNotesList noteTileWrap{
+    max-height: 250px;
+}
+
+[lines_to_display="7"] .saved-notes #savedNotesList noteTileWrap, [lines_to_display="7"] .saved-notesPinned #pinnedNotesList noteTileWrap, [lines_to_display="7"] .saved-notes #binNotesList noteTileWrap{
+    max-height: 250px;
+}
+
+[lines_to_display="8"] .saved-notes #savedNotesList noteTileWrap, [lines_to_display="8"] .saved-notesPinned #pinnedNotesList noteTileWrap, [lines_to_display="8"] .saved-notes #binNotesList noteTileWrap{
+    max-height: 250px;
 
 }
 
@@ -264,15 +305,6 @@ p_content h1, p_content h2, p_content h3, p_content h4{
     font-size: 18px;
 }
 
-.saved-notes #savedNotesList noteTileWrap span::before, p_content::before, .saved-notesPinned #pinnedNotesList noteTileWrap span::before, .saved-notes #binNotesList noteTileWrap span::before {
-    position: absolute;
-    bottom: 0;
-    content: '';
-    width: 100%;
-    background: linear-gradient(0deg, var(--Surface-Container-Low) 10%, rgba(255, 0, 0, 0));
-    height: 10px;
-    z-index: 1;
-}
 
 
 
@@ -300,10 +332,16 @@ p_content h1, p_content h2, p_content h3, p_content h4{
     bottom: 8px;
     z-index: 1;
     font-family: var(--google-mid);
-    font-size: 11px;
+    font-size: 10px;
     left: 10px;
     color: var(--On-Surface-Variant);
     opacity: 0.7;
+    background-color: var(--Surface);
+    border-radius: 3.5px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-left: 4px;
+    padding-right: 4px;
 }
 
 #notesContainerSearched{
@@ -553,11 +591,11 @@ blockquote{
     gap: 10px;
 }
 
-.lockedlabel, .binLabel{
+.lockedlabel, .binLabel, .folderLabel{
     position: relative;
 }
 
-.lockedlabel::before, .binLabel::before{
+.lockedlabel::before, .binLabel::before, .folderLabel::before{
     content: 'lock';
     font-family: 'Material symbols';
     font-weight: normal !important;
@@ -582,7 +620,11 @@ blockquote{
     content: 'auto_delete';
 }
 
-.hiddenNoteLabel{
+.folderLabel::before{
+    content: 'folder';
+}
+
+.hiddenNoteLabel, .hiddenNoteLabelFolder{
     display: none !important;
 }
 
@@ -620,6 +662,14 @@ notetilewrap{
     gap: 0px !important;
 }
 
+.saved-notes #savedNotesList.listView noteTileWrap p, .saved-notesPinned #pinnedNotesList.listView noteTileWrap p, .saved-notes #binNotesList.listView noteTileWrap p{
+    -webkit-line-clamp: 1 !important;
+}
+
+.saved-notes #savedNotesList.listView noteTileWrap time, .saved-notesPinned #pinnedNotesList.listView noteTileWrap time, .saved-notes #binNotesList.listView noteTileWrap time{
+    bottom: 6.5px !important;
+}
+
 .saved-notes #savedNotesList.listView noteTileWrap, .saved-notesPinned #pinnedNotesList.listView noteTileWrap, .saved-notes #binNotesList.listView noteTileWrap{
     border-radius: 15px;
     display: inline-block;
@@ -628,7 +678,7 @@ notetilewrap{
     border-radius: 0 !important;
     margin-bottom: 0px;
     padding: 10px;
-    height: 40px;
+    max-height: 40px;
     overflow: hidden;
     position: relative;
     padding-bottom: 35px;
@@ -650,18 +700,13 @@ notetilewrap{
 }
 
 
-.saved-notes #savedNotesList.listView noteTileWrap span::before, .saved-notesPinned #pinnedNotesList.listView noteTileWrap span::before, .saved-notes #binNotesList.listView noteTileWrap span::before{
-    background: linear-gradient(0deg, var(--Surface-Container) 10%, rgba(255, 0, 0, 0)) !important;
-
-}
-
 .saved-notes #savedNotesList noteTileWrap span hr, p_content hr, .saved-notesPinned #pinnedNotesList noteTileWrap span hr, .saved-notes #binNotesList noteTileWrap span hr{
     display: none;
 }
 
 .saved-notes #savedNotesList.listView noteTileWrap span, .saved-notesPinned #pinnedNotesList.listView noteTileWrap span, .saved-notes #binNotesList.listView noteTileWrap span {
-    height: 20px !important;
     font-size: 14px !important;
+    -webkit-line-clamp: 1 !important;
 }
 
 
@@ -693,6 +738,14 @@ notetilewrap{
     background-color: var(--Error-Container) !important;
 }
 
-.saved-notes #binNotesList noteTileWrap.deletedBinNote span::before{
-    background: linear-gradient(0deg, var(--Error-Container) 10%, rgba(255, 0, 0, 0)) !important;
+
+.slider_option_list{
+    width: calc(100% - 39px - 10px);
+    padding-left: 39px;
+    padding-right: 10px;
 }
+
+.slider_option_list md-slider{
+    width: 100%;
+}
+

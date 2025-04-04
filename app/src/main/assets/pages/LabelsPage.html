@@ -78,8 +78,8 @@
                     </md-outlined-text-field>
 
                     <div style="display: flex; align-items: center; margin-top: 16px;">
-                    <label style="width: 100%; display: flex; align-items: center; justify-content: space-between; color: var(--On-Surface); font-family: var(--google-normal); font-size: 17px; position: relative; padding: 10px; padding-right: 0; padding-left: 0;">
-                        Lock label PIN
+                    <label style="width: 100%; display: flex; align-items: center; justify-content: space-between; color: var(--On-Surface); font-family: var(--google-normal); font-size: 17px; position: relative; padding: 10px; padding-right: 0; padding-left: 0;" id="toggleLockedLabelSwitchLabel">
+                        Lock label
                         <md-switch class="switch-small" id="toggleLockedLabelSwitch"></md-switch>
                         <md-ripple></md-ripple>
                     </label>
@@ -87,6 +87,16 @@
                         <md-icon icon-outlined>info</md-icon>
                     </md-icon-button>
                 </div>
+                    <div style="display: flex; align-items: center; margin-top: 0px;">
+                        <label style="width: 100%; display: flex; align-items: center; justify-content: space-between; color: var(--On-Surface); font-family: var(--google-normal); font-size: 17px; position: relative; padding: 10px; padding-right: 0; padding-left: 0;" id="toggleTypeFolderSwitchLabel">
+                            Folder type
+                            <md-switch class="switch-small" id="toggleTypeFolderSwitch"></md-switch>
+                            <md-ripple></md-ripple>
+                        </label>
+                        <md-icon-button onclick="showInfoDialogTypeFolder(); " style="margin-left: 5px;">
+                            <md-icon icon-outlined>info</md-icon>
+                        </md-icon-button>
+                    </div>
                 </div>
 
                 <div slot="actions">

@@ -30,7 +30,7 @@ import android.widget.Toast;
 public class LabelsActivity extends AppCompatActivity {
     private WebView webview;
     private FrameLayout overlayLayout;
-
+    String alertTitleText = "Locked label";
     @Override
     public void onBackPressed() {
         if (webview.canGoBack()) {
@@ -78,7 +78,7 @@ public class LabelsActivity extends AppCompatActivity {
             @Override
             public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
                 new AlertDialog.Builder(view.getContext())
-                        .setTitle("Locked lables")
+                        .setTitle(alertTitleText)
                         .setMessage(message)
                         .setPositiveButton("OK", (DialogInterface dialog, int which) -> result.confirm())
                         .setOnDismissListener((DialogInterface dialog) -> result.confirm())
@@ -153,6 +153,12 @@ public class LabelsActivity extends AppCompatActivity {
                 public void run() {
                     if (functiontype.equals("hideSurfaceOverlay")){
                         hideOverlay();
+                        return;
+                    } else if(functiontype.equals("openedFolderTypeInfoAlert")){
+                        alertTitleText = "Type folder label";
+                        return;
+                    } else if(functiontype.equals("openedLockedLabelInfoAlert")){
+                        alertTitleText = "Locked label";
                         return;
                     }
                 }

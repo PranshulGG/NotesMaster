@@ -1,6 +1,7 @@
 package com.pranshulgg.notesmaster;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.res.ResourcesCompat;
@@ -10,6 +11,7 @@ import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -17,14 +19,19 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowInsetsController;
 import android.webkit.JavascriptInterface;
+import android.webkit.JsPromptResult;
+import android.webkit.JsResult;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -79,7 +86,52 @@ public class NoteView extends AppCompatActivity {
 
         webview.loadUrl("file:///android_asset/pages/note-editor.html");
 
+        webview.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
+                new AlertDialog.Builder(view.getContext())
+                        .setTitle("Input error")
+                        .setMessage(message)
+                        .setPositiveButton("OK", (DialogInterface dialog, int which) -> result.confirm())
+                        .setOnDismissListener((DialogInterface dialog) -> result.confirm())
+                        .create()
+                        .show();
+                return true;
+            }
 
+
+            @Override
+            public boolean onJsConfirm(WebView view, String url, String message, JsResult result) {
+                new AlertDialog.Builder(view.getContext())
+                        .setTitle("Confirm delete")
+                        .setMessage(message)
+                        .setPositiveButton("OK", (DialogInterface dialog, int which) -> result.confirm())
+                        .setNegativeButton("Cancel", (DialogInterface dialog, int which) -> result.cancel())
+                        .setOnDismissListener((DialogInterface dialog) -> result.cancel())
+                        .create()
+                        .show();
+                return true;
+            }
+
+            @Override
+            public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
+                final EditText input = new EditText(view.getContext());
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                input.setText(defaultValue);
+                new AlertDialog.Builder(view.getContext())
+                        .setTitle("Confirm Delete")
+                        .setMessage(message)
+                        .setView(input)
+                        .setPositiveButton("OK", (DialogInterface dialog, int which) -> result.confirm(input.getText().toString()))
+                        .setNegativeButton("Cancel", (DialogInterface dialog, int which) -> result.cancel())
+                        .setOnDismissListener((DialogInterface dialog) -> result.cancel())
+                        .create()
+                        .show();
+                return true;
+            }
+
+
+        });
     }
 
     public void hideOverlay() {

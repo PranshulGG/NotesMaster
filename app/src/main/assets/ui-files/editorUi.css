@@ -81,13 +81,6 @@
     overflow: auto;
 }
 
-[contenteditable][placeholder]:empty:before {
-    content: attr(placeholder);
-    position: absolute;
-    color: var(--On-Surface-Variant);
-    opacity: 0.6;
-    background-color: transparent;
-  }
 
  .editable pre {
     font-family: 'MonoSpace';
@@ -177,17 +170,17 @@ ul li:last-child, ol li:last-child {
   margin-bottom: 0;
 }
 
-.not-clickable{
+.not-clickable, .not-clickable-folder{
     pointer-events: none;
     opacity: 0.4;
 }
 
 
-[lockedlabelitem]{
+[lockedlabelitem], [folderLabelItem]{
     position: relative;
 }
 
-[lockedlabelitem]::before{
+[lockedlabelitem]::before, [folderLabelItem]::before{
     content: '';
     content: 'lock';
     font-family: 'Material symbols';
@@ -197,15 +190,20 @@ ul li:last-child, ol li:last-child {
     line-height: 1;
     position: absolute;
     right: 25px;
-    width: 20px;
-    height: 20px;
-    font-size: 12px;
+    width: 26px;
+    height: 26px;
+    font-size: 16px;
     background-color: var(--Error);
     color: var(--On-Error);
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50px;
+}
+[folderLabelItem]::before{
+    content: 'folder';
+    background-color: var(--Tertiary-Container);
+    color: var(--On-Tertiary-Container);
 }
 
 .note_info_content{

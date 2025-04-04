@@ -79,7 +79,7 @@
                     <md-icon slot="start" icon-outlined>share</md-icon>
                     <div slot="headline">Share</div>
                 </md-menu-item>
-                <md-menu-item menu-type onclick="document.getElementById('editor').innerHTML = ''; setTimeout(()=>{document.getElementById('ClearNoteContentMenuOption').disabled = true; saveNote()},100);" id="ClearNoteContentMenuOption" disabled>
+                <md-menu-item menu-type onclick="document.getElementById('editor').innerHTML = ''; document.getElementById('placeholderEditor').style.display = ''; setTimeout(()=>{document.getElementById('ClearNoteContentMenuOption').disabled = true; saveNote()},100);" id="ClearNoteContentMenuOption" disabled>
                     <md-icon slot="start" icon-outlined>close</md-icon>
                     <div slot="headline">Clear note<span style="opacity: 0;">31</span></div>
                 </md-menu-item>
@@ -101,16 +101,66 @@
             <div class="editor">
                 <div id="added_note_labels" hidden>
                 </div>
-                <div class="input-section">
-<!--            <input type="text" id="noteTitle" placeholder="Title" autocomplete="off">-->
-                    <div  id="noteTitle" placeholder="Title" oninput="if(this.innerHTML.trim()==='<br>')this.innerHTML=''" autocomplete="off"  contenteditable="plaintext-only"></div>
-        </div>
+                <div class="input-section" style="position: relative;">
+                    <div class="placeholderTitle" id="placeholderTitle" >Title</div>
 
-        <div class="editable" id="editor" contenteditable="true" placeholder="Note" oninput="if(this.innerHTML.trim()==='<br>')this.innerHTML=''"></div>
+<!--            <input type="text" id="noteTitle" placeholder="Title" autocomplete="off">-->
+                    <div  id="noteTitle"  autocomplete="off"  contenteditable="plaintext-only"></div>
+        </div>
+                <hold_it style="position: relative;">
+
+        <div class="editable" id="editor" contenteditable="true"></div>
+                    <div class="placeholder" id="placeholderEditor">Note</div>
+
+                </hold_it>
 
     </div>
 
         </div>
+        <style>
+            .placeholder, .placeholderTitle {
+                position: absolute;
+                pointer-events: none;
+                top: 10px;
+                color: var(--On-Surface-Variant);
+                opacity: 0.6;
+                font-size: 18px;
+
+            }
+                .placeholder.usingInter{
+                font-size: 17px;
+            }
+
+            .placeholderTitle{
+                top: 10px;
+                font-size: 30px;
+            }
+            </style>
+        <script>
+            const editorNONE = document.getElementById('editor');
+            const placeholderEditor = document.getElementById('placeholderEditor');
+
+            editorNONE.addEventListener('input', function() {
+            if (editorNONE.innerHTML.trim() === '' || editorNONE.innerHTML.trim() === '<br>' || editorNONE.innerHTML.trim() === '<div></div>' || editorNONE.innerHTML.trim() === '<div><br></div>') {
+                placeholderEditor.style.display = 'block';
+                editorNONE.innerHTML = '';
+            } else {
+                placeholderEditor.style.display = 'none';
+            }
+        });
+
+            const placeholderTitle = document.getElementById('placeholderTitle');
+            const editorTitle = document.getElementById('noteTitle');
+
+            editorTitle.addEventListener('input', function() {
+            if (editorTitle.textContent.trim().length > 0) {
+                placeholderTitle.style.display = 'none';
+            } else {
+                placeholderTitle.style.display = 'block';
+                document.getElementById('noteTitle').innerHTML = '';
+            }
+        });
+            </script>
         <id hidden></id>
 
 
@@ -159,9 +209,28 @@
             </div>
 
 
+            <div class="format_item">
+                <input type="checkbox" id="justifyLeft_checkbox" onchange="toggleFormat('justifyLeft')">
+                <label for="justifyLeft_checkbox"><md-icon icon-outlined>format_align_left</md-icon></label>
+            </div>
+
+            <div class="format_item">
+                <input type="checkbox" id="justifyCenter_checkbox" onchange="toggleFormat('justifyCenter')">
+                <label for="justifyCenter_checkbox"><md-icon icon-outlined>format_align_center</md-icon></label>
+            </div>
+
+            <div class="format_item">
+                <input type="checkbox" id="justifyRight_checkbox" onchange="toggleFormat('justifyRight')">
+                <label for="justifyRight_checkbox"><md-icon icon-outlined>format_align_right</md-icon></label>
+            </div>
+
+
             <div class="format_item" onclick="document.getElementById('editor').focus()">
                 <label for="heading_checkboxToggle"  id="Headingusage-popover-anchor"><md-icon icon-outlined>format_h1</md-icon></label>
                 <md-menu positioning="popover" id="Headingusage-popover" anchor="Headingusage-popover-anchor" style="min-width: 40px; --md-menu-container-shape: 10px;"  stay-open-on-focusout="true" skip-restore-focus="true" quick>
+                    <md-menu-item onclick="execCmd('formatBlock', 'div')">
+                        <md-icon slot="headline" icon-outlined>format_clear</md-icon>
+                    </md-menu-item>
                     <md-menu-item onclick="execCmd('formatBlock', 'h1')">
                         <md-icon slot="headline" icon-outlined>format_h1</md-icon>
                     </md-menu-item>
@@ -174,9 +243,9 @@
                     <md-menu-item onclick="execCmd('formatBlock', 'h4')">
                         <md-icon slot="headline" icon-outlined>format_h4</md-icon>
                     </md-menu-item>
-                      <md-menu-item onclick="execCmd('formatBlock', 'div')">
-                          <md-icon slot="headline" icon-outlined>format_paragraph</md-icon>
-                      </md-menu-item>
+                    <md-menu-item onclick="execCmd('formatBlock', 'p')">
+                        <md-icon slot="headline" icon-outlined>format_paragraph</md-icon>
+                    </md-menu-item>
                   </md-menu>
                   <script type="module">
                     const anchorEl = document.body.querySelector('#Headingusage-popover-anchor');
@@ -296,7 +365,7 @@
             </div>
             <div slot="actions">
                 <md-text-button onclick="window.history.back();">Cancel</md-text-button>
-                <md-text-button id="addNoteLabel">Add</md-text-button>
+                <md-text-button id="addNoteLabel">Save</md-text-button>
             </div>
         </md-dialog>
 
