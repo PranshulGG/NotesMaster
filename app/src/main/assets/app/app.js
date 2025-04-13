@@ -57,8 +57,9 @@ window.addEventListener("popstate", function (event) {
                     document.querySelector(`[label="${label.label}"]`).disabled = false
                 }
             });
-            }
             disabledLockedLabels()
+
+            }
         }
     }
 
@@ -171,44 +172,20 @@ function createNoteTile(){
                     document.querySelector('.saved-notesPinned').hidden = false;
                 }
 
-            if(document.querySelectorAll('#savedNotesList noteTileWrap').length === 2){
-                document.getElementById('savedNotesList').style.display = 'flex';
-                document.querySelectorAll('#savedNotesList notetilewrap').forEach(el => {
-                    el.style.height = 'max-content';
-                });
+                setTimeout(() => {
+                    document.querySelectorAll('md-checkbox').forEach(mdCheckbox => {
+                        if (mdCheckbox.shadowRoot) {
+                            const checkbox = mdCheckbox.shadowRoot.querySelector('input[type="checkbox"]');
+                            checkbox.style.width = '18px'
+                            checkbox.style.height = '18px'
 
-            } else{
-                document.getElementById('savedNotesList').style.display = '';
-                document.querySelectorAll('#savedNotesList notetilewrap').forEach(el => {
-                    el.style.height = '';
-                });
-            }
-
-            if(document.querySelectorAll('#pinnedNotesList noteTileWrap').length === 2){
-                document.getElementById('pinnedNotesList').style.display = 'flex';
-                document.querySelectorAll('#pinnedNotesList notetilewrap').forEach(el => {
-                    el.style.height = 'max-content';
-                });
-            } else{
-                document.getElementById('pinnedNotesList').style.display = '';
-                document.querySelectorAll('#pinnedNotesList notetilewrap').forEach(el => {
-                    el.style.height = '';
-                });
-            }
-
-                if(document.querySelectorAll('#binNotesList noteTileWrap').length === 2){
-                    document.getElementById('binNotesList').style.display = 'flex';
-                    document.querySelectorAll('#binNotesList notetilewrap').forEach(el => {
-                        el.style.height = 'max-content';
+                        } else {
+                            console.warn('No shadowRoot found for', mdCheckbox);
+                        }
                     });
-
-                } else{
-                    document.getElementById('binNotesList').style.display = '';
-                    document.querySelectorAll('#binNotesList notetilewrap').forEach(el => {
-                        el.style.height = '';
-                    });
-                }
+                }, 500);
         });
+
 
      document.querySelectorAll('md-filter-chip').forEach(chip => {
             chip.removeAttribute('selected');
@@ -335,7 +312,6 @@ noteTile.addEventListener('touchstart', () =>{
             document.getElementById('deleteNoteBtn').hidden = false;
         });
              if(document.querySelector('md-filter-chip[label="Bin"]').selected){
-                 disableOtherChips();
                  document.getElementById('restoreNoteBtn').hidden = false
              } else{
                  document.querySelector('md-filter-chip[label="Bin"]').disabled = true
@@ -511,9 +487,12 @@ document.getElementById('deleteNoteAlert').addEventListener('cancel', () =>{
 
 document.getElementById('deleteNoteAlert').addEventListener('close', () =>{
     sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '210')
-        setTimeout(() =>{
-            sessionStorage.setItem('DeleteAlertDialogOpen', "false");
-        }, 200);
+})
+
+document.getElementById('deleteNoteAlert').addEventListener('closed', () =>{
+    setTimeout(() =>{
+        sessionStorage.setItem('DeleteAlertDialogOpen', "false");
+    }, 200);
 })
 
 //-------------------------
@@ -546,9 +525,12 @@ document.getElementById('restoreNoteAlert').addEventListener('cancel', () =>{
 
 document.getElementById('restoreNoteAlert').addEventListener('close', () =>{
     sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '210')
-        setTimeout(() =>{
-            sessionStorage.setItem('DeleteAlertDialogOpen', "false");
-        }, 200);
+})
+
+document.getElementById('restoreNoteAlert').addEventListener('closed', () =>{
+    setTimeout(() =>{
+        sessionStorage.setItem('DeleteAlertDialogOpen', "false");
+    }, 200);
 })
 
 
@@ -642,9 +624,12 @@ if (JSON.parse(localStorage.getItem('notesLabels')) || !JSON.parse(localStorage.
                     document.querySelector('.saved-notesPinned').style.padding = '0';
                     document.getElementById('binNotesList').style.height = ''
                     document.getElementById('binNotesList').style.pointerEvents = ''
+                    document.querySelector('.water_mark').hidden = true
+                    showWaterMarkONBin('bin')
+
                     return
                 }
-
+//                skip bin label
                 if(!label.bin){
                 document.getElementById('savedNotesList').style.height = '';
                 document.getElementById('savedNotesList').style.overflow = '';
@@ -662,11 +647,13 @@ if (JSON.parse(localStorage.getItem('notesLabels')) || !JSON.parse(localStorage.
                     })
                     label_item.setAttribute('selected', '');
                     filterNotesByLabel(label.label);
+                    showWaterMarkONBin()
                     return
                 }
                 label_item.setAttribute('selected', '');
                 filterNotesByLabel(label.label);
                 hideLockedLabelNotes()
+                showWaterMarkONBin()
             } else {
                 showAllNotes();
                 document.getElementById('savedNotesList').style.height = '';
@@ -753,6 +740,17 @@ function filterNotesByLabel(selectedLabel) {
             noteTile.hidden = true;
         }
     });
+
+        const noteTilesHidden = document.querySelectorAll('.saved-notesPinned noteTileWrap');
+
+        if (noteTilesHidden.length > 0) {
+            const allHidden = Array.from(noteTilesHidden).every(el => el.hidden);
+            document.querySelector('.saved-notesPinned').hidden = allHidden;
+        } else{
+        }
+
+            showWaterMarkONfilter();
+
 }
 
 function showAllNotes() {
@@ -760,8 +758,43 @@ function showAllNotes() {
         noteTile.hidden = false;
     });
     hideLockedLabelNotes()
+    if(document.querySelectorAll('#pinnedNotesList noteTileWrap').length < 1 ){
+        document.querySelector('.saved-notesPinned').hidden = true;
+    } else{
+        document.querySelector('.saved-notesPinned').hidden = false;
+    }
+        showWaterMarkONfilter();
+        showWaterMarkONBin()
+
 }
 
+function showWaterMarkONfilter(){
+
+    const noteTilesHiddenAll = document.querySelectorAll('noteTileWrap');
+
+    const filteredNoteTiles = Array.from(noteTilesHiddenAll).filter(el => !el.closest('#binNotesList'));
+
+    if (filteredNoteTiles.length > 0) {
+        const allHiddenFull = filteredNoteTiles.every(el => el.hidden);
+        document.querySelector('.water_mark').hidden = !allHiddenFull;
+        document.querySelector('.water_mark').style.top = `calc(200px + ${document.getElementById('label_holder').offsetHeight}px)`
+    } else {
+        document.querySelector('.water_mark').hidden = true;
+    }
+}
+
+function showWaterMarkONBin(value){
+    if(value){
+    let notes = JSON.parse(localStorage.getItem('notes')) || [];
+    if(notes.filter(note => note.binNote).length === 0){
+        document.querySelector('.water_mark_bin').hidden = false;
+    } else{
+        document.querySelector('.water_mark_bin').hidden = true;
+    }
+} else{
+    document.querySelector('.water_mark_bin').hidden = true;
+}
+}
 // toggle list or grid view
 
 function useView(){
@@ -956,7 +989,7 @@ function clearBin() {
     createNoteTile();
 }
 
-let resetTimer
+let resetTimer;
 
 function checkIfTimeExceeded() {
     const savedTimestamp = localStorage.getItem("ClearBinTimeTimestamp");
@@ -997,7 +1030,7 @@ function checkIfTimeExceeded() {
     }, 200);
 
     } else {
-        return;
+        return; // 0;
     }
   }
 
@@ -1007,3 +1040,8 @@ function checkIfTimeExceeded() {
 
   displayLines()
 
+  document.getElementById('LockedNotepinInput').addEventListener('keypress', (event) => {
+    if (event.key === 'Enter') {
+        viewLockedNotes();
+    }
+});

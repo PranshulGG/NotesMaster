@@ -389,8 +389,9 @@ function toggleView() {
         document.querySelector('.full-activity-content').style.height = 'calc(100% - 65px - 65px - 20px)'
         document.getElementById('undo_btn_toggle').hidden = false;
         document.getElementById('redo_btn_toggle').hidden = false;
-        document.getElementById('ClearNoteContentMenuOption').disabled = false;
-
+        if(document.getElementById('noteTitle').innerHTML.trim() !== "" && document.getElementById('editor').innerHTML.trim() !== ""){
+            document.getElementById('ClearNoteContentMenuOption').disabled = false;
+        }
     }
 
 }

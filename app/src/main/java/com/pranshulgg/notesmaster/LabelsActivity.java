@@ -155,7 +155,7 @@ public class LabelsActivity extends AppCompatActivity {
                         hideOverlay();
                         return;
                     } else if(functiontype.equals("openedFolderTypeInfoAlert")){
-                        alertTitleText = "Type folder label";
+                        alertTitleText = "Type folder label"; // what in the world
                         return;
                     } else if(functiontype.equals("openedLockedLabelInfoAlert")){
                         alertTitleText = "Locked label";

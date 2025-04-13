@@ -1,5 +1,6 @@
 import { argbFromHex, hexFromArgb, themeFromSourceColor, applyTheme} from '../material-color-utilities.mjs';
 
+
 document.addEventListener("DOMContentLoaded", function () {
     const colorPickerElement = document.querySelector("#colorPicker");
 
@@ -49,6 +50,74 @@ document.addEventListener("DOMContentLoaded", function () {
 //        circles[1]?.setAttribute("stroke", "#fff");
 //    }
 
+    document.getElementById('setRandomTheme').addEventListener('click', () =>{
+        themeConfig(getRandomHexColor(), 'coloring')
+        colorPicker.color.set(localStorage.getItem('materialThemeColorSource') || '#ff0000');
+    })
+
+    function getRandomHexColor() {
+        const randomColor = Math.floor(Math.random() * 16777215).toString(16);
+        return '#' + randomColor.padStart(6, '0');
+    }
+
+    const schemes = [
+      scheme_1, scheme_2, scheme_3, scheme_4, scheme_5,
+      scheme_6, scheme_7, scheme_8, scheme_9, scheme_10,
+      scheme_11, scheme_12, scheme_13, scheme_14, scheme_15,
+      scheme_16, scheme_17, scheme_18, scheme_19
+    ];
+
+
+    document
+      .getElementById("openPredefineColorBlock")
+      .addEventListener("click", () => {
+        createColorSchemesItems()
+        document.getElementById("colorPickerSheetContent").hidden = true;
+        document.querySelector(".pre-define-colors").hidden = false;
+      document.getElementById('closeBlockBtn').hidden = false;
+        document.getElementById('setRandomTheme').hidden = true;
+        document.getElementById('openPredefineColorBlock').hidden = true;
+        document.getElementById('content_color').style.paddingLeft = '10px'
+        document.getElementById('content_color').style.paddingRight = '10px'
+      });
+
+
+    function createColorSchemesItems(){
+      document.getElementById('pre-define-colors_holder').innerHTML = ''
+      schemes.forEach((scheme, index) => {
+        const schemeItem = document.createElement('schemecolors');
+        scheme.forEach((schemeitemColorCode) =>{
+          const schemeItemColor = document.createElement('schemecoloritem');
+
+          schemeItemColor.style.backgroundColor = schemeitemColorCode
+
+          schemeItemColor.addEventListener('click', () =>{
+            themeConfig(schemeitemColorCode, 'coloring')
+            closeColorSchemeBlock()
+            colorPicker.color.set(localStorage.getItem('materialThemeColorSource') || '#ff0000');
+
+          });
+
+          schemeItem.appendChild(schemeItemColor)
+        })
+
+        document.getElementById('pre-define-colors_holder').appendChild(schemeItem)
+      });
+
+    }
+
+
+    function closeColorSchemeBlock(){
+      document.getElementById("colorPickerSheetContent").hidden = false;
+      document.querySelector(".pre-define-colors").hidden = true;
+      document.getElementById('closeBlockBtn').hidden = true;
+      document.getElementById('setRandomTheme').hidden = false;
+      document.getElementById('openPredefineColorBlock').hidden = false;
+      document.getElementById('content_color').style.paddingLeft = ''
+      document.getElementById('content_color').style.paddingRight = ''
+    }
+
+    document.getElementById('closeBlockBtn').addEventListener('click', closeColorSchemeBlock)
 
 
     colorPicker.on("input:end", function (color) {
@@ -173,10 +242,9 @@ function setCustomTheme(scheme, palettes, type, isSlider) {
 }
 
 
-//dialog
+//dialog animation
 
   document.addEventListener('DOMContentLoaded', () =>{
-
 
 
     const customOpenAnimation = {

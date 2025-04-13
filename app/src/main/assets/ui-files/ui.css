@@ -111,13 +111,21 @@ input[type="search"]::-webkit-search-results-decoration {
     color: var(--On-Surface-Variant);
 }
 
-.water_mark p{
+.water_mark_bin{
+    width: 100%;
+    left: 0;
+    opacity: 0.6;
+    color: var(--On-Surface-Variant);
+    height: 76px;
+}
+
+.water_mark p, .water_mark_bin p{
     margin: 0;
     font-family: var(--google-normal);
     font-size: 30px;
 }
 
-.water_mark i{
+.water_mark i, .water_mark_bin i{
     font-size: 40px;
 }
 
@@ -165,14 +173,15 @@ flex{
 
 .saved-notes #savedNotesList.cardsView noteTileWrap, .saved-notesPinned #pinnedNotesList.cardsView noteTileWrap, .saved-notes #binNotesList.cardsView noteTileWrap{
     border-radius: 10px;
+    margin-bottom: 8px;
 }
 
 .saved-notes #savedNotesList noteTileWrap, .saved-notesPinned #pinnedNotesList noteTileWrap, .saved-notes #binNotesList noteTileWrap {
-    display: inline-block;
+    display: block;
     width: calc(100% - 10px - 10px);
     background-color: var(--Surface-Container-Low);
     border-radius: 10px;
-    margin-bottom: 6px;
+    margin-bottom: 10px;
     padding: 10px;
     max-height: 120px;
     overflow: hidden;
@@ -324,7 +333,6 @@ p_content h1, p_content h2, p_content h3, p_content h4{
     right: 10px;
     bottom: 10px !important;
     height: 18px;
-    overflow: hidden;
     width: 18px;
 }
 .saved-notes #savedNotesList noteTileWrap time, .saved-notesPinned #pinnedNotesList noteTileWrap time, .saved-notes #binNotesList noteTileWrap time{
@@ -454,10 +462,10 @@ note_label{
 
 
 note_label p{
-    color: var(--On-Secondary-Container);
+    color: var(--On-Surface);
     font-family: var(--google-normal);
     font-size: 15px;
-    background-color: var(--Secondary-Container);
+    background-color: var(--Surface-Container-Highest);
     padding-left: 10px;
     padding-right: 10px;
     padding-top: 5px;
@@ -749,3 +757,40 @@ notetilewrap{
     width: 100%;
 }
 
+.pre-define-colors{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-height: 0;
+    overflow: hidden;
+    animation: pre-define-colors 1s ease-in forwards;
+}
+
+@keyframes pre-define-colors{
+    0%{
+        max-height: 0;
+    }
+    100%{
+        max-height: 5000px;
+    }
+}
+
+
+#pre-define-colors_holder schemecolors{
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    padding: 10px;
+    gap: 8px;
+    margin-bottom: 10px;
+    border-radius: 20px;
+    background-color: var(--Surface-Container);
+}
+
+#pre-define-colors_holder schemecolors schemecoloritem{
+    width: 43px;
+    height: 43px;
+    display: flex;
+    border-radius: 50px;
+    border: 1px solid var(--Outline-Variant);
+}

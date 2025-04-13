@@ -76,7 +76,7 @@ document.getElementById('pinThisNoteBtn').addEventListener('click', () =>{
     localStorage.setItem('notes', JSON.stringify(notes));
 });
 
-// add label
+// add label thingy
 
 document.getElementById('addLabelToThisNoteDialog').addEventListener('click', () =>{
     document.getElementById('NoteLabelDialog').show();
@@ -257,10 +257,10 @@ function loadNoteLabels(noteId) {
         if(matchingCheckbox){
         matchingCheckbox.checked = true;
         disableIFLocked()
+        disableIFFolder()
     }
 
     });
-
     label_holder.hidden = labelsForNote.length === 0;
 
         if(labelsForNote.length === 0){
@@ -294,6 +294,32 @@ function loadNoteLabels(noteId) {
                 }
             });
     }
+
+        function disableIFFolder() {
+            const checkboxes = document.querySelectorAll('.label-checkbox');
+
+            checkboxes.forEach(checkbox => {
+                    const isLocked = checkbox.getAttribute('data-folder') === "true";
+                    if (isLocked && checkbox.checked) {
+                        checkboxes.forEach(cb => {
+                            if (cb !== checkbox) {
+                                cb.disabled = true;
+                                cb.closest('noteLabelitem').classList.add('not-clickable-folder');
+                                cb.checked = false;
+
+                            }
+                        });
+                    } else {
+                        const lockedChecked = [...checkboxes].some(cb => cb.getAttribute('data-folder') === "true" && cb.checked);
+                        if (!lockedChecked) {
+                            checkboxes.forEach(cb => {
+                                cb.disabled = false;
+                                cb.closest('noteLabelitem').classList.remove('not-clickable-folder');
+                            });
+                        }
+                    }
+                });
+        }
 }
 
 // ----------------
