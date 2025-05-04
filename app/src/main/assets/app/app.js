@@ -3,6 +3,7 @@ const Search_notes_inputWrapper = document.getElementById('Search_notes_input_wr
 
 Search_notes_inputWrapper.addEventListener('click', () =>{
     if(document.querySelector('.search_container_screen').hidden){
+    if(document.getElementById('deleteNoteBtn').hidden){
     document.querySelector('.search_container_screen').hidden = false
     window.history.pushState({ SearchContainerOpen: true }, "");
     sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container-High'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container-High'), Themeflag, '200')
@@ -12,7 +13,10 @@ Search_notes_inputWrapper.addEventListener('click', () =>{
     setTimeout(() =>{
         Search_notes_input.focus();
     }, 100);
-  }
+  } else{
+       Search_notes_input.blur();
+     }
+ }
 })
 
 window.addEventListener("popstate", function (event) {
@@ -321,7 +325,7 @@ noteTile.addEventListener('touchstart', () =>{
 
             window.history.pushState({ SelectionOpen: true }, "");
             disabledLockedLabels()
-            document.querySelector('#textheadingNotes').innerHTML = `Selected 0`
+            document.querySelector('selectedCount').innerHTML = `0`
     }, 1000)
 })
 
@@ -447,7 +451,7 @@ function disableEnableDeleteBtn() {
                 document.getElementById('deleteNoteBtn').disabled = false;
                 document.getElementById('restoreNoteBtn').disabled = false
             }
-            document.querySelector('#textheadingNotes').innerHTML = `Selected ${checkedCount}`
+            document.querySelector('selectedCount').innerHTML = `${checkedCount}`
         });
     });
 }
@@ -670,13 +674,16 @@ if (JSON.parse(localStorage.getItem('notesLabels')) || !JSON.parse(localStorage.
 
         label_holder.appendChild(label_item);
     });
-    if(localStorage.getItem('RememberLastLabelS') && localStorage.getItem('RememberLastLabelS') === 'true'){
-        if(localStorage.getItem('lastSelectedLabelId')){
-            if(document.querySelector(`[label="${localStorage.getItem('lastSelectedLabelId')}"]`)){
-                document.querySelector(`[label="${localStorage.getItem('lastSelectedLabelId')}"]`).click()
+
+    document.addEventListener('DOMContentLoaded', () =>{
+        if(localStorage.getItem('RememberLastLabelS') && localStorage.getItem('RememberLastLabelS') === 'true'){
+            if(localStorage.getItem('lastSelectedLabelId')){
+                if(document.querySelector(`[label="${localStorage.getItem('lastSelectedLabelId')}"]`)){
+                    document.querySelector(`[label="${localStorage.getItem('lastSelectedLabelId')}"]`).click()
+                }
             }
         }
-    }
+    });
 }
 
 

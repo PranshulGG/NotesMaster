@@ -63,6 +63,9 @@
                 </md-icon-button>
             <md-icon-button onclick="showDeleteAlertDialog(); event.stopPropagation();" hidden id="deleteNoteBtn" disabled>
                 <md-icon icon-outlined>delete</md-icon>
+                <selectedCount>
+                    0
+                </selectedCount>
             </md-icon-button>
             <md-icon-button onclick="navigateActivity('SettingsActivity');  event.stopPropagation();">
                 <md-icon icon-outlined>settings</md-icon>
@@ -108,9 +111,14 @@
     </div>
 
     <div class="floatfab_div">
+        <div>
+        <md-fab variant="tertiary" size="small" id="goupFab" onclick="goUpFab()" style="--md-fab-small-container-shape-start-start: 50px; --md-fab-small-container-shape-start-end: 50px; --md-fab-small-container-shape-end-end: 50px; --md-fab-small-container-shape-end-start: 50px;">
+            <md-icon icon-outlined slot="icon">arrow_upward</md-icon>
+        </md-fab>
         <md-fab variant="surface" size="small" onclick="navigateActivity('LabelsActivity')">
             <md-icon icon-outlined slot="icon">new_label</md-icon>
         </md-fab>
+        </div>
         <md-fab variant="primary" onclick="navigateActivity('NotesViewActivity')" label="New note" style="--md-fab-label-text-size: 16px;">
             <md-icon icon-outlined slot="icon">add</md-icon>
         </md-fab>

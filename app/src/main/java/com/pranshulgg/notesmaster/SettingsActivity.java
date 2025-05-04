@@ -21,6 +21,7 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.InputType;
 import android.util.TypedValue;
 import android.view.View;
@@ -408,12 +409,29 @@ public class SettingsActivity extends AppCompatActivity {
                     if (functiontype.equals("hideSurfaceOverlay")){
                             hideOverlay();
                         return;
+                    } else if (functiontype.equals("applyAMOLED")) {
+                        restartApp();
+                        return;
                     }
                 }
             });
         }
     }
 
+
+    private void restartApp() {
+        Toast.makeText(this, "App is restarting...", Toast.LENGTH_SHORT).show();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            }
+        }, 500);
+    }
 
 
     public class AndroidInterface {

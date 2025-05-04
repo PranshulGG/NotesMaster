@@ -188,8 +188,11 @@ function setCustomTheme(scheme, palettes, type, isSlider) {
     root.style.setProperty('--Error-Container', getTone(palettes.error, type === 'light' ? 90 : 30));
     root.style.setProperty('--On-Error-Container', getTone(palettes.error, type === 'light' ? 10 : 90));
 
+    if(localStorage.getItem('useAMOLED') === 'true' && localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') !== "false"){
+        root.style.setProperty('--Surface', getTone(palettes.neutral, type === 'light' ? 'black' : 'black'));
+    } else{
     root.style.setProperty('--Surface', getTone(palettes.neutral, type === 'light' ? 98 : 6));
-
+}
     root.style.setProperty('--Inverse-Surface', getTone(palettes.neutral, type === 'light' ? 20 : 90));
     root.style.setProperty('--Inverse-On-Surface', getTone(palettes.neutral, type === 'light' ? 95 : 20));
     root.style.setProperty('--Inverse-Primary', getTone(palettes.primary, type === 'light' ? 80 : 40));

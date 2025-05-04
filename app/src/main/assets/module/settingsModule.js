@@ -2,9 +2,14 @@ document.getElementById('darkThemeSwitch').addEventListener('change', () =>{
     localStorage.setItem('useDarkTheme', document.getElementById('darkThemeSwitch').selected);
     if(document.getElementById('darkThemeSwitch').selected){
         document.documentElement.setAttribute('colorTheme', 'dark');
+      document.getElementById('AMOLEDThemeSwitch').disabled = false
+      document.querySelector('[for="AMOLEDThemeSwitch"]').style.pointerEvents = ''
     sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '0')
     } else{
         document.documentElement.setAttribute('colorTheme', 'light');
+          document.getElementById('AMOLEDThemeSwitch').disabled = true
+          localStorage.setItem('useAMOLED', 'false')
+          document.querySelector('[for="AMOLEDThemeSwitch"]').style.pointerEvents = 'none'
         sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '1')
     }
 
@@ -16,6 +21,9 @@ if(localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') 
     document.getElementById('darkThemeSwitch').selected = true;
 } else{
     document.getElementById('darkThemeSwitch').selected = false;
+      document.getElementById('AMOLEDThemeSwitch').disabled = true
+      localStorage.setItem('useAMOLED', 'false')
+      document.querySelector('[for="AMOLEDThemeSwitch"]').style.pointerEvents = 'none'
 }
 
 
@@ -510,3 +518,19 @@ const scheme_16 = [ "#fbe9e7", "#ffccbb", "#ffab91", "#ff8a66", "#ff7143", "#bf3
 const scheme_17 = [ "#efebe8", "#d7ccc8", "#bcaba4", "#a0887e", "#8c6e63", "#3e2622", "#4d342f", "#5d4038", "#6d4d42", "#795547" ];
 const scheme_18 = [ "#fafafa", "#f5f5f5", "#eeeeee", "#e0e0e0", "#bdbdbd", "#212121", "#424242", "#616161", "#757575", "#9e9e9e" ];
 const scheme_19 = [ "#ebeff2", "#cfd8dd", "#b0bfc6", "#90a4ad", "#78909c", "#273238", "#36474f", "#465a65", "#546f7a", "#607d8b" ];
+
+// amoled
+
+document.getElementById('AMOLEDThemeSwitch').addEventListener('change', () =>{
+  localStorage.setItem('useAMOLED',  document.getElementById('AMOLEDThemeSwitch').selected);
+//    ShowSnackMessage.ShowSnack("Restart the app to apply the changes", "short");
+AndroidFunctionActivityInterface.androidFunction('applyAMOLED');
+})
+
+
+if(localStorage.getItem('useAMOLED') === 'true'){
+   document.getElementById('AMOLEDThemeSwitch').selected = true;
+} else{
+    document.getElementById('AMOLEDThemeSwitch').selected = false;
+}
+

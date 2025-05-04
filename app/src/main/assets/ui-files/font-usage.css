@@ -92,3 +92,17 @@
 [icon-weight="bold"]{
   font-weight: 600 !important;
 }
+
+[list-type="radio"]{
+  --md-list-item-top-space: 0;
+  --md-list-item-bottom-space: 0;
+  --md-list-item-one-line-container-height: 48px;
+  --md-list-item-leading-space: 24px;
+  --md-list-item-trailing-space: 24px;
+}
+
+[content-type="radio-list"]{
+  padding-right: 0;
+  padding-left: 0;
+  padding-top: 16px;
+}

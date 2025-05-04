@@ -140,6 +140,12 @@
                     <label for="darkThemeSwitch" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" slot="end"><md-ripple></md-ripple></label>
                   </md-list-item>
 
+                <md-list-item>
+                    <md-icon icon-filled slot="start">contrast</md-icon>
+                    <div slot="headline">AMOLED dark</div>
+                    <md-switch slot="end" id="AMOLEDThemeSwitch"></md-switch>
+                    <label for="AMOLEDThemeSwitch" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" slot="end"><md-ripple></md-ripple></label>
+                </md-list-item>
 
                 <md-list-item onclick="openAppFontDialog()" type="button">
                     <md-icon icon-filled slot="start">font_download</md-icon>
@@ -293,18 +299,20 @@
           <md-dialog id="chooseAPPFontDialog" style="min-width: 85%;">
               <div slot="headline" data-translate="app_font">App font</div>
 
-              <div slot="content">
-                  <label class="main_provider_item">
-                      <md-radio slot="start" value="product_sans" name="app_font_radio"></md-radio>
-                      Product sans
-                  </label>
-                  <label class="main_provider_item">
-                      <md-radio slot="start" value="roboto" name="app_font_radio"></md-radio>
-                      Inter
-                  </label>
+              <div slot="content" content-type="radio-list">
+                  <md-list-item list-type="radio">
+                      <md-radio slot="start" value="product_sans" name="app_font_radio" id="product_sans_radio_ripple"></md-radio>
+                      <div slot="headline">Product sans</div>
+                      <label for="product_sans_radio_ripple" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" slot="end"><md-ripple></md-ripple></label>
+                  </md-list-item>
+                  <md-list-item list-type="radio">
+                      <md-radio slot="start" value="roboto" name="app_font_radio" id="roboto_radio_ripple"></md-radio>
+                      <div slot="headline">Inter</div>
+                      <label for="roboto_radio_ripple" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" slot="end"><md-ripple></md-ripple></label>
+                  </md-list-item>
               </div>
 
-              <div slot="actions">
+              <div slot="actions" >
                   <md-text-button onclick="window.history.back()" data-translate="cancel">Cancel</md-text-button>
                   <md-text-button id="saveSelectedFont" data-translate="ok">OK</md-text-button>
               </div>
@@ -313,22 +321,25 @@
               <md-dialog id="chooseNotesViewDialog" style="min-width: 85%;">
                   <div slot="headline">Notes view</div>
 
-                  <div slot="content">
-                      <label class="main_provider_item">
-                          <md-radio slot="start" value="grid_view" name="notes_view_radio"></md-radio>
-                          Grid view
-                      </label>
-                      <label class="main_provider_item">
-                          <md-radio slot="start" value="cards_view" name="notes_view_radio"></md-radio>
-                          Cards view
-                      </label>
-                      <label class="main_provider_item">
-                          <md-radio slot="start" value="list_view" name="notes_view_radio"></md-radio>
-                          List view
-                      </label>
+                  <div slot="content" content-type="radio-list">
+                      <md-list-item list-type="radio">
+                          <md-radio slot="start" value="grid_view" name="notes_view_radio" id="grid_view_radio_ripple"></md-radio>
+                          <div slot="headline">Grid view</div>
+                          <label for="grid_view_radio_ripple" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" slot="end"><md-ripple></md-ripple></label>
+                      </md-list-item>
+                      <md-list-item list-type="radio">
+                          <md-radio slot="start" value="cards_view" name="notes_view_radio" id="cards_view_radio_ripple"></md-radio>
+                          <div slot="headline">Cards view</div>
+                          <label for="cards_view_radio_ripple" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" slot="end"><md-ripple></md-ripple></label>
+                      </md-list-item>
+                      <md-list-item list-type="radio">
+                          <md-radio slot="start" value="list_view" name="notes_view_radio" id="list_view_radio_ripple"></md-radio>
+                          <div slot="headline">List view</div>
+                          <label for="list_view_radio_ripple" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" slot="end"><md-ripple></md-ripple></label>
+                      </md-list-item>
                   </div>
 
-                  <div slot="actions">
+                  <div slot="actions" >
                       <md-text-button onclick="window.history.back()" data-translate="cancel">Cancel</md-text-button>
                       <md-text-button id="saveSelectedViewBtn" data-translate="ok">OK</md-text-button>
                   </div>
@@ -337,27 +348,32 @@
               <md-dialog id="chooseAutoClearBinDialog" style="min-width: 85%;">
                   <div slot="headline">Auto-Clear Bin</div>
 
-                  <div slot="content">
-                      <label class="main_provider_item">
-                          <md-radio slot="start" value="clear_never" name="bin_clear_radio"></md-radio>
-                          Never
-                      </label>
-                      <label class="main_provider_item">
-                          <md-radio slot="start" value="clear_24hrs" name="bin_clear_radio"></md-radio>
-                          After 24 hours
-                      </label>
-                      <label class="main_provider_item">
-                          <md-radio slot="start" value="clear_7days" name="bin_clear_radio"></md-radio>
-                          After 7 days
-                      </label>
-                      <label class="main_provider_item">
-                          <md-radio slot="start" value="clear_14days" name="bin_clear_radio"></md-radio>
-                          After 14 days
-                      </label>
-                      <label class="main_provider_item">
-                          <md-radio slot="start" value="clear_30days" name="bin_clear_radio"></md-radio>
-                          After 30 days
-                      </label>
+                  <div slot="content" content-type="radio-list">
+                      <md-list-item list-type="radio">
+                          <md-radio slot="start" value="clear_never" name="bin_clear_radio" id="clear_never_radio_ripple"></md-radio>
+                          <div slot="headline">Never</div>
+                          <label for="clear_never_radio_ripple" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" slot="end"><md-ripple></md-ripple></label>
+                      </md-list-item>
+                      <md-list-item list-type="radio">
+                          <md-radio slot="start" value="clear_24hrs" name="bin_clear_radio" id="clear_24hrs_radio_ripple"></md-radio>
+                          <div slot="headline">After 24 hours</div>
+                          <label for="clear_24hrs_radio_ripple" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" slot="end"><md-ripple></md-ripple></label>
+                      </md-list-item>
+                      <md-list-item list-type="radio">
+                          <md-radio slot="start" value="clear_7days" name="bin_clear_radio" id="clear_7days_radio_ripple"></md-radio>
+                          <div slot="headline">After 7 days</div>
+                          <label for="clear_7days_radio_ripple" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" slot="end"><md-ripple></md-ripple></label>
+                      </md-list-item>
+                      <md-list-item list-type="radio">
+                          <md-radio slot="start" value="clear_14days" name="bin_clear_radio" id="clear_14days_radio_ripple"></md-radio>
+                          <div slot="headline">After 14 days</div>
+                          <label for="clear_14days_radio_ripple" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" slot="end"><md-ripple></md-ripple></label>
+                      </md-list-item>
+                      <md-list-item list-type="radio">
+                          <md-radio slot="start" value="clear_30days" name="bin_clear_radio" id="clear_30days_radio_ripple"></md-radio>
+                          <div slot="headline">After 30 days</div>
+                          <label for="clear_30days_radio_ripple" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" slot="end"><md-ripple></md-ripple></label>
+                      </md-list-item>
                   </div>
 
                   <div slot="actions">
