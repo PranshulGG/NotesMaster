@@ -208,7 +208,11 @@ if(JSON.parse(localStorage.getItem('notesLabels'))){
 
 }
 
-createNoteTile()
+document.addEventListener('DOMContentLoaded', () =>{
+    setTimeout(() =>{
+        createNoteTile()
+    }, 300);
+});
 
 
 
@@ -674,16 +678,20 @@ if (JSON.parse(localStorage.getItem('notesLabels')) || !JSON.parse(localStorage.
 
         label_holder.appendChild(label_item);
     });
+    selectRememberedLabel()
 
-    document.addEventListener('DOMContentLoaded', () =>{
+    function selectRememberedLabel(){
         if(localStorage.getItem('RememberLastLabelS') && localStorage.getItem('RememberLastLabelS') === 'true'){
             if(localStorage.getItem('lastSelectedLabelId')){
                 if(document.querySelector(`[label="${localStorage.getItem('lastSelectedLabelId')}"]`)){
                     document.querySelector(`[label="${localStorage.getItem('lastSelectedLabelId')}"]`).click()
+                    setTimeout(() => {
+                        document.querySelector(`[label="${localStorage.getItem('lastSelectedLabelId')}"]`).scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+                    }, 100);
                 }
             }
         }
-    });
+    }
 }
 
 
