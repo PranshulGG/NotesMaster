@@ -815,8 +815,4 @@ selectedCount{
     position: absolute;
 }
 
-#goupFab{
-    transition: all 0.3s cubic-bezier(1,0,0,1);
-    transform: scale(0);
-}
 
