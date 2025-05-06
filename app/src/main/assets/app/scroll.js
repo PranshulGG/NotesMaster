@@ -17,10 +17,8 @@ if(wrap){
 
             if(scrollPosition > 20){
                 wrap.classList.add('scrolled')
-               document.getElementById('goupFab').style.transform = 'scale(1)';
             } else{
                 wrap.classList.remove('scrolled')
-                document.getElementById('goupFab').style.transform = 'scale(0)';
             }
 
             ticking = false;
@@ -28,7 +26,3 @@ if(wrap){
         ticking = true;
     }
 });}
-
-function goUpFab(){
-    document.querySelector('.main_app_wrap').scrollTop = 0
-}
