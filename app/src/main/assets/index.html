@@ -111,14 +111,9 @@
     </div>
 
     <div class="floatfab_div">
-        <div>
-        <md-fab variant="tertiary" size="small" id="goupFab" onclick="goUpFab()" style="--md-fab-small-container-shape-start-start: 50px; --md-fab-small-container-shape-start-end: 50px; --md-fab-small-container-shape-end-end: 50px; --md-fab-small-container-shape-end-start: 50px;">
-            <md-icon icon-outlined slot="icon">arrow_upward</md-icon>
-        </md-fab>
         <md-fab variant="surface" size="small" onclick="navigateActivity('LabelsActivity')">
             <md-icon icon-outlined slot="icon">new_label</md-icon>
         </md-fab>
-        </div>
         <md-fab variant="primary" onclick="navigateActivity('NotesViewActivity')" label="New note" style="--md-fab-label-text-size: 16px;">
             <md-icon icon-outlined slot="icon">add</md-icon>
         </md-fab>
@@ -136,7 +131,12 @@
 
         <div class="saved-notes">
             <p style="color: var(--Primary); font-family: var(--google-mid); margin-top: 0; font-size: 18px; margin-bottom: 10px;" id="textheadingNotes">Notes</p>
-            <div id="savedNotesList"></div>
+            <div id="savedNotesList">
+                <empty_note style="display: flex ; align-items: center; justify-content: center; width: 100%; position: fixed; left: 0; height: 100%; top: 0; background-color: var(--Surface);">
+                    <md-circular-progress indeterminate></md-circular-progress>
+                </empty_note>
+
+            </div>
             <div id="binNotesList" style="height: 0; overflow: hidden;"></div>
             <water_mark_bin class="water_mark_bin" style="display: flex; align-items: center; justify-content: center; flex-direction: column; flex-shrink: 0;" hidden>
                 <i icon-outlined>folder_delete</i>
