@@ -1,9 +1,11 @@
 package com.pranshulgg.notesmaster;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.res.ResourcesCompat;
 
 import android.animation.ArgbEvaluator;
@@ -14,6 +16,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -27,6 +30,7 @@ import android.view.WindowInsetsController;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -35,13 +39,15 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.Manifest;
 
 import com.google.android.material.snackbar.Snackbar;
 
 public class NoteView extends AppCompatActivity {
     private WebView webview;
     private FrameLayout overlayLayout;
-
+    private static final int FILE_CHOOSER_REQUEST_CODE = 99;
+    private ValueCallback<Uri[]> filePathCallback;
     @Override
     public void onBackPressed() {
         if (webview.canGoBack()) {
@@ -130,12 +136,38 @@ public class NoteView extends AppCompatActivity {
                 return true;
             }
 
+            @Override
+            public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
+                NoteView.this.filePathCallback = filePathCallback;
+
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("image/*"); // Only images
+
+                Intent chooser = Intent.createChooser(intent, "Select Image");
+                startActivityForResult(chooser, FILE_CHOOSER_REQUEST_CODE);
+
+                return true;
+            }
 
         });
     }
 
     public void hideOverlay() {
         overlayLayout.setVisibility(View.GONE);
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Handle the result of the file chooser
+        if (requestCode == FILE_CHOOSER_REQUEST_CODE && filePathCallback != null) {
+            Uri[] results = (resultCode == RESULT_OK && data != null) ? new Uri[]{data.getData()} : null;
+            filePathCallback.onReceiveValue(results);
+            filePathCallback = null;
+        }
     }
     public class WebAppInterfaceShare {
         @JavascriptInterface

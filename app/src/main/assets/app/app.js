@@ -6,7 +6,7 @@ Search_notes_inputWrapper.addEventListener('click', () =>{
     if(document.getElementById('deleteNoteBtn').hidden){
     document.querySelector('.search_container_screen').hidden = false
     window.history.pushState({ SearchContainerOpen: true }, "");
-    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container-High'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container-High'), Themeflag, '200')
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container-High'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container-High'), Themeflag, '250')
     document.getElementById('backSearchBtn').hidden = false;
     document.getElementById('backSearchBtnIconSearch').hidden = true;
     document.querySelector('.header_search').classList.add('enabled');
@@ -124,6 +124,19 @@ function createNoteTile(){
 
             const formattedDate = `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}`;
 
+                    const tempDiv = document.createElement('imgDivTempID');
+                    tempDiv.innerHTML = note.content;
+                    const imgIds = [];
+                    tempDiv.querySelectorAll('img').forEach(img => {
+                        const alt = img.getAttribute('data-img-id');
+                        if (alt) {
+                            imgIds.push(alt);
+                        }
+                    });
+                    if (imgIds.length > 0) {
+                        noteTile.setAttribute('hasImg-ids', imgIds.join(','));
+                    }
+
                 if(note.binNote){
                     noteTile.classList.add('deletedBinNote')
                 } else{
@@ -160,6 +173,11 @@ function createNoteTile(){
                 navigateActivity('NotesViewActivity')
             });
 
+                        document.querySelectorAll('imgDivTempID').forEach((div) =>{
+                            div.remove();
+                        })
+
+
                 if (note.pinned) {
                     pinnedNotesList.appendChild(noteTile);
                 } else if (note.binNote){
@@ -195,8 +213,8 @@ function createNoteTile(){
             chip.removeAttribute('selected');
         });
         createLabels()
-
-                hideLockedLabelNotes()
+        hideLockedLabelNotes()
+        cleanUnusedImagesFromIndexedDB()
 
 if(JSON.parse(localStorage.getItem('notesLabels'))){
       JSON.parse(localStorage.getItem('notesLabels')).forEach((label, index) => {
@@ -1060,3 +1078,50 @@ function checkIfTimeExceeded() {
         viewLockedNotes();
     }
 });
+
+function cleanUnusedImagesFromIndexedDB() {
+    const usedImgIDs = new Set();
+
+    document.querySelectorAll('noteTileWrap[hasImg-id]').forEach(tile => {
+        const id = tile.getAttribute('hasImg-id');
+        if (id) usedImgIDs.add(id);
+    });
+
+    document.querySelectorAll('noteTileWrap[hasimg-ids]').forEach(tile => {
+        const ids = tile.getAttribute('hasimg-ids');
+        if (ids) {
+            ids.split(',').forEach(id => {
+                const trimmed = id.trim();
+                if (trimmed) usedImgIDs.add(trimmed);
+            });
+        }
+    });
+
+    const request = indexedDB.open('NoteImagesDB', 1);
+
+    request.onsuccess = function(event) {
+        const db = event.target.result;
+        const transaction = db.transaction(['images'], 'readwrite');
+        const objectStore = transaction.objectStore('images');
+
+        const getAllKeysRequest = objectStore.getAllKeys();
+
+        getAllKeysRequest.onsuccess = function() {
+            const allKeys = getAllKeysRequest.result;
+            allKeys.forEach(key => {
+                if (!usedImgIDs.has(String(key))) {
+                    objectStore.delete(key);
+                    console.log(`Deleted unused image with ID: ${key}`);
+                }
+            });
+        };
+
+        getAllKeysRequest.onerror = function(event) {
+            console.error('Error retrieving keys from object store:', event);
+        };
+    };
+
+    request.onerror = function(event) {
+        console.error('Error opening IndexedDB:', event);
+    };
+}

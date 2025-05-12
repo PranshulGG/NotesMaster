@@ -1,3 +1,4 @@
+
 function sendThemeToAndroid(status, nav, flag, flagAnimAndroid) {
     AndroidInterface.updateStatusBarColor(status, nav, flag, flagAnimAndroid);
 };
@@ -83,5 +84,17 @@ function applyAppFont(){
 }
 
 applyAppFont();
+
+
+
+//let settingsPref = {};
+//try {
+//    const stored = JSON.parse(localStorage.getItem("AppSettings"));
+//    if (stored && typeof stored === "object" && !Array.isArray(stored)) {
+//        settingsPref = stored;
+//    }
+//} catch (e) {
+//    settingsPref = {};
+//}
 
 

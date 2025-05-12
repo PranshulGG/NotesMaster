@@ -1,3 +1,12 @@
+//function saveSetting(key, value) {
+//    if (typeof key !== "string" || key.trim() === "") return;
+//
+//    settingsPref[key] = value;
+//
+//    localStorage.setItem("AppSettings", JSON.stringify(settingsPref));
+//}
+//
+
 document.getElementById('darkThemeSwitch').addEventListener('change', () =>{
     localStorage.setItem('useDarkTheme', document.getElementById('darkThemeSwitch').selected);
     if(document.getElementById('darkThemeSwitch').selected){
@@ -533,4 +542,22 @@ if(localStorage.getItem('useAMOLED') === 'true'){
 } else{
     document.getElementById('AMOLEDThemeSwitch').selected = false;
 }
+
+
+const switchesDataAll = document.querySelectorAll('.switch-save');
+
+switchesDataAll.forEach((sw) =>{
+  sw.addEventListener('change', () =>{
+    localStorage.setItem(sw.getAttribute('set-value'), sw.selected)
+  });
+
+
+  if(localStorage.getItem(sw.getAttribute('set-value')) && localStorage.getItem(sw.getAttribute('set-value')) === 'true'){
+    sw.selected = localStorage.getItem(sw.getAttribute('set-value'))
+  } else{
+    sw.selected = false
+  }
+
+})
+
 

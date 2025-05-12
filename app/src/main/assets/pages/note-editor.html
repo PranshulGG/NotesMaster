@@ -96,7 +96,7 @@
                 anchorElNoteOptions.addEventListener('click', () => { menuElNoteOptions.open = !menuElNoteOptions.open; });
               </script>
         </div>
-        <div class="full-activity-content" id="Content" style="height: calc(100% - 65px - 65px - 20px); top: 65px; width: calc(100% - 32px); padding: 0 16px 0 16px; padding-bottom: 20px;">
+        <div class="full-activity-content full-activity-content-note_editor" id="Content" style="height: calc(100% - 65px - 65px - 20px); top: 65px; width: calc(100% - 32px); padding: 0 16px 0 16px; padding-bottom: 20px;">
 
             <div class="editor">
                 <div id="added_note_labels" hidden>
@@ -212,6 +212,11 @@
                 <label for="justifyRight_checkbox"><md-icon icon-outlined>format_align_right</md-icon></label>
             </div>
 
+            <div class="format_item">
+                <input type="file" id="fileInput" accept="image/*">
+                <label for="fileInput"><md-icon icon-outlined>image</md-icon></label>
+            </div>
+
 
             <div class="format_item" onclick="document.getElementById('editor').focus()">
                 <label for="heading_checkboxToggle"  id="Headingusage-popover-anchor"><md-icon icon-outlined>format_h1</md-icon></label>
@@ -249,6 +254,7 @@
             <div class="format_item" id="openInsertLinkDialog">
                 <label ><md-icon icon-outlined>link</md-icon></label>
             </div>
+
 
             <div class="format_item">
                 <input type="checkbox" id="blockquote_checkbox">

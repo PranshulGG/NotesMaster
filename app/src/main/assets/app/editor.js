@@ -1,5 +1,9 @@
 let openedNoteId = null;
 
+const imageDBName = "NoteImagesDB";
+const imageStoreName = "images";
+
+
 function execCmd(command, value = null) {
     if (command === 'createLink') {
         const url = prompt('Enter the URL:');
@@ -107,11 +111,11 @@ function saveNote() {
     clearEditor();
 }
 
-function displaySavedNotes(note) {
+async function displaySavedNotes(note) {
 
         document.getElementById('noteTitle').innerHTML = note.title;
         document.getElementById('editor').innerHTML = note.content;
-        if (document.getElementById('editor').textContent.trim().length > 0) {
+        if (document.getElementById('editor').textContent.trim().length > 0 || document.getElementById('editor').querySelector('img') !== null) {
             document.getElementById('placeholderEditor').style.display = 'none';
         }
 
@@ -151,6 +155,45 @@ function displaySavedNotes(note) {
 
 
 
+        await rehydrateImagesFromIndexedDB();
+
+}
+
+async function rehydrateImagesFromIndexedDB() {
+    const editor = document.getElementById('editor');
+    const images = editor.querySelectorAll('img[data-img-id]');
+
+    const tasks = Array.from(images).map(async (img) => {
+        img.removeAttribute('src');
+
+        const loadingText = document.createElement('span');
+        loadingText.innerHTML =
+            `<md-circular-progress indeterminate style="--md-circular-progress-size: 40px;"></md-circular-progress>`;
+
+        img.parentNode.insertBefore(loadingText, img);
+
+        const id = img.getAttribute('data-img-id');
+        const blobURL = await getImageURLFromIndexedDB(id);
+
+        // improves loading
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        const tempImg = new Image();
+        return new Promise((resolve) => {
+            tempImg.onload = () => {
+                img.src = blobURL;
+                loadingText.remove();
+                resolve();
+            };
+            tempImg.onerror = () => {
+                loadingText.textContent = 'Failed to load image.';
+                resolve();
+            };
+            tempImg.src = blobURL;
+        });
+    });
+
+    await Promise.all(tasks);
 }
 
 if(localStorage.getItem('clickedNote')){
@@ -454,6 +497,227 @@ if(localStorage.getItem('SelectedAPPfont') === 'roboto'){
     document.documentElement.setAttribute('sys-font', ' ');
     document.getElementById('editor').classList.remove('usingInter');
     document.getElementById('placeholderEditor').classList.remove('usingInter');
+}
+
+if(localStorage.getItem('Showscrollbar') === 'true'){
+    document.querySelector('.full-activity-content-note_editor').classList.add('useScrollbar');
+} else{
+    document.querySelector('.full-activity-content-note_editor').classList.remove('useScrollbar');
 
 }
 
+
+
+// -------------------------------------------
+
+function openImageDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(imageDBName, 1);
+
+        request.onupgradeneeded = function (event) {
+            const db = event.target.result;
+            db.createObjectStore(imageStoreName);
+        };
+
+        request.onsuccess = function (event) {
+            resolve(event.target.result);
+        };
+
+        request.onerror = function () {
+            reject("Error opening IndexedDB");
+        };
+    });
+}
+
+async function saveImageToIndexedDB(blob) {
+    const db = await openImageDB();
+    const tx = db.transaction(imageStoreName, "readwrite");
+    const store = tx.objectStore(imageStoreName);
+    const id = Date.now().toString();
+    store.put(blob, id);
+    return new Promise((resolve) => {
+        tx.oncomplete = () => resolve(id);
+    });
+}
+
+async function getImageURLFromIndexedDB(id) {
+    const db = await openImageDB();
+    const tx = db.transaction(imageStoreName, "readonly");
+    const store = tx.objectStore(imageStoreName);
+    const request = store.get(id);
+    return new Promise((resolve) => {
+        request.onsuccess = () => {
+            const blob = request.result;
+            const url = URL.createObjectURL(blob);
+            resolve(url);
+        };
+    });
+}
+
+
+// -------------------------------------------
+
+
+let imageBlob = null;
+
+function openImageSizeDialog() {
+const existingSheet = document.getElementById('imageSizeSheet');
+    if (existingSheet) {
+        existingSheet.remove();
+    }
+
+const sheetHtml = `
+                    <bottom-sheet id="imageSizeSheet">
+                <close-touch-sheet></close-touch-sheet>
+                <bottom-sheet-content>
+                <handle></handle>
+                <p style="color: var(--On-Surface); font-size: 20px; font-family: var(--google-normal); margin: 0; padding-bottom: 10px; text-align: center;">Select image size</p>
+                <md-list-item list-type="radio">
+                <md-radio slot="start" value="small" name="imageSize" id="small_radio_ripple"></md-radio>
+                <div slot="headline">Small</div>
+                <label for="small_radio_ripple" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" slot="end"><md-ripple></md-ripple></label>
+                </md-list-item>
+                <md-list-item list-type="radio">
+                <md-radio slot="start" value="medium" name="imageSize" id="medium_radio_ripple"></md-radio>
+                <div slot="headline">Medium</div>
+                <label for="medium_radio_ripple" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" slot="end"><md-ripple></md-ripple></label>
+                </md-list-item>
+                <md-list-item list-type="radio">
+                <md-radio slot="start" value="original" name="imageSize" id="original_radio_ripple" checked></md-radio>
+
+                <div slot="headline">Original</div>
+                <label for="original_radio_ripple" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" slot="end"><md-ripple></md-ripple></label>
+                </md-list-item>
+                <div style="padding: 16px; display: flex; gap: 10px; border-top: 1px solid var(--Outline-Variant); margin-top: 10px;">
+                <md-outlined-button id="cancelImageBtn"  style="width: 100%;">
+                    Cancel
+                </md-outlined-button>
+                <md-filled-button id="confirmImageBtn" style="width: 100%;">
+                    Add Image
+                </md-filled-button>
+                </div>
+                </content-holder-sheet>
+                </bottom-sheet-content>
+                </bottom-sheet>
+`
+    sendThemeToAndroid(colorsDialogsOpenContainer()[GetDialogOverlayContainerColor()], getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container-Low'), '0colorOnly', '225');
+    window.history.pushState({ ImageSizeSheetOpen: true }, "");
+
+    document.querySelector('.full-activity').insertAdjacentHTML('beforeend', sheetHtml);
+
+    setTimeout(() => {
+        document.getElementById('imageSizeSheet').show();
+
+        document.getElementById('cancelImageBtn').addEventListener('click', () => {
+            window.history.back();
+        });
+
+        document.getElementById('confirmImageBtn').addEventListener('click', () => {
+            addImage();
+        });
+    }, 0);
+
+
+
+document.getElementById("imageSizeSheet").addEventListener("closing", () => {
+    if(document.querySelector('.view-btn').selected){
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '200')
+        } else{
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), Themeflag, '200')
+        }
+  });
+
+  document.getElementById("imageSizeSheet").addEventListener("closed", () => {
+      if (window.history.state && window.history.state.NoteInfoSheetOpen === true) {
+        window.history.back();
+    } else {
+        console.log("imageSizeSheet is not open.");
+    }
+  })
+}
+
+
+window.addEventListener("popstate", function (event) {
+    if (document.getElementById("imageSizeSheet").hasAttribute('open')) {
+      document.getElementById("imageSizeSheet").close();
+    }
+  });
+
+
+
+function addImage() {
+
+  const radios = document.querySelectorAll('md-radio[name="imageSize"]');
+ let selectedImageSize = 'original';
+
+    radios.forEach(radio => {
+        if (radio.checked) {
+            selectedImageSize = radio.value || 'original';
+            console.log(radio.value)
+        }
+    });
+    restoreCursorPosition();
+
+
+    if (imageBlob) {
+
+
+        setTimeout(() => {
+            restoreCursorPosition();
+        }, 50);
+
+        setTimeout(() => {
+
+        insertImageWithSize(imageBlob, selectedImageSize);
+        console.log(imageBlob, selectedImageSize)
+    }, 100);
+
+    } else {
+        console.error("No image selected.");
+    }
+
+     window.history.back();
+}
+
+function insertImageWithSize(imageBlobObj, size) {
+    let img = document.createElement('img');
+    console.log(imageBlobObj.url)
+    img.src = imageBlobObj.url;
+    img.setAttribute('data-img-id', imageBlobObj.id);
+
+    switch (size) {
+        case "small":
+            img.style.width = "100px";
+            break;
+        case "medium":
+            img.style.width = "300px";
+            break;
+        case "original":
+            img.style.width = "100%";
+            break;
+    }
+
+    img.style.height = "auto";
+    document.execCommand('insertHTML', false, img.outerHTML);
+}
+
+document.getElementById('fileInput').addEventListener('change', async (event) => {
+    const file = event.target.files[0];
+
+
+
+    if (file) {
+            imageBlob = file;
+
+            const imageId = await saveImageToIndexedDB(imageBlob);
+
+            const imageURL = URL.createObjectURL(imageBlob);
+
+            openImageSizeDialog();
+
+            imageBlob = { url: imageURL, id: imageId };
+
+            event.target.value = '';
+
+    }
+});

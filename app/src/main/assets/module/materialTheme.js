@@ -21,35 +21,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     window.addEventListener('resize', setColorPickerWidth);
 
-
-//    const iroSlider = document.querySelector(".IroSlider");
-//    if (iroSlider) {
-//        iroSlider.style.height = "40px";
-//        iroSlider.style.borderRadius = "50px";
-//    }
-//
-//    const iroGradient = document.querySelector(".IroSliderGradient");
-//    if (iroGradient) {
-//        iroGradient.style.height = "100%";
-//        iroGradient.style.borderRadius = "50px";
-//    }
-//
-//    const iroHandle = document.querySelector(".IroHandle");
-//    if (iroHandle) {
-//
-//        iroHandle.style.top = "-2px";
-//        iroHandle.style.left = "-2px";
-//
-//        const circles = iroHandle.querySelectorAll("circle");
-//        circles[0]?.setAttribute("r", "12");
-//        circles[0]?.setAttribute("stroke-width", "2");
-//        circles[0]?.setAttribute("stroke", "#000");
-//
-//        circles[1]?.setAttribute("r", "10");
-//        circles[1]?.setAttribute("stroke-width", "2");
-//        circles[1]?.setAttribute("stroke", "#fff");
-//    }
-
     document.getElementById('setRandomTheme').addEventListener('click', () =>{
         themeConfig(getRandomHexColor(), 'coloring')
         colorPicker.color.set(localStorage.getItem('materialThemeColorSource') || '#ff0000');

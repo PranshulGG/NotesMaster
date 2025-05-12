@@ -245,3 +245,17 @@ ul li:last-child, ol li:last-child {
     padding-bottom: 3px;
     border-radius: 5px;
 }
+
+#editor img{
+    border-radius: 10px;
+    -webkit-user-drag: none;
+}
+
+.full-activity-content-note_editor.useScrollbar::-webkit-scrollbar{
+    width: 2px;
+}
+
+.full-activity-content-note_editor.useScrollbar::-webkit-scrollbar-thumb{
+    background-color: var(--Primary);
+    border-radius: 50px;
+}
