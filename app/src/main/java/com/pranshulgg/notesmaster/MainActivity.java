@@ -1,6 +1,7 @@
 package com.pranshulgg.notesmaster;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -8,6 +9,7 @@ import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.documentfile.provider.DocumentFile;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
@@ -16,10 +18,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.UriPermission;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
 import android.view.View;
@@ -34,12 +40,25 @@ import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Executor;
 
 public class MainActivity extends AppCompatActivity {
     private WebView webview;
     private FrameLayout overlayLayout;
     private boolean isFirstLoad = true;
+    public String notesData;
+    private static final int REQUEST_CODE_PICK_FOLDER = 42;
+    private static final String PREFS_NAME = "app_prefs";
+    private static final String PREF_BACKUP_URI = "backup_folder_uri";
 
     @Override
     public void onBackPressed() {
@@ -57,6 +76,10 @@ public class MainActivity extends AppCompatActivity {
 
         setAppTheme(this, isDarkMode);
         super.onCreate(savedInstanceState);
+
+
+
+
 
         setContentView(R.layout.activity_main);
         overlayLayout = findViewById(R.id.overlayLayout);
@@ -81,9 +104,14 @@ public class MainActivity extends AppCompatActivity {
         webview.addJavascriptInterface(new NavigateActivityInterface(this), "OpenActivityInterface");
         webview.addJavascriptInterface(new ShowSnackInterface(this), "ShowSnackMessage");
         webview.addJavascriptInterface(new AndroidFunctionActivityInterface(this), "AndroidFunctionActivityInterface");
+        webview.addJavascriptInterface(new WebAppInterface(this, this), "AndroidSaved");
 
+        if (savedInstanceState != null) {
+            webview.restoreState(savedInstanceState);
+        } else {
+            webview.loadUrl("file:///android_asset/index.html");
+        }
 
-        webview.loadUrl("file:///android_asset/index.html");
 
         webview.setWebViewClient(new WebViewClient() {
             @Override
@@ -107,16 +135,193 @@ public class MainActivity extends AppCompatActivity {
                     String jsCodePrimaryColor = "dynamicMaterial('" + hexColor + "');";
                     webview.evaluateJavascript(jsCodePrimaryColor, null);
 
+                    SharedPreferences prefsFolderName = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                    String savedUri = prefsFolderName.getString(PREF_BACKUP_URI, null);
+
+                    if (savedUri != null) {
+                        Uri folderUri = Uri.parse(savedUri);
+                        if (isUriPermissionStillGranted(folderUri)) {
+                            String folderName = getFolderDisplayName(folderUri);
+                            webview.evaluateJavascript("setFolderInStorage('"+ folderName + "')", null);
+
+                        } else {
+                            webview.evaluateJavascript("removeFolderInStorage();", null);
+                        }
+                    }
+
                 }
             }
         });
 
+
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        webview.saveState(outState);
     }
 
     public void hideOverlay() {
         overlayLayout.setVisibility(View.GONE);
     }
 
+
+    private String getFolderDisplayName(Uri uri) {
+        DocumentFile documentFile = DocumentFile.fromTreeUri(this, uri);
+        if (documentFile != null && documentFile.getName() != null) {
+            String volumeName = getVolumeName(uri);
+            return volumeName + "/" + documentFile.getName();
+        } else {
+            return "Unknown Folder";
+        }
+    }
+
+    private String getVolumeName(Uri uri) {
+        String uriAuthority = uri.getAuthority();
+        String uriPath = uri.getPath();
+
+        if (uriAuthority == null || uriPath == null) {
+            return "Storage";
+        }
+
+        if (uriAuthority.equals("com.android.externalstorage.documents")) {
+            if (uriPath.contains("primary:")) {
+                return "Internal Storage";
+            } else {
+                // Extract SD card label or default to "SD Card"
+                return "SD Card";
+            }
+        } else if (uriAuthority.equals("com.android.providers.downloads.documents")) {
+            return "Downloads";
+        } else if (uriAuthority.equals("com.android.providers.media.documents")) {
+            return "Media";
+        } else {
+            return "Storage";
+        }
+    }
+
+    public void saveBackup() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        String savedUri = prefs.getString(PREF_BACKUP_URI, null);
+
+        if (savedUri != null) {
+            Uri folderUri = Uri.parse(savedUri);
+            boolean hasPermission = isUriPermissionStillGranted(folderUri);
+
+            if (hasPermission) {
+                saveJsonToFolder(folderUri, notesData);
+            } else {
+                Toast.makeText(this, "Folder permission lost. Please reselect.", Toast.LENGTH_LONG).show();
+                pickBackupFolder();
+            }
+        } else {
+            Toast.makeText(this, "Please select a backup folder first.", Toast.LENGTH_LONG).show();
+            pickBackupFolder();
+        }
+    }
+
+
+    // Launch the folder picker
+    public void pickBackupFolder() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
+                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+                | Intent.FLAG_GRANT_PREFIX_URI_PERMISSION);
+        startActivityForResult(intent, REQUEST_CODE_PICK_FOLDER);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE_PICK_FOLDER && resultCode == RESULT_OK && data != null) {
+            new Handler().postDelayed(() -> {
+
+            Uri folderUri = data.getData();
+
+            int takeFlags = data.getFlags() & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            if (takeFlags == 0) {
+                takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
+            }
+            try {
+                getContentResolver().takePersistableUriPermission(folderUri, takeFlags);
+            } catch (SecurityException e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Could not persist folder permission. Try again.", Toast.LENGTH_LONG).show();
+                return;
+            }
+            getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+                    .edit()
+                    .putString(PREF_BACKUP_URI, folderUri.toString())
+                    .apply();
+
+            Toast.makeText(this, "Backup folder selected.", Toast.LENGTH_SHORT).show();
+
+            restartApp();
+            }, 300);
+
+        }
+    }
+
+    private boolean isUriPermissionStillGranted(Uri uri) {
+        List<UriPermission> permissions = getContentResolver().getPersistedUriPermissions();
+        for (UriPermission permission : permissions) {
+            Log.d("PermissionCheck", "Found: " + permission.getUri() + ", granted: " + permission.isWritePermission());
+            if (permission.getUri().equals(uri)
+                    && permission.isReadPermission()
+                    && permission.isWritePermission()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
+    private void saveJsonToFolder(Uri folderUri, String jsonContent) {
+        try {
+            DocumentFile pickedDir = DocumentFile.fromTreeUri(this, folderUri);
+            if (pickedDir == null || !pickedDir.isDirectory()) {
+                Toast.makeText(this, "Invalid folder selected.", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            DocumentFile[] files = pickedDir.listFiles();
+            List<DocumentFile> backupFiles = new ArrayList<>();
+            for (DocumentFile file : files) {
+                if (file.getName() != null && file.getName().startsWith("notes_backup_") && file.getName().endsWith(".json")) {
+                    backupFiles.add(file);
+                }
+            }
+
+            Collections.sort(backupFiles, new Comparator<DocumentFile>() {
+                @Override
+                public int compare(DocumentFile f1, DocumentFile f2) {
+                    return f2.getName().compareTo(f1.getName());
+                }
+            });
+
+
+            for (int i = 2; i < backupFiles.size(); i++) {
+                backupFiles.get(i).delete();
+            }
+
+            String timeStamp = new SimpleDateFormat("yyyy-MM-dd_HH-mm", Locale.getDefault()).format(new Date());
+            String fileName = "notes_backup_" + timeStamp + ".json";
+            DocumentFile file = pickedDir.createFile("application/json", fileName);
+
+            OutputStream out = getContentResolver().openOutputStream(file.getUri());
+            out.write(jsonContent.getBytes(StandardCharsets.UTF_8));
+            out.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Failed to save file: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
 
 
     private void checkBiometricSupport() {
@@ -288,11 +493,45 @@ public class MainActivity extends AppCompatActivity {
                         isFirstLoad = true;
                         webview.reload();
                         return;
+                    } else if (functiontype.equals("pickAfolderOnly")) {
+                        pickBackupFolder();
+                        return;
                     }
                 }
             });
         }
     }
+
+    private void restartApp() {
+        Toast.makeText(this, "App is restarting...", Toast.LENGTH_SHORT).show();
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            }
+        }, 500);
+    }
+
+    public class WebAppInterface {
+        Context mContext;
+        MainActivity activity;
+
+        WebAppInterface(Context c, MainActivity activity) {
+            mContext = c;
+            this.activity = activity;
+        }
+
+        @JavascriptInterface
+        public void sendNotesData(String notesJson) {
+            activity.notesData = notesJson;
+            activity.saveBackup();
+        }
+    }
+
 
     public class AndroidInterface {
         private MainActivity mActivity;
