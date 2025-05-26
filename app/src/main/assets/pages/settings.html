@@ -242,18 +242,31 @@
               <md-list>
                   <p class="title" style="margin-top: 0px; padding-bottom: 0;">Additional</p>
 
+                  <md-list-item type="button" onclick="localStorage.setItem('pickBackupFolderClicked', `clicked_${Date.now()}`); ActivityBack()">
+                      <md-icon icon-filled slot="start">folder_open</md-icon>
+                      <div slot="headline">Pick backups folder</div>
+                      <div slot="supporting-text" id="selectedFolderNameText">Not selected</div>
+                  </md-list-item>
+                  <md-list-item>
+                      <md-icon icon-filled slot="start">file_save</md-icon>
+                      <div slot="headline">Auto backups</div>
+                      <div slot="supporting-text">Automatically creates backups whenever a note is edited or saved</div>
+                      <md-switch slot="end" id="AutoBackupSwitch" class="switch-save" set-value="AutoBackup" disabled></md-switch>
+                      <label for="AutoBackupSwitch" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;" slot="end"><md-ripple></md-ripple></label>
+                  </md-list-item>
+
                   <md-list-item type="button" id="exportAppData">
                       <md-icon icon-filled slot="start">upload</md-icon>
                       <div slot="headline">Export data</div>
                       <div slot="supporting-text">Export a backup file</div>
                   </md-list-item>
-
+                  <div id="feedback"></div>
 
                   <md-list-item type="button" id="importAppData">
                       <md-icon icon-filled slot="start">download</md-icon>
                       <div slot="headline">Import data</div>
                       <div slot="supporting-text">import a backup file</div>
-                      <input type="file" id="ImportFile" style="display:none;" accept="application/json">
+                      <input type="file" id="ImportFile" hidden accept="application/json">
                   </md-list-item>
 
                   <md-list-item type="button" onclick="navigateActivity('AboutPage');">
