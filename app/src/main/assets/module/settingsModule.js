@@ -112,96 +112,156 @@ document.getElementById("saveSelectedFont").addEventListener("click", () => {
 // export import
 
 document.getElementById("exportAppData").addEventListener("click", () => {
+  const notesData = localStorage.getItem("notes");
 
-  const keysToExport = ["notes"];
-
-
-  const data = keysToExport.reduce((acc, key) => {
-    const value = localStorage.getItem(key);
-    if (value !== null) {
-      acc[key] = value;
-    }
-    return acc;
-  }, {});
-
-  if (Object.keys(data).length > 0) {
-    const jsonData = JSON.stringify(data, null, 2);
-    Android.saveFile(jsonData);
-  } else {
-    ShowSnackMessage.ShowSnack("No selected data found", "short");
+  if (!notesData) {
+    ShowSnackMessage.ShowSnack("No 'notes' key found in localStorage.", "short");
+    return;
   }
+
+  Android.saveFile(notesData);
 });
+
 
 document.getElementById("importAppData").addEventListener("click", () => {
   Android.importFile();
 });
 
-//function handleImportedData(importedData) {
-//  try {
-//    const data = JSON.parse(importedData);
-//
-//    if (typeof data !== "object" || data === null) {
-//      throw new Error("Invalid data format");
-//    }
-//
-//    setTimeout(() => {
-//      for (const [key, value] of Object.entries(data)) {
-//        localStorage.setItem(key, value);
-//      }
-//      ShowSnackMessage.ShowSnack('Data imported successfully!', 'short');
-//    }, 1000);
-//
-//
-//  } catch (error) {
-//    ShowSnackMessage.ShowSnack('Failed to import data!', 'short');
-//    console.error(error);
-//  }
-//}
-//
 
-function handleImportedData(importedData) {
+function generateUniqueNoteID(existingNotes) {
+  let newID;
+  do {
+    newID = Date.now() + '_note'
+  } while (existingNotes.some(note => note.noteID === newID));
+  return newID;
+}
+
+function handleImportedData(importedNotesData) {
   try {
-    const data = JSON.parse(importedData);
-    if (typeof data !== "object" || data === null) {
-      throw new Error("Invalid data format");
+    const importedNotes = JSON.parse(importedNotesData);
+    if (!Array.isArray(importedNotes)) {
+      throw new Error('Invalid format: JSON must be an array of notes.');
     }
 
-    if (typeof data.notes === "string") {
-      data.notes = JSON.parse(data.notes);
-    }
+    let existingNotes = JSON.parse(localStorage.getItem('notes')) || [];
 
-    Object.entries(data).forEach(([key, newValue]) => {
-      let existingValue = localStorage.getItem(key);
+    let addedCount = 0;
+    let duplicateCount = 0;
 
-      if (existingValue !== null) {
-        try {
-          existingValue = JSON.parse(existingValue);
-        } catch {
-          existingValue = null;
+    importedNotes.forEach(newNote => {
+      const existingIndex = existingNotes.findIndex(existingNote =>
+        existingNote.noteID === newNote.noteID
+      );
+
+      if (existingIndex !== -1) {
+        const existingNote = existingNotes[existingIndex];
+
+        const isExactDuplicate =
+          existingNote.title === newNote.title &&
+          existingNote.content === newNote.content;
+
+        if (isExactDuplicate) {
+          duplicateCount++;
+        } else {
+          // Same noteID but different title/content -> change noteID of newNote
+          newNote.noteID = generateUniqueNoteID(existingNotes);
+          existingNotes.push(newNote);
+          addedCount++;
         }
-      }
-
-      console.log(`Before saving: ${key} =`, newValue);
-
-      if (Array.isArray(existingValue) && Array.isArray(newValue)) {
-        const mergedArray = [...new Set([...existingValue, ...newValue])];
-        localStorage.setItem(key, JSON.stringify(mergedArray));
-      } else if (typeof existingValue === "object" && typeof newValue === "object") {
-        const mergedObject = { ...existingValue, ...newValue };
-        localStorage.setItem(key, JSON.stringify(mergedObject));
       } else {
-        localStorage.setItem(key, JSON.stringify(newValue));
+        existingNotes.push(newNote);
+        addedCount++;
       }
-
-      console.log(`After saving: ${key} =`, localStorage.getItem(key));
     });
 
-    ShowSnackMessage.ShowSnack("Data imported successfully!", "short");
-  } catch (error) {
-    console.error("Failed to import data!", error);
-    ShowSnackMessage.ShowSnack("Failed to import data!", "short");
+          localStorage.setItem('notes', JSON.stringify(existingNotes));
+
+          const existingDialogNotesImported = document.getElementById('importedNotesInfoDialog');
+          if (existingDialogNotesImported) {
+              existingDialogNotesImported.remove();
+          }
+
+
+          const feedBackDialogInfo = `
+
+                    <md-dialog style="min-width: 85%;" id="importedNotesInfoDialog">
+                    <style>
+                        .imported_notes_value_count{
+                            min-width: calc(25px - 10px);; height: 25px; padding-left: 5px; padding-right: 5px; display: flex; align-items: center; justify-content: center; background-color: var(--Primary-Container); color: var(--On-Primary-Container); border-radius: 50px; font-family: var(--google-mid);
+                        }
+                    </style>
+            <div slot="headline">Notes Imported</div>
+            <div slot="content" style="padding-left: 10px; padding-right: 10px; padding-top: 10px; --md-list-item-one-line-container-height: 30px;">
+                <md-list-item >
+                    <div slot="headline">Total in file</div>
+                    <div slot="end" class="imported_notes_value_count">${importedNotes.length}</div>
+                </md-list-item>
+                <md-list-item>
+                    <div slot="headline">Duplicates skipped</div>
+                    <div slot="end" class="imported_notes_value_count">${duplicateCount}</div>
+                </md-list-item>
+                <md-list-item>
+                    <div slot="headline">Notes added</div>
+                    <div slot="end" class="imported_notes_value_count">${addedCount}</div>
+                </md-list-item>
+            </div>
+
+            <div slot="actions">
+                <md-text-button id="CloseImportedNotesInfoDialog">OK</md-text-button>
+            </div>
+          </md-dialog>
+
+          `
+
+        if (document.getElementById("headUser-1").scrollTop >= 50) {
+          sendThemeToAndroid(colorsDialogsOpenContainer()[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], '0colorOnly', '225');
+        } else {
+          sendThemeToAndroid(colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], '0colorOnly', '225');
+        }
+
+      window.history.pushState({ importedNotesInfoDialogOpen: true }, "");
+
+              document.querySelector('.content-parent-large').insertAdjacentHTML('beforeend', feedBackDialogInfo);
+
+
+              setTimeout(() => {
+             document.getElementById("importedNotesInfoDialog").show();
+        document.getElementById('CloseImportedNotesInfoDialog').addEventListener('click', () => {
+            window.history.back();
+        });
+
+
+
+                document
+          .getElementById("importedNotesInfoDialog")
+          .addEventListener("cancel", () => {
+            document
+              .getElementById("importedNotesInfoDialog")
+              .addEventListener("closed", () => {
+                window.history.back();
+              });
+          });
+
+          document.getElementById("importedNotesInfoDialog").addEventListener("close", () => {
+            if (document.getElementById("headUser-1").scrollTop >= 50) {
+              sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '210')
+            } else {
+              sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '210')
+
+            }
+          });
+      }, 0)
+        } catch (error) {
+          ShowSnackMessage.ShowSnack(`Error importing notes: ${error.message}`, "short");
+        }
+      };
+
+
+      window.addEventListener("popstate", function (event) {
+  if (document.getElementById("importedNotesInfoDialog").open) {
+    document.getElementById("importedNotesInfoDialog").close();
   }
-}
+});
 
 // only title
 
@@ -560,4 +620,19 @@ switchesDataAll.forEach((sw) =>{
 
 })
 
+function ifFolderSelected(){
+if(localStorage.getItem("selectedBackupsFolder")){
+    document.getElementById("AutoBackupSwitch").disabled = false;
+    document.getElementById("selectedFolderNameText").innerHTML = localStorage.getItem("selectedBackupsFolder")
 
+} else{
+    document.getElementById("AutoBackupSwitch").disabled = true;
+    if(document.getElementById("AutoBackupSwitch").selected){
+        document.getElementById("AutoBackupSwitch").click();
+    }
+}
+}
+
+document.addEventListener('DOMContentLoaded', () =>{
+    ifFolderSelected()
+})
