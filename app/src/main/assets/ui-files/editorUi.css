@@ -259,3 +259,19 @@ ul li:last-child, ol li:last-child {
     background-color: var(--Primary);
     border-radius: 50px;
 }
+
+.table-wrapper {
+      max-width: 100%;
+      overflow: auto;
+      margin: 10px 0;
+    }
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+table, td, th {
+    border: 1.5px solid var(--Outline-Variant);
+    padding: 5px;
+}
