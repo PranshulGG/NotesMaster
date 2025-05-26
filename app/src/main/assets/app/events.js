@@ -20,23 +20,36 @@ function handleStorageChange(event) {
             case 'onlyShowTitle':
             case 'noteLabels':
                 createNoteTile()
+                break;
             case 'SelectedAPPfont':
                 applyAppFont()
+                break;
             case 'notesLabels':
             case 'dragAndDropState':
                  createLabels()
+                 break;
             case 'SelectedNotesView':
-            useView()
+                useView()
+                 break;
             case 'StackedLabel':
             labelsView()
+                 break;
             case 'SelectedClearBinTime':
             checkIfTimeExceeded();
             case 'useDynamicColors':
                 if(localStorage.getItem('useDynamicColors') === 'true'){
                     AndroidFunctionActivityInterface.androidFunction('ReloadDynamicColors');
                 }
+                 break;
             case 'linesToDisplay':
                   displayLines()
+                 break;
+            case 'pickBackupFolderClicked':
+                 ShowSnackMessage.ShowSnack('Select backups folder', 'short');
+                setTimeout(() =>{
+                  AndroidFunctionActivityInterface.androidFunction('pickAfolderOnly');
+                }, 1000);
+                 break;
             default:
                 console.log('Untracked key changed:', event.key);
       }
