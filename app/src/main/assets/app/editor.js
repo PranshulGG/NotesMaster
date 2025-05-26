@@ -18,7 +18,19 @@ function execCmd(command, value = null) {
     document.getElementById('editor').focus(); 
 }
 
-let inputDebounce
+
+function debounceNoteSave(func, delay) {
+    let timer
+    return function(...args) {
+        clearTimeout(timer)
+        timer = setTimeout(() => {
+            func.apply(this, args)
+        }, delay)
+    }
+}
+
+const debouncedSaveNote = debounceNoteSave(saveNote, 300)
+
 
 document.getElementById('editor').addEventListener('input', () =>{
     setTimeout(updateCheckboxes, 0);
@@ -34,33 +46,16 @@ document.getElementById('editor').addEventListener('input', () =>{
         document.getElementById('horizontal_rule_btn').style.opacity = '';
         document.getElementById('horizontal_rule_btn').style.pointerEvents = '';
        }
-
-
-    clearTimeout(inputDebounce)
-
-    inputDebounce = setTimeout(() =>{
-        saveNote()
-    }, 300);
-
+        debouncedSaveNote();
 });
 
-
-let inputDebounceTitle
-
-document.getElementById('noteTitle').addEventListener('input', () =>{
-    clearTimeout(inputDebounceTitle)
-    inputDebounceTitle = setTimeout(() =>{
-        saveNote()
-    }, 300);
-
-});
+document.getElementById('noteTitle').addEventListener('input', debouncedSaveNote)
 
 function saveNote() {
     const title = document.getElementById('noteTitle').innerHTML.trim();
     const content = document.getElementById('editor').innerHTML.trim();
     const noteID = document.querySelector('id').getAttribute('id')
     const lastEdited = Date.now()
-
 
     if(title === "" && content === ""){
         document.getElementById('pinThisNoteBtn').disabled = true;
@@ -115,7 +110,7 @@ async function displaySavedNotes(note) {
 
         document.getElementById('noteTitle').innerHTML = note.title;
         document.getElementById('editor').innerHTML = note.content;
-        if (document.getElementById('editor').textContent.trim().length > 0 || document.getElementById('editor').querySelector('img') !== null) {
+        if (document.getElementById('editor').textContent.trim().length > 0 || document.getElementById('editor').querySelector('img') !== null || document.getElementById('editor').querySelector('ul')  || document.getElementById('editor').querySelector('ol') || document.getElementById("editor").querySelector('.table-wrapper')) {
             document.getElementById('placeholderEditor').style.display = 'none';
         }
 
@@ -560,13 +555,52 @@ async function getImageURLFromIndexedDB(id) {
 
 let imageBlob = null;
 
-function openImageSizeDialog() {
+function openImageSizeDialog(name) {
 const existingSheet = document.getElementById('imageSizeSheet');
     if (existingSheet) {
         existingSheet.remove();
     }
 
-const sheetHtml = `
+    let sheetHtml
+
+    if(name === 'table'){
+     sheetHtml = `
+                  <bottom-sheet id="imageSizeSheet">
+                <close-touch-sheet></close-touch-sheet>
+                <bottom-sheet-content>
+                <handle></handle>
+                <p style="color: var(--On-Surface); font-size: 20px; font-family: var(--google-normal); margin: 0; padding-bottom: 10px; text-align: center;">Select table size</p>
+                <div style="display: flex; justify-content: center; flex-wrap: wrap; padding-top: 10px;">
+                    <md-text-button onclick="insertPresetTable(2, 2)">
+                        2 x 2
+                    </md-text-button>
+                    <md-text-button onclick="insertPresetTable(3, 3)">
+                        3 x 3
+                    </md-text-button>
+                    <md-text-button onclick="insertPresetTable(4, 4)">
+                        4 x 4
+                    </md-text-button>
+                    <md-text-button onclick="insertPresetTable(5, 2)">
+                        5 x 2
+                    </md-text-button>
+                    <md-text-button onclick="insertPresetTable(2, 5)">
+                        2 x 5
+                    </md-text-button>
+                    <md-text-button onclick="insertPresetTable(10, 6)">
+                        10 x 6
+                    </md-text-button>
+                </div>
+                <div style="padding: 16px; display: flex; gap: 10px; border-top: 1px solid var(--Outline-Variant); margin-top: 10px; justify-content: flex-end;">
+                <md-filled-button id="canceltableBtn" >
+                    Cancel
+                </md-filled-button>
+                </div>
+                </content-holder-sheet>
+                </bottom-sheet-content>
+                </bottom-sheet>
+`
+    } else{
+ sheetHtml = `
                     <bottom-sheet id="imageSizeSheet">
                 <close-touch-sheet></close-touch-sheet>
                 <bottom-sheet-content>
@@ -600,6 +634,7 @@ const sheetHtml = `
                 </bottom-sheet-content>
                 </bottom-sheet>
 `
+}
     sendThemeToAndroid(colorsDialogsOpenContainer()[GetDialogOverlayContainerColor()], getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container-Low'), '0colorOnly', '225');
     window.history.pushState({ ImageSizeSheetOpen: true }, "");
 
@@ -608,13 +643,22 @@ const sheetHtml = `
     setTimeout(() => {
         document.getElementById('imageSizeSheet').show();
 
+        if(document.getElementById('cancelImageBtn')){
         document.getElementById('cancelImageBtn').addEventListener('click', () => {
             window.history.back();
         });
+    }
+        if(document.getElementById('canceltableBtn')){
+        document.getElementById('canceltableBtn').addEventListener('click', () => {
+            window.history.back();
+        });
+    }
 
+        if(document.getElementById('confirmImageBtn')){
         document.getElementById('confirmImageBtn').addEventListener('click', () => {
             addImage();
         });
+    }
     }, 0);
 
 
@@ -679,6 +723,32 @@ function addImage() {
      window.history.back();
 }
 
+
+ function insertPresetTable(rows, cols) {
+    let tableHTML = '<div class="table-wrapper"><table>';
+    for (let i = 0; i < rows; i++) {
+      tableHTML += "<tr>";
+      for (let j = 0; j < cols; j++) {
+        tableHTML += "<td>&nbsp;</td>";
+      }
+      tableHTML += "</tr>";
+    }
+    tableHTML += "</table></div>";
+    restoreCursorPosition();
+
+            setTimeout(() => {
+            restoreCursorPosition();
+        }, 50);
+
+        setTimeout(() => {
+    document.execCommand('insertHTML', false, tableHTML);
+    }, 100);
+
+     window.history.back();
+
+  }
+
+
 function insertImageWithSize(imageBlobObj, size) {
     let img = document.createElement('img');
     console.log(imageBlobObj.url)
@@ -721,3 +791,7 @@ document.getElementById('fileInput').addEventListener('change', async (event) =>
 
     }
 });
+
+document.getElementById('openInsertTableSheet').addEventListener('click', () =>{
+    openImageSizeDialog('table')
+})
