@@ -239,17 +239,19 @@ public class SettingsActivity extends AppCompatActivity {
                 StringBuilder stringBuilder = new StringBuilder();
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    stringBuilder.append(line);
+                    stringBuilder.append(line).append("\n");  // Preserve line breaks
                 }
                 reader.close();
                 inputStream.close();
 
-                String importedData = stringBuilder.toString();
-
-                String safeJson = JSONObject.quote(importedData);
+                String importedData = stringBuilder.toString()
+                        .replace("\\", "\\\\")    // Escape backslashes
+                        .replace("'", "\\'")       // Escape single quotes
+                        .replace("\n", "\\n")      // Escape newlines for JavaScript
+                        .replace("\r", "");        // Optional: strip carriage returns
 
                 runOnUiThread(() -> {
-                    String jsCode = "handleImportedData(" + safeJson + ");";
+                    String jsCode = "handleImportedData('" + importedData + "');";
                     webview.evaluateJavascript(jsCode, null);
                 });
             }
@@ -258,7 +260,6 @@ public class SettingsActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
 
 
     private void saveToUri(Uri uri) {
