@@ -1,18 +1,29 @@
 const Search_notes_input = document.getElementById('Search_notes_input');
 const Search_notes_inputWrapper = document.getElementById('Search_notes_input_wrapper');
 
+let debounceSearchTimer
+let debounceSearchBackTimer
+
 Search_notes_inputWrapper.addEventListener('click', () =>{
     if(document.querySelector('.search_container_screen').hidden){
     if(document.getElementById('deleteNoteBtn').hidden){
+        clearTimeout(debounceSearchTimer)
+    document.querySelector('.search_container_screen').style.borderRadius = ''
     document.querySelector('.search_container_screen').hidden = false
     window.history.pushState({ SearchContainerOpen: true }, "");
-    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container-High'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container-High'), Themeflag, '250')
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container-High'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '20')
     document.getElementById('backSearchBtn').hidden = false;
     document.getElementById('backSearchBtnIconSearch').hidden = true;
     document.querySelector('.header_search').classList.add('enabled');
-    setTimeout(() =>{
-        Search_notes_input.focus();
-    }, 100);
+           Search_notes_input.blur();
+        debounceSearchTimer = setTimeout(() =>{
+            Search_notes_input.focus();
+        }, 500);
+       debounceSearchTimer = setTimeout(() => {
+                document.querySelector('.search_container_screen').style.borderRadius = 'unset'
+                     sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container-High'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container-High'), Themeflag, '200')
+
+        }, 400);
   } else{
        Search_notes_input.blur();
      }
@@ -33,14 +44,24 @@ window.addEventListener("popstate", function (event) {
     }
 
     if(!document.querySelector('.search_container_screen').hidden){
-        document.querySelector('.search_container_screen').hidden = true;
+        clearTimeout(debounceSearchBackTimer)
+    document.querySelector('.search_container_screen').style.height = 'calc(0% + 76.5px)'
+    document.querySelector('.search_container_screen').style.borderRadius = ''
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container-High'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag)
+    document.body.style.pointerEvents = 'none'
         Search_notes_input.blur();
-        document.getElementById('backSearchBtnIconSearch').hidden = false;
-        document.querySelector('.header_search').classList.remove('enabled');
-        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag)
-        document.getElementById('backSearchBtn').hidden = true;
         document.getElementById('notesContainerSearched').innerHTML = '';
+
+       debounceSearchBackTimer =   setTimeout(() =>{
+        document.querySelector('.search_container_screen').hidden = true;
+        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag)
+        document.querySelector('.header_search').classList.remove('enabled');
+        document.getElementById('backSearchBtnIconSearch').hidden = false;
+        document.querySelector('.search_container_screen').style.height = ''
+        document.getElementById('backSearchBtn').hidden = true;
         document.getElementById('Search_notes_input').value = ''
+        document.body.style.pointerEvents = ''
+      }, 300);
     }
 
        deleteCheckboxes.forEach((checkbox) =>{
@@ -153,11 +174,12 @@ function createNoteTile(){
                   <check_label>
                   <md-checkbox class="noteCheckbox" data-id="${note.noteID}" style="border-radius: 50px;"></md-checkbox></check_label>
                 </label>
-                <p style="${hiddenNoteMargin} ${hiddenNoteMarginNocontent}">${note.title}</p>
+                <p style="${hiddenNoteMargin} ${hiddenNoteMarginNocontent} ${stripHtmlTags(note.content) === "" && note.title === "" ? 'color: var(--Secondary); font-style: italic' : ''}">${note.title}${stripHtmlTags(note.content) === "" && note.title === "" ? 'Empty note' : ''}</p>
                 <span ${hiddenNote}>${stripHtmlTags(note.content)}</span>
                 <time>Created: ${formattedDate}</time>
                 <md-ripple class="notes_ripple_elem"></md-ripple>
             `
+
 
             noteTile.addEventListener('click', function() {
                 if(note.binNote){
@@ -233,7 +255,6 @@ document.addEventListener('DOMContentLoaded', () =>{
 });
 
 
-
 function deleteSelectedNotes() {
     if(document.querySelector('md-filter-chip[label="Bin"]').selected){
         PermanentdeleteSelectedNotes()
@@ -268,7 +289,10 @@ function deleteSelectedNotes() {
     createNoteTile();
     displayWaterMark();
     window.history.back();
-     ShowSnackMessage.ShowSnack('Notes have been moved to the bin', 'short');
+     ShowSnackMessage.ShowSnack('Moved to the bin', 'short');
+    window.dispatchEvent(new CustomEvent('localNotesUpdated', {
+     detail: { key: 'notes', newValue: notes }
+ }));
 }
 
 
@@ -307,6 +331,9 @@ function PermanentdeleteSelectedNotes() {
     document.querySelector('.saved-notesPinned').style.padding = '';
     document.getElementById('binNotesList').style.height = '0'
     document.getElementById('binNotesList').style.pointerEvents = 'none'
+       window.dispatchEvent(new CustomEvent('localNotesUpdated', {
+        detail: { key: 'notes', newValue: notes }
+    }));
 }
 
 let holdTimer
@@ -361,12 +388,15 @@ noteTile.addEventListener('touchmove', () =>{
 });
 }
 function displayWaterMark(){
-    if (JSON.parse(localStorage.getItem('notes')) && JSON.parse(localStorage.getItem('notes')).length > 0 ) {
+    const notes = JSON.parse(localStorage.getItem('notes')) || [];
+
+    const activeNotes = notes.filter(note => !note.binNote);
+
+    if (activeNotes.length > 0) {
         document.querySelector('.water_mark').hidden = true;
-    } else{
+    } else {
         document.querySelector('.water_mark').hidden = false;
         document.querySelector('.saved-notesPinned').hidden = true;
-
     }
 
 }
@@ -702,10 +732,12 @@ if (JSON.parse(localStorage.getItem('notesLabels')) || !JSON.parse(localStorage.
         if(localStorage.getItem('RememberLastLabelS') && localStorage.getItem('RememberLastLabelS') === 'true'){
             if(localStorage.getItem('lastSelectedLabelId')){
                 if(document.querySelector(`[label="${localStorage.getItem('lastSelectedLabelId')}"]`)){
+                    setTimeout(() => {
                     document.querySelector(`[label="${localStorage.getItem('lastSelectedLabelId')}"]`).click()
+                    }, 100);
                     setTimeout(() => {
                         document.querySelector(`[label="${localStorage.getItem('lastSelectedLabelId')}"]`).scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
-                    }, 100);
+                    }, 200);
                 }
             }
         }
@@ -802,6 +834,15 @@ function showAllNotes() {
 }
 
 function showWaterMarkONfilter(){
+        displayWaterMark()
+
+    const IFnotes = JSON.parse(localStorage.getItem('notes')) || [];
+
+    const activeNotes = IFnotes.filter(note => !note.binNote);
+
+    if (activeNotes.length <= 0) {
+        return
+    }
 
     const noteTilesHiddenAll = document.querySelectorAll('noteTileWrap');
 
@@ -983,6 +1024,10 @@ function restoreSelectedNote(){
     document.querySelector('.saved-notesPinned').style.padding = '';
     document.getElementById('binNotesList').style.height = '0'
     document.getElementById('binNotesList').style.pointerEvents = 'none'
+
+       window.dispatchEvent(new CustomEvent('localNotesUpdated', {
+        detail: { key: 'notes', newValue: notes }
+    }));
 }
 
 function restoreSingleNote(dataAll){
@@ -1009,6 +1054,10 @@ function restoreSingleNote(dataAll){
     document.querySelector('.saved-notesPinned').style.padding = '';
     document.getElementById('binNotesList').style.height = '0'
     document.getElementById('binNotesList').style.pointerEvents = 'none'
+
+       window.dispatchEvent(new CustomEvent('localNotesUpdated', {
+        detail: { key: 'notes', newValue: notes }
+    }));
 }
 
 function clearBin() {
@@ -1124,4 +1173,44 @@ function cleanUnusedImagesFromIndexedDB() {
     request.onerror = function(event) {
         console.error('Error opening IndexedDB:', event);
     };
+}
+
+
+window.addEventListener('storage', (event) =>{
+    if(event.key === "notes"){
+        if(localStorage.getItem('AutoBackup') && localStorage.getItem('AutoBackup') === "true"){
+            saveBackup();
+        }
+    }
+})
+
+let debounceTimerSaveBackup;
+
+function saveBackup() {
+    clearTimeout(debounceTimerSaveBackup);
+
+    debounceTimerSaveBackup = setTimeout(() => {
+        const notesData = localStorage.getItem("notes");
+
+        if (notesData) {
+            AndroidSaved.sendNotesData(notesData);
+        }
+    }, 3000);
+}
+
+
+window.addEventListener('localNotesUpdated', (event) => {
+   if(event.detail.key === "notes"){
+    if(localStorage.getItem('AutoBackup') && localStorage.getItem('AutoBackup') === "true"){
+        saveBackup();
+    }
+    }
+});
+
+function setFolderInStorage(data){
+    localStorage.setItem('selectedBackupsFolder', data);
+}
+
+function removeFolderInStorage(data){
+    localStorage.removeItem('selectedBackupsFolder');
 }
