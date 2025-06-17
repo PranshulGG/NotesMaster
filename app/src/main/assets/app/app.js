@@ -136,6 +136,10 @@ function createNoteTile(){
         localStorage.setItem('notes', JSON.stringify(notes));
         displayWaterMark()
 
+        const savedFragment = document.createDocumentFragment();
+        const pinnedFragment = document.createDocumentFragment();
+        const binFragment = document.createDocumentFragment();
+
         notes.forEach((note, index) => {
             const noteTile = document.createElement('noteTileWrap');
               noteTile.setAttribute('noteID', note.noteID)
@@ -201,14 +205,17 @@ function createNoteTile(){
 
 
                 if (note.pinned) {
-                    pinnedNotesList.appendChild(noteTile);
+                    pinnedFragment.appendChild(noteTile);
                 } else if (note.binNote){
-                    document.getElementById('binNotesList').appendChild(noteTile)
+                    binFragment.appendChild(noteTile)
                     checkIfTimeExceeded()
                     console.log('started')
                 } else {
-                    savedNotesList.appendChild(noteTile);
+                    savedFragment.appendChild(noteTile);
                 }
+
+
+        });
 
                 if(notes.filter(note => note.pinned).length < 1 ){
                     document.querySelector('.saved-notesPinned').hidden = true;
@@ -228,9 +235,10 @@ function createNoteTile(){
                         }
                     });
                 }, 500);
-        });
 
-
+                            savedNotesList.appendChild(savedFragment);
+                    pinnedNotesList.appendChild(pinnedFragment);
+                    binNotesList.appendChild(binFragment);
      document.querySelectorAll('md-filter-chip').forEach(chip => {
             chip.removeAttribute('selected');
         });
@@ -1204,7 +1212,7 @@ window.addEventListener('localNotesUpdated', (event) => {
     if(localStorage.getItem('AutoBackup') && localStorage.getItem('AutoBackup') === "true"){
         saveBackup();
     }
-    }
+   }
 });
 
 function setFolderInStorage(data){
