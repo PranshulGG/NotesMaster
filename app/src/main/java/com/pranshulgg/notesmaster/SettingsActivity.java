@@ -96,6 +96,8 @@ public class SettingsActivity extends AppCompatActivity {
         webview.getSettings().setAllowContentAccess(true);
         webview.getSettings().setDomStorageEnabled(true);
         webview.setWebViewClient(new WebViewClientDemo());
+        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+
         AndroidInterface androidInterface = new AndroidInterface(this);
         webview.addJavascriptInterface(androidInterface, "AndroidInterface");
         webview.addJavascriptInterface(new NavigateActivityInterface(this), "OpenActivityInterface");
