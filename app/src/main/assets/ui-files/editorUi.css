@@ -1,16 +1,31 @@
 
 .bottom_tool_bar {
-    height: 65px;    
-    position: absolute;
+    /* height: 65px;     */
+    position: fixed;
     bottom: 0;
     background-color: var(--Surface-Container);
-    width: 100%;
+    width: calc(100% - 32px - 0px);
     display: flex;
     align-items: center;
     gap: 10px;
     overflow: auto;
+    margin: 16px;
+    border-radius: 50px;
+    padding: 10px 0;
+    animation: bottom_tool_bar 0.5s cubic-bezier(1,0,0,1);
+    transition: transform 0.5s cubic-bezier(1,0,0,1), opacity 0.5s cubic-bezier(1,0,0,1);
 }
 
+@keyframes bottom_tool_bar{
+    0%{
+        opacity: 0;
+        transform: translateY(100%);
+    }
+    100%{
+        opacity: 1;
+        transform: translateY(0%);
+    }
+}
 
 .bottom_tool_bar .format_item input{
     display: none;    
