@@ -1,3 +1,5 @@
+let shouldRunCreateNoteTile = false;
+
 function handleStorageChange(event) {
     switch (event.key) {
         case 'useDarkTheme':
@@ -19,7 +21,11 @@ function handleStorageChange(event) {
             case 'notes':
             case 'onlyShowTitle':
             case 'noteLabels':
-                createNoteTile()
+                if (document.visibilityState === 'visible') {
+                    createNoteTile();
+                } else {
+                    shouldRunCreateNoteTile = true;
+                }
                 break;
             case 'SelectedAPPfont':
                 applyAppFont()
@@ -56,3 +62,10 @@ function handleStorageChange(event) {
  }
 
 window.addEventListener('storage', handleStorageChange);
+
+document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible' && shouldRunCreateNoteTile) {
+        createNoteTile();
+        shouldRunCreateNoteTile = false;
+    }
+});
