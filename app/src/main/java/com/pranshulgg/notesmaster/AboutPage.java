@@ -75,6 +75,7 @@ public class AboutPage extends AppCompatActivity {
         webview.addJavascriptInterface(new BackActivityInterface(this), "BackActivityInterface");
         webview.addJavascriptInterface(new ShowSnackInterface(this), "ShowSnackMessage");
         webview.addJavascriptInterface(new AndroidFunctionActivityInterface(this), "AndroidFunctionActivityInterface");
+        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
 
         webview.loadUrl("file:///android_asset/pages/aboutPage.html");
 
