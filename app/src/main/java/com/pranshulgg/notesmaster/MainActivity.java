@@ -105,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
         webview.addJavascriptInterface(new ShowSnackInterface(this), "ShowSnackMessage");
         webview.addJavascriptInterface(new AndroidFunctionActivityInterface(this), "AndroidFunctionActivityInterface");
         webview.addJavascriptInterface(new WebAppInterface(this, this), "AndroidSaved");
+        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
 
         if (savedInstanceState != null) {
             webview.restoreState(savedInstanceState);
@@ -232,6 +233,8 @@ public class MainActivity extends AppCompatActivity {
                 | Intent.FLAG_GRANT_PREFIX_URI_PERMISSION);
         startActivityForResult(intent, REQUEST_CODE_PICK_FOLDER);
     }
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
