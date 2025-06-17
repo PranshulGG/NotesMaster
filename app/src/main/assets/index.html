@@ -132,9 +132,7 @@
         <div class="saved-notes">
             <p style="color: var(--Primary); font-family: var(--google-mid); margin-top: 0; font-size: 18px; margin-bottom: 10px;" id="textheadingNotes">Notes</p>
             <div id="savedNotesList">
-                <empty_note style="display: flex ; align-items: center; justify-content: center; width: 100%; position: fixed; left: 0; height: 100%; top: 0; background-color: var(--Surface);">
-                    <md-circular-progress indeterminate></md-circular-progress>
-                </empty_note>
+
 
             </div>
             <div id="binNotesList" style="height: 0; overflow: hidden;"></div>
@@ -143,6 +141,9 @@
                 <p>Empty bin</p>
             </water_mark_bin>
         </div>
+            <empty_note style="display: flex ; align-items: center; justify-content: center; width: 100%; position: fixed; left: 0; height: 100%; top: 0; background-color: var(--Surface); z-index: 4;">
+                <md-circular-progress indeterminate></md-circular-progress>
+            </empty_note>
         </div>
 
     <div class="water_mark" hidden>
