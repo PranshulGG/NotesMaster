@@ -72,6 +72,7 @@ public class LabelsActivity extends AppCompatActivity {
         webview.addJavascriptInterface(new NavigateActivityInterface(this), "OpenActivityInterface");
         webview.addJavascriptInterface(new BackActivityInterface(this), "BackActivityInterface");
         webview.addJavascriptInterface(new AndroidFunctionActivityInterface(this), "AndroidFunctionActivityInterface");
+        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
 
         webview.loadUrl("file:///android_asset/pages/LabelsPage.html");
         webview.setWebChromeClient(new WebChromeClient() {
