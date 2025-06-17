@@ -89,6 +89,7 @@ public class NoteView extends AppCompatActivity {
         webview.addJavascriptInterface(new ShowSnackInterface(this), "ShowSnackMessage");
         webview.addJavascriptInterface(new WebAppInterfaceShare(), "Android");
         webview.addJavascriptInterface(new AndroidFunctionActivityInterface(this), "AndroidFunctionActivityInterface");
+        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
 
         webview.loadUrl("file:///android_asset/pages/note-editor.html");
 
