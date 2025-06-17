@@ -3,6 +3,7 @@ const Search_notes_inputWrapper = document.getElementById('Search_notes_input_wr
 
 let debounceSearchTimer
 let debounceSearchBackTimer
+let onLoadElements = false;
 
 Search_notes_inputWrapper.addEventListener('click', () =>{
     if(document.querySelector('.search_container_screen').hidden){
@@ -103,9 +104,12 @@ window.addEventListener("popstate", function (event) {
 let hiddenNote = '';
 let hiddenNoteMargin = '';
 let isImportant = '';
+let debounceCheckbox
+let debounceListeners
 
 function createNoteTile(){
-    setTimeout(() =>{
+    clearTimeout(debounceListeners)
+    debounceListeners = setTimeout(() =>{
         loadCheckboxListeners()
         disableEnableDeleteBtn()
     }, 200);
@@ -122,9 +126,11 @@ function createNoteTile(){
         }
         const savedNotesList = document.getElementById('savedNotesList');
         const pinnedNotesList = document.getElementById('pinnedNotesList');
-        savedNotesList.innerHTML = '';
-        pinnedNotesList.innerHTML = '';
-        document.getElementById('binNotesList').innerHTML =  ''
+
+    while (savedNotesList.firstChild) savedNotesList.removeChild(savedNotesList.firstChild);
+    while (pinnedNotesList.firstChild) pinnedNotesList.removeChild(pinnedNotesList.firstChild);
+    const binList = document.getElementById('binNotesList');
+    while (binList.firstChild) binList.removeChild(binList.firstChild);
 
         let notes = JSON.parse(localStorage.getItem('notes')) || [];
         notes = notes.filter(note => {
@@ -223,7 +229,9 @@ function createNoteTile(){
                     document.querySelector('.saved-notesPinned').hidden = false;
                 }
 
-                setTimeout(() => {
+
+                clearTimeout(debounceCheckbox)
+               debounceCheckbox = setTimeout(() => {
                     document.querySelectorAll('md-checkbox').forEach(mdCheckbox => {
                         if (mdCheckbox.shadowRoot) {
                             const checkbox = mdCheckbox.shadowRoot.querySelector('input[type="checkbox"]');
@@ -242,7 +250,10 @@ function createNoteTile(){
      document.querySelectorAll('md-filter-chip').forEach(chip => {
             chip.removeAttribute('selected');
         });
+        if(!onLoadElements){
         createLabels()
+        onLoadElements = true
+        }
         hideLockedLabelNotes()
         cleanUnusedImagesFromIndexedDB()
 
@@ -601,6 +612,7 @@ document.getElementById('restoreNoteAlert').addEventListener('closed', () =>{
 // labels
 
 let selectedLabelLocked = null
+let labelWasSelected = false
 
 function createLabels(){
 if (JSON.parse(localStorage.getItem('notesLabels')) || !JSON.parse(localStorage.getItem('notesLabels'))) {
@@ -734,7 +746,9 @@ if (JSON.parse(localStorage.getItem('notesLabels')) || !JSON.parse(localStorage.
 
         label_holder.appendChild(label_item);
     });
+    if(!labelWasSelected){
     selectRememberedLabel()
+    }
 
     function selectRememberedLabel(){
         if(localStorage.getItem('RememberLastLabelS') && localStorage.getItem('RememberLastLabelS') === 'true'){
@@ -745,9 +759,13 @@ if (JSON.parse(localStorage.getItem('notesLabels')) || !JSON.parse(localStorage.
                     }, 100);
                     setTimeout(() => {
                         document.querySelector(`[label="${localStorage.getItem('lastSelectedLabelId')}"]`).scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+                        labelWasSelected = true
+                        document.querySelector('empty_note')?.remove()
                     }, 200);
                 }
             }
+        } else{
+            document.querySelector('empty_note')?.remove()
         }
     }
 }
