@@ -20,12 +20,14 @@ function handleStorageChange(event) {
             break;
             case 'notes':
             case 'onlyShowTitle':
-            case 'noteLabels':
                 if (document.visibilityState === 'visible') {
                     createNoteTile();
                 } else {
                     shouldRunCreateNoteTile = true;
                 }
+                break;
+            case 'noteLabels':
+                createLabels()
                 break;
             case 'SelectedAPPfont':
                 applyAppFont()
