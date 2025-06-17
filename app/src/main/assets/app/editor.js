@@ -1,4 +1,5 @@
 let openedNoteId = null;
+let debounceToolBarTimer
 
 const imageDBName = "NoteImagesDB";
 const imageStoreName = "images";
@@ -29,7 +30,8 @@ function debounceNoteSave(func, delay) {
     }
 }
 
-const debouncedSaveNote = debounceNoteSave(saveNote, 300)
+const debouncedSaveNoteEditor = debounceNoteSave(saveNote, 300);
+const debouncedSaveNoteTitle = debounceNoteSave(saveNote, 300);
 
 
 document.getElementById('editor').addEventListener('input', () =>{
@@ -46,10 +48,10 @@ document.getElementById('editor').addEventListener('input', () =>{
         document.getElementById('horizontal_rule_btn').style.opacity = '';
         document.getElementById('horizontal_rule_btn').style.pointerEvents = '';
        }
-        debouncedSaveNote();
+        debouncedSaveNoteEditor();
 });
 
-document.getElementById('noteTitle').addEventListener('input', debouncedSaveNote)
+document.getElementById('noteTitle').addEventListener('input', debouncedSaveNoteTitle)
 
 function saveNote() {
     const title = document.getElementById('noteTitle').innerHTML.trim();
@@ -211,6 +213,9 @@ if(localStorage.getItem('clickedNote')){
             document.getElementById('shareContentMenuOption').disabled = true
             document.getElementById('ClearNoteContentMenuOption').disabled = true;
         }
+
+    document.querySelector('.bottom_tool_bar').hidden = false
+
 }
 
 
@@ -342,7 +347,7 @@ document.getElementById('openInsertLinkDialog').addEventListener('click', () =>{
     document.getElementById('linkTitleInput').value = ''
     document.getElementById('insertLinkDialog').show();
     window.history.pushState({ InsertLinkDialogOpen: true }, "");
-    sendThemeToAndroid(colorsDialogsOpenContainer()[GetDialogOverlayContainerColor()], colorsDialogsOpenContainer()[GetDialogOverlayContainerColor()], '0', '225');
+    sendThemeToAndroid(colorsDialogsOpenContainer()[GetDialogOverlayContainerColor()], colorsDialogsOpenSurface()[GetDialogOverlayContainerColor()], '0', '225');
 });
 
 document.getElementById('linkURLInput').addEventListener('input', () =>{
@@ -376,7 +381,7 @@ document.getElementById('insertLinkDialog').addEventListener('closed', () =>{
 })
 
 document.getElementById('insertLinkDialog').addEventListener('close', () =>{
-    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), Themeflag, '210');
+    sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '210');
 })
 
 function addLinkIfAdded(){
@@ -408,23 +413,33 @@ function addLinkIfAdded(){
 
 
 function toggleView() {
+    clearTimeout(debounceToolBarTimer)
+
     const editor = document.getElementById('editor');
     const viewButton = document.querySelector('.view-btn');
 
     if(viewButton.selected){
+        document.querySelector('.bottom_tool_bar').style.transform = 'translateY(100%)';
+        document.querySelector('.bottom_tool_bar').style.opacity = '0';
         editor.contentEditable = 'false';
         document.getElementById('noteTitle').contentEditable = 'false';
-        document.querySelector('.bottom_tool_bar').hidden = true
-        document.querySelector('.full-activity-content').style.height = 'calc(100% - 65px - 0px - 20px)'
+       document.querySelector('.full-activity-content').style.height = 'calc(100% - 65px - 20px - 0px)'
+       document.querySelector('.full-activity-content').style.paddingBottom = '20px'
         document.getElementById('undo_btn_toggle').hidden = true;
         document.getElementById('redo_btn_toggle').hidden = true;
         document.getElementById('ClearNoteContentMenuOption').disabled = true;
-
+        debounceToolBarTimer = setTimeout(() =>{
+        document.querySelector('.bottom_tool_bar').hidden = true
+        }, 500);
     } else{
+
+        document.querySelector('.bottom_tool_bar').style.transform = '';
+        document.querySelector('.bottom_tool_bar').style.opacity = '';
         editor.contentEditable = 'true';
         document.getElementById('noteTitle').contentEditable = 'true';
         document.querySelector('.bottom_tool_bar').hidden = false
-        document.querySelector('.full-activity-content').style.height = 'calc(100% - 65px - 65px - 20px)'
+       document.querySelector('.full-activity-content').style.height = 'calc(100% - 65px - 100px - 0px)'
+       document.querySelector('.full-activity-content').style.paddingBottom = '100px'
         document.getElementById('undo_btn_toggle').hidden = false;
         document.getElementById('redo_btn_toggle').hidden = false;
         if(document.getElementById('noteTitle').innerHTML.trim() !== "" && document.getElementById('editor').innerHTML.trim() !== ""){
@@ -432,26 +447,6 @@ function toggleView() {
         }
     }
 
-}
-
-function changeNavStatusConfig(){
-    const viewButton = document.querySelector('.view-btn');
-
-    if(viewButton.selected){
-        if(localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') === 'true'){
-            sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '0')
-        } else{
-            sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '1')
-        }
-
-    } else{
-        if(localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') === 'true'){
-            sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), '0')
-        } else{
-            sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), '1')
-        }
-
-    }
 }
 
 
@@ -664,11 +659,7 @@ const existingSheet = document.getElementById('imageSizeSheet');
 
 
 document.getElementById("imageSizeSheet").addEventListener("closing", () => {
-    if(document.querySelector('.view-btn').selected){
         sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), Themeflag, '200')
-        } else{
-        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), Themeflag, '200')
-        }
   });
 
   document.getElementById("imageSizeSheet").addEventListener("closed", () => {
@@ -795,3 +786,16 @@ document.getElementById('fileInput').addEventListener('change', async (event) =>
 document.getElementById('openInsertTableSheet').addEventListener('click', () =>{
     openImageSizeDialog('table')
 })
+
+function scrollToBottom() {
+  const container = document.querySelector('.full-activity-content');
+  const scrollThreshold = 80;
+
+  const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+
+  if (distanceFromBottom <= scrollThreshold) {
+    container.scrollTop = container.scrollHeight;
+  }
+}
+
+editor.addEventListener('input', scrollToBottom);
