@@ -17,19 +17,11 @@
         themeConfig(localStorage.getItem('materialThemeColorSource') || '#aac7ff')
     setTimeout(()=>{
         if(localStorage.getItem('useDarkTheme') && localStorage.getItem('useDarkTheme') === 'true'){
-        if(localStorage.getItem('clickedNote')){
         sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '0')
-        } else{
-        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), '0')
-        }
         AndroidFunctionActivityInterface.androidFunction('hideSurfaceOverlay');
 
     } else{
-        if(localStorage.getItem('clickedNote')){
         sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface'), '1')
-        } else{
-        sendThemeToAndroid(getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), getComputedStyle(document.documentElement).getPropertyValue('--Surface-Container'), '1')
-        }
         AndroidFunctionActivityInterface.androidFunction('hideSurfaceOverlay');
     }
     },80);
@@ -54,7 +46,7 @@
             <md-icon-button onclick="redo()" id="redo_btn_toggle">
                 <md-icon icon-outlined>redo</md-icon>
             </md-icon-button>
-            <md-icon-button onclick="toggleView(); changeNavStatusConfig()" toggle class="view-btn" >
+            <md-icon-button onclick="toggleView();" toggle class="view-btn" >
                 <md-icon icon-outlined slot="selected">edit</md-icon>
                 <md-icon icon-outlined>visibility</md-icon>
             </md-icon-button>
@@ -96,7 +88,7 @@
                 anchorElNoteOptions.addEventListener('click', () => { menuElNoteOptions.open = !menuElNoteOptions.open; });
               </script>
         </div>
-        <div class="full-activity-content full-activity-content-note_editor" id="Content" style="height: calc(100% - 65px - 65px - 20px); top: 65px; width: calc(100% - 32px); padding: 0 16px 0 16px; padding-bottom: 20px;">
+        <div class="full-activity-content full-activity-content-note_editor" id="Content" style="height: calc(100% - 65px - 20px - 0px); top: 65px; width: calc(100% - 32px); padding: 0 16px 0 16px; padding-bottom: 20px;">
 
             <div class="editor">
                 <div id="added_note_labels" hidden>
@@ -164,7 +156,7 @@
         <id hidden></id>
 
 
-        <div class="bottom_tool_bar">
+        <div class="bottom_tool_bar" hidden>
             <div class="format_item">
                 <input type="checkbox" id="bold_checkbox" onchange="toggleFormat('bold')">
                 <label for="bold_checkbox"><md-icon icon-outlined>format_bold</md-icon></label>
